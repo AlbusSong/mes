@@ -1,6 +1,6 @@
-import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:mes/Home/HomePage.dart';
 
 class MyToast {
   // 单例公开访问点
@@ -23,7 +23,7 @@ class MyToast {
   void _initSomeThings() {}
 
   int milliSecondsBeforeDissmissed = 1500;
-  BuildContext context;
+
   ToastController _toastControl = ToastController(1500);
 
   static showMessage(String status) {
@@ -32,7 +32,7 @@ class MyToast {
 
   static showMessageWithLivingPeriod(
       String status, int milliSecondsBeforeDissmissed) {
-    var overlayState = Overlay.of(MyToast().context);
+    var overlayState = Overlay.of(HomePage.appContext);
     OverlayEntry overlayEntry;
     overlayEntry = new OverlayEntry(builder: (ctx) {
       return buildMessageToastLayout(status);
@@ -47,7 +47,7 @@ class MyToast {
   }
 
   static show() {
-    var overlayState = Overlay.of(MyToast().context);
+    var overlayState = Overlay.of(HomePage.appContext);
     OverlayEntry overlayEntry;
     overlayEntry = new OverlayEntry(builder: (ctx) {
       return buildProgressHUDLayout();
@@ -105,7 +105,7 @@ class MyToast {
             child: Container(
               child: Container(
                 child: Text(
-                  "${status}",
+                  "$status",
                   style: TextStyle(color: Colors.white, fontSize: 15),
                 ),
                 decoration: BoxDecoration(

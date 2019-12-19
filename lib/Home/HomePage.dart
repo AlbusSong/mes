@@ -5,9 +5,10 @@ import 'HomeMenu.dart';
 import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Login/LoginPage.dart';
-import 'package:mes/Others/Tool/MyToast.dart';
 
 class HomePage extends StatelessWidget {
+  static BuildContext appContext;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   // HomePage({Key key, this.title}) : super(key: key);
   bool _isLoginInfoRefreshed = false;
@@ -27,7 +28,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MyToast().context = context;
+    // MyToast().context = context;
+    appContext = context;
     Scaffold scf = Scaffold(
       key: _scaffoldKey,
       backgroundColor: hexColor("f0eff5"),
