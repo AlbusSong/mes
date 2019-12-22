@@ -3,6 +3,7 @@ import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
+import '../../Others/View/MESConntenInputWidget.dart';
 
 class MoldInPage extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class MoldInPage extends StatefulWidget {
 class _MoldInPageState extends State<MoldInPage> {
 
   final SearchBarWithFunction _sBar = SearchBarWithFunction(hintText: "模具编码",);
+  String content;
 
   @override
   void initState() {
@@ -72,8 +74,17 @@ class _MoldInPageState extends State<MoldInPage> {
         _buildSelectionItem(2),
         _buildSelectionItem(3),
         _buildSelectionItem(4),
+        _buildContentInputItem(),
       ],
     );
+  }
+
+  Widget _buildContentInputItem() {
+    void Function (String) contentChangedBlock = (String newContent) {
+      // print("contentChangedBlock: $newContent");
+      this.content = newContent;
+    };
+    return MESConntenInputWidget(placeholder: "备注", contentChangedBlock: contentChangedBlock,);
   }
 
   Widget _buildSelectionItem(int index) {
