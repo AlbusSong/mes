@@ -13,15 +13,28 @@ class MESSelectionItemWidget extends StatefulWidget {
     }
   );
 
+  void setEnabled(bool e) {
+    this.enabled = e;
+    _theState.setEnabled(e);
+  }
+
+  void setSelected(bool s) {
+    this.selected = s;
+    _theState.setSelected(s);
+  }
+
   bool enabled;
   String title;
   String content;
   bool selected;
   void Function () selectionBlock;
 
+  _MESSelectionItemWidgetState _theState;
+
   @override
   State<StatefulWidget> createState() {
-    return _MESSelectionItemWidgetState(enabled: this.enabled, title: this.title, content: this.content, selected: this.selected, selectionBlock: this.selectionBlock);
+    _theState = _MESSelectionItemWidgetState(enabled: this.enabled, title: this.title, content: this.content, selected: this.selected, selectionBlock: this.selectionBlock);
+    return _theState;
   }
 }
 
@@ -35,6 +48,18 @@ class _MESSelectionItemWidgetState extends State<MESSelectionItemWidget> {
       this.selectionBlock,
     }
   );
+
+  void setEnabled(bool e) {
+    setState(() {
+      this.enabled = e;
+    });
+  }
+
+  void setSelected(bool s) {
+    setState(() {
+      this.selected = s;
+    });
+  }
 
   bool enabled;
   String title;

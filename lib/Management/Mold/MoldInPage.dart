@@ -16,6 +16,8 @@ class _MoldInPageState extends State<MoldInPage> {
 
   final SearchBarWithFunction _sBar = SearchBarWithFunction(hintText: "模具编码",);
   String content;
+  final List<MESSelectionItemWidget> selectionItemList = List();
+  int selectedIndex = -1;
 
   @override
   void initState() {
@@ -24,6 +26,10 @@ class _MoldInPageState extends State<MoldInPage> {
     _sBar.functionBlock = () {
       print("functionBlock");
     };
+
+    for (int i = 0; i < 5; i++) {
+      this.selectionItemList.add(_buildSelectionItem(i));
+    }
   }
 
   @override
@@ -66,16 +72,14 @@ class _MoldInPageState extends State<MoldInPage> {
   }
 
   Widget _buildListView() {
+    List<Widget> children = List();
+    for (int i = 0; i < this.selectionItemList.length; i++) {
+      children.add(this.selectionItemList[i]);
+    }
+    children.add(_buildContentInputItem());
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      children: <Widget>[
-        _buildSelectionItem(0),
-        _buildSelectionItem(1),
-        _buildSelectionItem(2),
-        _buildSelectionItem(3),
-        _buildSelectionItem(4),
-        _buildContentInputItem(),
-      ],
+      children: children,
     );
   }
 
@@ -112,12 +116,17 @@ class _MoldInPageState extends State<MoldInPage> {
       _hasSelectedItem(index);
     };
 
-    MESSelectionItemWidget item = MESSelectionItemWidget(enabled: enabled, title: title, selectionBlock: selectionBlock,);
+    MESSelectionItemWidget item = MESSelectionItemWidget(enabled: enabled, title: title, selected: false, selectionBlock: selectionBlock,);
     return item;
   }
 
   void _hasSelectedItem(int index) {
     print("_hasSelectedItem: $index");
+    this.selectedIndex = index;
+    for (int i = 0; i < this.selectionItemList.length; i++) {
+       MESSelectionItemWidget wgt = this.selectionItemList[index];
+       wgt.setSelected((this.selectedIndex == i));
+    }
   }
 
   void _btnConfirmClicked() {

@@ -52,12 +52,12 @@ class MoldPage extends StatelessWidget {
   }
 
   void _functionItemClickedAtIndex(int index) {
-
+    Widget w;
     if (index == 0) {
-
+      w = MoldInPage();
     }
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-              builder: (BuildContext context) => MoldInPage()));
+              builder: (BuildContext context) => w));
   }
   
   Widget _buildGridView() {
