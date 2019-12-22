@@ -49,6 +49,7 @@ flutter:
    - Others/Images/故障报修-下三角.png
    - Others/Images/Login-Background.jpg
    - Others/Images/home_menu_user_portrait_icon.png
+   - Others/Images/scan_barcode_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

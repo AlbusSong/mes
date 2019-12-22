@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 
+import 'MoldInPage.dart';
+
 class MoldPage extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   final List<Map> functionItemDataArray = [
     {"title": "模具入库", "icon": "", "badgeValue": 0},
     {"title": "模具出库", "icon": "", "badgeValue": 0},
@@ -19,6 +23,7 @@ class MoldPage extends StatelessWidget {
   Widget build(BuildContext context) {
     _initSomeThings();
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("设备管理(EES)"),
@@ -47,7 +52,12 @@ class MoldPage extends StatelessWidget {
   }
 
   void _functionItemClickedAtIndex(int index) {
-    
+
+    if (index == 0) {
+
+    }
+    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
+              builder: (BuildContext context) => MoldInPage()));
   }
   
   Widget _buildGridView() {
