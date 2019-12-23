@@ -6,6 +6,7 @@ import 'MoldInPage.dart';
 import 'MoldOutPage.dart';
 import 'MoldLockPage.dart';
 import 'MoldUnlockPage.dart';
+import 'MoldMaintenanceAppllicationPage.dart';
 
 class MoldPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -64,6 +65,8 @@ class MoldPage extends StatelessWidget {
       w = MoldLockPage();
     } else if (index == 3) {
       w = MoldUnlockPage();
+    } else if (index == 4) {
+      w = MoldMaintenanceAppllicationPage();
     }
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
               builder: (BuildContext context) => w));
