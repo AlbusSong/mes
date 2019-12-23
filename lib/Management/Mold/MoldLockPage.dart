@@ -3,15 +3,16 @@ import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
+import '../../Others/View/MESConntenInputWidget.dart';
 
-class MoldOutPage extends StatefulWidget {
+class MoldLockPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _MoldOutPageState();  
+    return _MoldLockPageState();  
   }
 }
 
-class _MoldOutPageState extends State<MoldOutPage> {
+class _MoldLockPageState extends State<MoldLockPage> {
 
   final SearchBarWithFunction _sBar = SearchBarWithFunction(hintText: "模具编码",);
   String content;
@@ -36,7 +37,7 @@ class _MoldOutPageState extends State<MoldOutPage> {
     return Scaffold(
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("模具出库"),
+        title: Text("模具锁定"),
         centerTitle: true,
       ),
       body: _buildBody(),
@@ -60,7 +61,7 @@ class _MoldOutPageState extends State<MoldOutPage> {
             child: FlatButton(
               textColor: Colors.white,
               color: hexColor(MAIN_COLOR),
-              child: Text("出库"),
+              child: Text("锁定"),
               onPressed: () {
                 _btnConfirmClicked();
               },
@@ -71,10 +72,23 @@ class _MoldOutPageState extends State<MoldOutPage> {
   }
 
   Widget _buildListView() {
+    List<Widget> children = List();
+    for (int i = 0; i < this.selectionItemList.length; i++) {
+      children.add(this.selectionItemList[i]);
+    }
+    children.add(_buildContentInputItem());
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      children: this.selectionItemList,
+      children: children,
     );
+  }
+
+  Widget _buildContentInputItem() {
+    void Function (String) contentChangedBlock = (String newContent) {
+      // print("contentChangedBlock: $newContent");
+      this.content = newContent;
+    };
+    return MESConntenInputWidget(placeholder: "备注", contentChangedBlock: contentChangedBlock,);
   }
 
   Widget _buildSelectionItem(int index) {
@@ -94,8 +108,8 @@ class _MoldOutPageState extends State<MoldOutPage> {
       enabled = false;
       title = "锁定状态";
     } else if (index == 4) {
-      enabled = false;
-      title = "出入库状态";
+      enabled = true;
+      title = "锁定代码";
     }
 
     void Function () selectionBlock = () {

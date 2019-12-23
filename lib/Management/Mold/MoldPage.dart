@@ -4,6 +4,7 @@ import '../../Others/View/MESSquareItemWidget.dart';
 
 import 'MoldInPage.dart';
 import 'MoldOutPage.dart';
+import 'MoldLockPage.dart';
 
 class MoldPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -58,6 +59,8 @@ class MoldPage extends StatelessWidget {
       w = MoldInPage();
     } else if (index == 1) {
       w = MoldOutPage();
+    } else if (index == 2) {
+      w = MoldLockPage();
     }
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
               builder: (BuildContext context) => w));

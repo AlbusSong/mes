@@ -111,7 +111,7 @@ class _MESSelectionItemWidgetState extends State<MESSelectionItemWidget> {
                     child: Image(
                       width: 10,
                       height: 10,
-                      image: AssetImage("Others/Images/故障报修-下三角.png"),
+                      image: AssetImage("Others/Images/downward_triangle.png"),
                     ),
                   ),
                 ),
