@@ -5,6 +5,7 @@ import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import 'package:mes/Login/LoginPage.dart';
 import '../Management/Mold/MoldPage.dart';
+import '../Management/ProductLine/ProductLinePage.dart';
 
 class HomeMenu extends StatefulWidget {
   HomeMenu({Key key}) : super(key: key);
@@ -66,6 +67,11 @@ class _HomeMenuState extends State<HomeMenu> {
       // Navigator.of(context).pop();
       // Navigator.of(context).push(MaterialPageRoute(
       //     builder: (BuildContext context) => HomeFunctionModules()));
+    } else if (index == 2) {
+
+    } else if (index == 3) {
+      Navigator.of(context).pop();
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => ProductLinePage()));
     } else if (index == 5) {
       Navigator.of(context).pop();
       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => MoldPage()));
