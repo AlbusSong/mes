@@ -3,6 +3,7 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
 import 'MoldInPage.dart';
+import 'MoldOutPage.dart';
 
 class MoldPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -55,6 +56,8 @@ class MoldPage extends StatelessWidget {
     Widget w;
     if (index == 0) {
       w = MoldInPage();
+    } else if (index == 1) {
+      w = MoldOutPage();
     }
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
               builder: (BuildContext context) => w));
