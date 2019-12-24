@@ -25,6 +25,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   ];
   List<Widget> bottomFunctionWidgetList = List();
 
+  final List<bool> expansionList = [false, false, false];
+
   @override
   void initState() {
     super.initState();
@@ -135,24 +137,31 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
       physics: const AlwaysScrollableScrollPhysics(),
       children: <Widget>[
         _buildHeader(),
-        _buildSummaryCellItem(),
-        _buildDetailCellItem(),
-        _buildSummaryCellItem(),
-        _buildDetailCellItem(),
-        _buildSummaryCellItem(),
-        _buildDetailCellItem(),
+        _buildSummaryCellItem(0),
+        _buildDetailCellItem(shouldExpand: expansionList[0]),
+        _buildSummaryCellItem(1),
+        _buildDetailCellItem(shouldExpand: expansionList[1]),
+        _buildSummaryCellItem(2),
+        _buildDetailCellItem(shouldExpand: expansionList[2]),
       ],
     );
   }
 
-  Widget _buildDetailCellItem() {
-    return Container(
-      height: 1,
-    );
+  Widget _buildDetailCellItem({bool shouldExpand = false}) {
+    if (shouldExpand) {
+      return Container(
+        height: 300,
+        color: randomColor(),
+      );
+    } else {
+      return Container(
+        height: 1,
+      );
+    }
   }
 
-  Widget _buildSummaryCellItem() {
-    double progress = randomIntUntil(100)/100.0;
+  Widget _buildSummaryCellItem(int index) {
+    double progress = randomIntUntil(100) / 100.0;
 
     return Container(
       color: Colors.white,
@@ -202,12 +211,16 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                         ),
                         GestureDetector(
                           child: Icon(
-                            Icons.more_horiz,
+                            this.expansionList[index] == false ? Icons.more_horiz : Icons.expand_less,
                             color: hexColor(MAIN_COLOR),
                             size: 20,
                           ),
                           onTap: () {
-                            print("more_horiz");
+                            print("more_horiz");                            
+                            setState(() {
+
+                              this.expansionList[index] = !this.expansionList[index];
+                            });
                           },
                         ),
                       ],
@@ -218,33 +231,26 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                     child: Stack(
                       children: <Widget>[
                         Container(
-                      height: 16,
-                      child: LinearProgressIndicator(
-                        backgroundColor: hexColor("eeeeee"),
-                        valueColor:
-                            AlwaysStoppedAnimation(hexColor(MAIN_COLOR)),
-                        value: progress,
-                      ),
-                    ),
-                    Positioned(
-                      top: 2,
-                      right: 0,                      
-                      child: Text(
-                        "${progress*100}%",
-                        style: TextStyle(color: hexColor("999999"), fontSize: 11),                       
-                      ),
-                    ),
+                          height: 16,
+                          child: LinearProgressIndicator(
+                            backgroundColor: hexColor("eeeeee"),
+                            valueColor:
+                                AlwaysStoppedAnimation(hexColor(MAIN_COLOR)),
+                            value: progress,
+                          ),
+                        ),
+                        Positioned(
+                          top: 2,
+                          right: 0,
+                          child: Text(
+                            "${progress * 100}%",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 11),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  // Container(
-                  //   height: 16,
-                  //   decoration: BoxDecoration(
-                  //     color: hexColor("ffffff"),
-                  //     border: Border.all(width: 1, color: hexColor("dddddd")),
-                  //     borderRadius: BorderRadius.all(Radius.circular(8)),
-                  //   ),
-                  // ),
                 ],
               ),
             ),
