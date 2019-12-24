@@ -4,10 +4,14 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
-import 'package:mes/Login/LoginPage.dart';
+
+import '../Login/LoginPage.dart';
 import '../Management/Mold/MoldPage.dart';
 import '../Management/ProductLine/ProductLinePage.dart';
 import '../Management/Plan/PlanPage.dart';
+import '../Management/Project/ProjectPage.dart';
+import '../Management/Quality/QualityPage.dart';
+
 
 class HomeMenu extends StatefulWidget {
   HomeMenu({Key key}) : super(key: key);
@@ -66,15 +70,19 @@ class _HomeMenuState extends State<HomeMenu> {
           MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
         return;
       }
-      // Navigator.of(context).pop();
-      // Navigator.of(context).push(MaterialPageRoute(
-      //     builder: (BuildContext context) => HomeFunctionModules()));
+
+      Navigator.of(context).pop();
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => ProjectPage()));
     } else if (index == 2) {
       Navigator.of(context).pop();
       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => PlanPage()));
     } else if (index == 3) {
       Navigator.of(context).pop();
       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => ProductLinePage()));
+    } else if (index == 4) {
+      Navigator.of(context).pop();
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => QualityPage()));
     } else if (index == 5) {
       Navigator.of(context).pop();
       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => MoldPage()));

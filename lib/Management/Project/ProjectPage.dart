@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
-import 'PlanProgressPage.dart';
+// import 'PlanProgressPage.dart';
 
-class PlanPage extends StatelessWidget {
+class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Map> functionItemDataArray = [
-    {"title": "计划进度", "icon": "", "badgeValue": 0},
+    {"title": "工单上料", "icon": "", "badgeValue": 0},
+    {"title": "Lot报工", "icon": "", "badgeValue": 0},
+    {"title": "Lot查询", "icon": "", "badgeValue": 0},
+    {"title": "Lot锁定", "icon": "", "badgeValue": 0},
+    {"title": "Lot解锁", "icon": "", "badgeValue": 0},
+    {"title": "报修", "icon": "", "badgeValue": 0},
+    {"title": "Lot分批", "icon": "", "badgeValue": 0},
+    {"title": "档位变更", "icon": "", "badgeValue": 0},
+    {"title": "修理", "icon": "", "badgeValue": 0},
+    {"title": "报废", "icon": "", "badgeValue": 0},
   ];
 
   final List<MESSquareItemWidget> functionItemArray = [];
@@ -20,7 +29,7 @@ class PlanPage extends StatelessWidget {
       key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("计划管理"),
+        title: Text("工程管理"),
         centerTitle: true,
       ),
       body: _buildGridView(),
@@ -48,10 +57,10 @@ class PlanPage extends StatelessWidget {
   void _functionItemClickedAtIndex(int index) {
     Widget w;
     if (index == 0) {
-      w = PlanProgressPage();
+      // w = PlanProgressPage();
     }
-    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-              builder: (BuildContext context) => w));
+    // Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
+    //           builder: (BuildContext context) => w));
   }
   
   Widget _buildGridView() {
