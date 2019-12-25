@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../Others/Tool/AlertTool.dart';
 import '../../Others/Network/HttpDigger.dart';
 import '../../Others/Tool/GlobalTool.dart';
+import '../../Others/Tool/HudTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
@@ -159,6 +160,11 @@ class _MoldUnlockPageState extends State<MoldUnlockPage> {
   }
 
   Future _btnConfirmClicked() async {
+    if (isAvailable(this.content) == false) {
+      HudTool.showInfoWithStatus("请填写备注");
+      return;
+    }
+
     bool isOkay = await AlertTool.showStandardAlert(context, "确定解锁?");
 
     if (isOkay) {
@@ -167,6 +173,16 @@ class _MoldUnlockPageState extends State<MoldUnlockPage> {
   }
 
   void _realConfirmationAction() {
-    
+    HudTool.show();
+    HttpDigger().postWithUri("Mould/UnLock", parameters: {"mouldCode":"D0D201910250001", "remark":this.content}, success: (int code, String message, dynamic responseJson) {
+      print("Mould/UnLock: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus(message);
+      Navigator.pop(context);
+    });
   }
 }
