@@ -23,6 +23,11 @@ class MESSelectionItemWidget extends StatefulWidget {
     _theState.setSelected(s);
   }
 
+  void setContent(String c) {
+    this.content = c;
+    _theState.setContent(c);
+  }
+
   bool enabled;
   String title;
   String content;
@@ -58,6 +63,12 @@ class _MESSelectionItemWidgetState extends State<MESSelectionItemWidget> {
   void setSelected(bool s) {
     setState(() {
       this.selected = s;
+    });
+  }
+
+  void setContent(String c) {
+    setState(() {
+      this.content = c;
     });
   }
 
