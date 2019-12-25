@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
-import 'MoldIn/MoldInPage.dart';
-import 'MoldOut/MoldOutPage.dart';
+import 'MoldInPage.dart';
+import 'MoldOutPage.dart';
 import 'MoldLockPage.dart';
 import 'MoldUnlockPage.dart';
 import 'MoldMaintenanceAppllicationPage.dart';

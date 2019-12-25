@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
-import '../../../Others/Tool/GlobalTool.dart';
-import '../../../Others/Tool/AlertTool.dart';
-import '../../../Others/Const/Const.dart';
-import '../../../Others/View/SearchBarWithFunction.dart';
-import '../../../Others/View/MESSelectionItemWidget.dart';
-import '../../../Others/View/MESConntenInputWidget.dart';
+import '../../Others/Tool/GlobalTool.dart';
+import '../../Others/Tool/AlertTool.dart';
+import '../../Others/Const/Const.dart';
+import '../../Others/View/SearchBarWithFunction.dart';
+import '../../Others/View/MESSelectionItemWidget.dart';
+import '../../Others/View/MESConntenInputWidget.dart';
+
+import 'package:barcode_scan/barcode_scan.dart';
 
 import 'Model/MoldInModel.dart';
 
@@ -18,9 +20,11 @@ class MoldInPage extends StatefulWidget {
 }
 
 class _MoldInPageState extends State<MoldInPage> {
+  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(
     hintText: "模具编码",
   );
+  String moldCode;
   String content;
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
@@ -33,20 +37,48 @@ class _MoldInPageState extends State<MoldInPage> {
 
     _sBar.functionBlock = () {
       print("functionBlock");
+      _popSheetAlert();
+    };
+    _sBar.keyboardReturnBlock = (String c) {
+      this.moldCode = c;
+      _getDataFromServer();
     };
 
     for (int i = 0; i < 5; i++) {
       this.selectionItemList.add(_buildSelectionItem(i));
     }
+  }
 
-    _getDataFromServer();
+  void _popSheetAlert() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        child: ListView(
+            children: List.generate(
+          2,
+          (index) => InkWell(
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 60.0,
+                  child: Text(bottomFunctionTitleList[index])),
+              onTap: () {
+                print('tapped item ${index + 1}');
+                Navigator.pop(context);
+                _tryToscan();
+              }),
+        )),
+        height: 120,
+      ),
+    );
   }
 
   void _getDataFromServer() {
+    HudTool.show();
     HttpDigger().postWithUri("Mould/LoadMould",
-        parameters: {"mouldCode": "D0D201910250001"},
+        parameters: {"mouldCode": this.moldCode},
         success: (int code, String message, dynamic responseJson) {
       print("Mould/LoadMould: $responseJson");
+      HudTool.dismiss();
       this.responseJson = responseJson;
       _reloadListView();
     });
@@ -148,7 +180,6 @@ class _MoldInPageState extends State<MoldInPage> {
       enabled = false;
       title = "锁定状态";
       content = avoidNull(this.responseJson["HoldStateDes"]);
-      print("this.responseJson[HoldStateDes]: $content");
     } else if (index == 4) {
       enabled = false;
       title = "出入库状态";
@@ -198,5 +229,24 @@ class _MoldInPageState extends State<MoldInPage> {
       HudTool.showInfoWithStatus(message);
       Navigator.pop(context);
     });
+  }
+
+  Future _tryToscan() async {
+    print("start scanning");
+
+    try {
+      this.moldCode = await BarcodeScanner.scan();
+      _getDataFromServer();
+    } on Exception catch (e) {
+      if (e == BarcodeScanner.CameraAccessDenied) {
+        HudTool.showInfoWithStatus("相机权限未开启");
+      } else {
+        HudTool.showInfoWithStatus("未知错误");
+      }
+    } on FormatException {
+      HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
+    } catch (e) {
+      HudTool.showInfoWithStatus("未知错误");
+    }
   }
 }
