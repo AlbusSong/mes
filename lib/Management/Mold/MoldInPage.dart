@@ -210,6 +210,11 @@ class _MoldInPageState extends State<MoldInPage> {
   }
 
   Future _btnConfirmClicked() async {
+    if (isAvailable(this.moldCode) == false || this.responseJson.isNotEmpty == false) {
+      HudTool.showInfoWithStatus("请先获取模具信息");
+      return;
+    }
+
     bool isOkay = await AlertTool.showStandardAlert(context, "确定入库?");
 
     if (isOkay) {
