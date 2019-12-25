@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Const/Const.dart';
-import '../../Others/View/SearchBarWithFunction.dart';
-import '../../Others/View/MESSelectionItemWidget.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
+import '../../../Others/Tool/GlobalTool.dart';
+import '../../../Others/Tool/AlertTool.dart';
+import '../../../Others/Const/Const.dart';
+import '../../../Others/View/SearchBarWithFunction.dart';
+import '../../../Others/View/MESSelectionItemWidget.dart';
 
 class MoldOutPage extends StatefulWidget {
   @override
@@ -15,6 +17,7 @@ class _MoldOutPageState extends State<MoldOutPage> {
 
   final SearchBarWithFunction _sBar = SearchBarWithFunction(hintText: "模具编码",);
   String content;
+  Map responseJson = Map();
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
 
@@ -28,6 +31,37 @@ class _MoldOutPageState extends State<MoldOutPage> {
 
     for (int i = 0; i < 5; i++) {
       this.selectionItemList.add(_buildSelectionItem(i));
+    }
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer() {
+    HttpDigger().postWithUri("Mould/LoadMould",
+        parameters: {"mouldCode": "D0D201910250001"},
+        success: (int code, String message, dynamic responseJson) {
+      print("Mould/LoadMould: $responseJson");
+      this.responseJson = responseJson;
+      _reloadListView();
+    });
+  }
+
+  void _reloadListView() {
+    for (int i = 0; i < 5; i++) {
+      MESSelectionItemWidget w = this.selectionItemList[i];
+      String content = "";
+      if (i == 0) {
+        content = avoidNull(this.responseJson["MouldNo"]);
+      } else if (i == 1) {
+        content = avoidNull(this.responseJson["MouldName"]);
+      } else if (i == 2) {
+        content = avoidNull(this.responseJson["MouldStatus"]);
+      } else if (i == 3) {
+        content = avoidNull(this.responseJson["HoldStateDes"]);
+      } else if (i == 4) {
+        content = avoidNull(this.responseJson["StorageStateDes"]);
+      }
+      w.setContent(content);
     }
   }
 
@@ -115,7 +149,15 @@ class _MoldOutPageState extends State<MoldOutPage> {
     }
   }
 
-  void _btnConfirmClicked() {
+  Future _btnConfirmClicked() async {
+    bool isOkay = await AlertTool.showStandardAlert(context, "确定出库?");
+
+    if (isOkay) {
+      _realConfirmationAction();
+    }
+  }
+
+  void _realConfirmationAction() {
 
   }
 }

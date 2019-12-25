@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
+import '../../../Others/Tool/AlertTool.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/View/SearchBarWithFunction.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
@@ -176,5 +178,16 @@ class _MoldInPageState extends State<MoldInPage> {
     }
   }
 
-  void _btnConfirmClicked() {}
+  Future _btnConfirmClicked() async {
+    bool isOkay = await AlertTool.showStandardAlert(context, "确定入库?");
+
+    if (isOkay) {
+      _realConfirmationAction();
+    }
+  }
+
+  void _realConfirmationAction() {
+    // HudTool.show();
+
+  }
 }
