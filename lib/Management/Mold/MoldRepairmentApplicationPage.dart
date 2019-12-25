@@ -30,7 +30,7 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
       print("functionBlock");
     };
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
       this.selectionItemList.add(_buildSelectionItem(i));
     }
 
@@ -48,7 +48,7 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
   }
 
   void _reloadListView() {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
       MESSelectionItemWidget w = this.selectionItemList[i];
       String content = "";
       if (i == 0) {
@@ -58,7 +58,10 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
       } else if (i == 2) {
         content = avoidNull(this.responseJson["MouldStatus"]);
       } else if (i == 3) {
-        content = avoidNull(this.responseJson["HoldStateDes"]);
+        String actUseCount = this.responseJson["AlertLife"].toString();
+        String alertLife = this.responseJson["AlertLife"].toString();
+        String ctrlLife = this.responseJson["CtrlLife"].toString();  
+        content = '$actUseCount/$alertLife/$ctrlLife';
       } else if (i == 4) {
         content = avoidNull(this.responseJson["HoldStateDes"]);
       }
@@ -140,8 +143,11 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
       title = "状态";
     } else if (index == 3) {
       enabled = false;
-      title = "锁定状态";
+      title = "冲次信息";
     } else if (index == 4) {
+      enabled = false;
+      title = "锁定状态";
+    } else if (index == 5) {
       enabled = true;
       title = "拆模类型";
     }
@@ -150,7 +156,7 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
       _hasSelectedItem(index);
     };
 
-    MESSelectionItemWidget item = MESSelectionItemWidget(enabled: enabled, title: title, selected: false, selectionBlock: selectionBlock,);
+    MESSelectionItemWidget item = MESSelectionItemWidget(enabled: enabled, title: title, content: content, selected: false, selectionBlock: selectionBlock,);
     return item;
   }
 
