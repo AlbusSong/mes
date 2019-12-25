@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/Tool/GlobalTool.dart';
 import '../../../Others/Tool/AlertTool.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/View/SearchBarWithFunction.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
@@ -158,6 +159,16 @@ class _MoldOutPageState extends State<MoldOutPage> {
   }
 
   void _realConfirmationAction() {
+    HudTool.show();
+    HttpDigger().postWithUri("Mould/OutStock", parameters: {"mouldCode":"D0D201910250001"}, success: (int code, String message, dynamic responseJson) {
+      print("Mould/OutStock: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
 
+      HudTool.showInfoWithStatus(message);
+      Navigator.pop(context);
+    });
   }
 }

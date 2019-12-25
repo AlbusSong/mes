@@ -187,7 +187,16 @@ class _MoldInPageState extends State<MoldInPage> {
   }
 
   void _realConfirmationAction() {
-    // HudTool.show();
+    HudTool.show();
+    HttpDigger().postWithUri("Mould/InStock", parameters: {"mouldCode":"D0D201910250001"}, success: (int code, String message, dynamic responseJson) {
+      print("Mould/InStock: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
 
+      HudTool.showInfoWithStatus(message);
+      Navigator.pop(context);
+    });
   }
 }
