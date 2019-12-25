@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../Others/Tool/AlertTool.dart';
 import '../../Others/Network/HttpDigger.dart';
+import '../../Others/Tool/HudTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
@@ -167,6 +168,11 @@ class _MoldMaintenanceAppllicationPageState extends State<MoldMaintenanceAppllic
   }
 
   Future _btnConfirmClicked() async {
+    if (isAvailable(this.content) == false) {
+      HudTool.showInfoWithStatus("请填写备注");
+      return;
+    }
+
     bool isOkay = await AlertTool.showStandardAlert(context, "确定申请?");
 
     if (isOkay) {
@@ -175,6 +181,16 @@ class _MoldMaintenanceAppllicationPageState extends State<MoldMaintenanceAppllic
   }
 
   void _realConfirmationAction() {
-    
+    HudTool.show();
+    HttpDigger().postWithUri("Mould/ApplyPM", parameters: {"mouldCode":"D0D201910250001", "remark":this.content}, success: (int code, String message, dynamic responseJson) {
+      print("Mould/ApplyPM: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus(message);
+      Navigator.pop(context);
+    });
   }
 }
