@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import '../Tool/GlobalTool.dart';
 
 class SearchBarWithFunction extends StatelessWidget {
-  SearchBarWithFunction(
-    {this.hintText = "输入",}
-  );
+  SearchBarWithFunction({
+    this.hintText = "输入",
+  });
 
   final String hintText;
 
-  void Function () functionBlock;
-  void Function (String newContent) contentChangeBlock;
-  void Function (String content) keyboardReturnBlock;
+  void Function() functionBlock;
+  void Function(String newContent) contentChangeBlock;
+  void Function(String content) keyboardReturnBlock;
 
   @override
   Widget build(BuildContext context) {
@@ -75,17 +75,20 @@ class SearchBarWithFunction extends StatelessWidget {
                   ),
                   GestureDetector(
                     child: Container(
-                    width: 45,
-                    // color: randomColor(),
-                    child: Center(
-                      // child: Icon(Icons.scanner, size: 30, color: hexColor("999999"),),
-                      child: Image.asset("Others/Images/scan_barcode_icon.png", width: 25, height: 25),
+                      width: 45,
+                      // color: randomColor(),
+                      child: Center(
+                        // child: Icon(Icons.scanner, size: 30, color: hexColor("999999"),),
+                        child: Image.asset(
+                            "Others/Images/scan_barcode_icon.png",
+                            width: 25,
+                            height: 25),
+                      ),
                     ),
-                  ),
-                  onTap: () {
-                    print("functionClicked");
-                    _functionBtnClicked();
-                  },
+                    onTap: () {
+                      print("functionClicked");
+                      _functionBtnClicked();
+                    },
                   ),
                 ],
               ),
