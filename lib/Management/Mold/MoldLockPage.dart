@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mes/Management/Mold/Model/MoldLockCodeModel.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import '../../Others/Tool/AlertTool.dart';
 import '../../Others/Network/HttpDigger.dart';
@@ -9,25 +10,30 @@ import '../../Others/View/MESSelectionItemWidget.dart';
 import '../../Others/View/MESConntenInputWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 
-import 'Model/MoldLockCodeModel.dart';
+ import 'Model/MoldLockCodeModel.dart';
 
 class MoldLockPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _MoldLockPageState();  
+    return _MoldLockPageState();
   }
 }
 
 class _MoldLockPageState extends State<MoldLockPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
-  final SearchBarWithFunction _sBar = SearchBarWithFunction(hintText: "模具编码",);
+  final SearchBarWithFunction _sBar = SearchBarWithFunction(
+    hintText: "模具编码",
+  );
   Map responseJson = Map();
   String moldCode;
   String content;
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
-  List<MoldLockCodeModel> arrOfData;
+  List arrOfLockCode;
+  MoldLockCodeModel selectedLockCode;
 
   @override
   void initState() {
@@ -45,6 +51,8 @@ class _MoldLockPageState extends State<MoldLockPage> {
     for (int i = 0; i < 5; i++) {
       this.selectionItemList.add(_buildSelectionItem(i));
     }
+
+    _getAdditionalDataFromServer();
   }
 
   void _getDataFromServer() {
@@ -57,13 +65,16 @@ class _MoldLockPageState extends State<MoldLockPage> {
       this.responseJson = responseJson;
       _reloadListView();
     });
+  }
 
-    HttpDigger().postWithUri("Mould/LoadLockCodes",
-        parameters: {},
-        success: (int code, String message, dynamic responseJson) {
-      print("Mould/LoadLockCodes: $responseJson");
-      this.arrOfData = (responseJson["Extend"] as List).map((item) => MoldLockCodeModel.fromJson(item)).toList();
-      print("this.arrOfData: ${this.arrOfData}");
+  void _getAdditionalDataFromServer() {
+    HttpDigger()
+        .postWithUri("Mould/LoadLockCodes", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
+      print('Mould/LoadLockCodes: ${responseJson["Extend"]}');
+      this.arrOfLockCode = (responseJson['Extend'] as List)
+          .map((item) => MoldLockCodeModel.fromJson(item))
+          .toList();
     });
   }
 
@@ -87,6 +98,7 @@ class _MoldLockPageState extends State<MoldLockPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("模具锁定"),
@@ -94,7 +106,7 @@ class _MoldLockPageState extends State<MoldLockPage> {
       ),
       body: _buildBody(),
     );
-  }  
+  }
 
   Widget _buildBody() {
     return Column(
@@ -107,18 +119,18 @@ class _MoldLockPageState extends State<MoldLockPage> {
           ),
         ),
         Container(
-            height: 50,
-            width: double.infinity,
-            // color: randomColor(),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: hexColor(MAIN_COLOR),
-              child: Text("锁定"),
-              onPressed: () {
-                _btnConfirmClicked();
-              },
-            ),
+          height: 50,
+          width: double.infinity,
+          // color: randomColor(),
+          child: FlatButton(
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text("锁定"),
+            onPressed: () {
+              _btnConfirmClicked();
+            },
           ),
+        ),
       ],
     );
   }
@@ -136,11 +148,14 @@ class _MoldLockPageState extends State<MoldLockPage> {
   }
 
   Widget _buildContentInputItem() {
-    void Function (String) contentChangedBlock = (String newContent) {
+    void Function(String) contentChangedBlock = (String newContent) {
       // print("contentChangedBlock: $newContent");
       this.content = newContent;
     };
-    return MESConntenInputWidget(placeholder: "备注", contentChangedBlock: contentChangedBlock,);
+    return MESConntenInputWidget(
+      placeholder: "备注",
+      contentChangedBlock: contentChangedBlock,
+    );
   }
 
   Widget _buildSelectionItem(int index) {
@@ -163,11 +178,16 @@ class _MoldLockPageState extends State<MoldLockPage> {
       title = "锁定代码";
     }
 
-    void Function () selectionBlock = () {
+    void Function() selectionBlock = () {
       _hasSelectedItem(index);
     };
 
-    MESSelectionItemWidget item = MESSelectionItemWidget(enabled: enabled, title: title, selected: false, selectionBlock: selectionBlock,);
+    MESSelectionItemWidget item = MESSelectionItemWidget(
+      enabled: enabled,
+      title: title,
+      selected: false,
+      selectionBlock: selectionBlock,
+    );
     return item;
   }
 
@@ -175,21 +195,55 @@ class _MoldLockPageState extends State<MoldLockPage> {
     print("_hasSelectedItem: $index");
     this.selectedIndex = index;
     for (int i = 0; i < this.selectionItemList.length; i++) {
-       MESSelectionItemWidget wgt = this.selectionItemList[index];
-       wgt.setSelected((this.selectedIndex == i));
+      MESSelectionItemWidget wgt = this.selectionItemList[index];
+      wgt.setSelected((this.selectedIndex == i));
+    }
+
+    if (index == 4) {
+      List<String> arrOfSelectionTitle = [];
+      for (MoldLockCodeModel m in this.arrOfLockCode) {
+        arrOfSelectionTitle.add("${m.LockCode}|${m.Description}");
+      }
+      _showPickerWithData(arrOfSelectionTitle, index);
+    }
+
+    hideKeyboard(context);
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first, index);
+        });
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(int indexOfSelectedItem, int index) {
+    if (index == 4) {
+      this.selectedLockCode = this.arrOfLockCode[indexOfSelectedItem];
+      MESSelectionItemWidget wgt = this.selectionItemList[4];
+      wgt.setContent(
+          "${this.selectedLockCode.LockCode}|${this.selectedLockCode.Description}");
     }
   }
 
   Future _btnConfirmClicked() async {
-    if (isAvailable(this.moldCode) == false || this.responseJson.isNotEmpty == false) {
+    if (isAvailable(this.moldCode) == false ||
+        this.responseJson.isNotEmpty == false) {
       HudTool.showInfoWithStatus("请先获取模具信息");
       return;
     }
 
-    // if (this.selectedDepartMoldType == null) {
-    //   HudTool.showInfoWithStatus("请选择拆模类型");
-    //   return;
-    // }
+    if (this.selectedLockCode == null) {
+      HudTool.showInfoWithStatus("请选择锁定代码");
+      return;
+    }
 
     if (isAvailable(this.content) == false) {
       HudTool.showInfoWithStatus("请填写备注");
@@ -205,7 +259,11 @@ class _MoldLockPageState extends State<MoldLockPage> {
 
   void _realConfirmationAction() {
     HudTool.show();
-    HttpDigger().postWithUri("Mould/Lock", parameters: {"mouldCode":this.moldCode, "lockCode":"LOTLock", "remark":this.content}, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("Mould/Lock", parameters: {
+      "mouldCode": this.moldCode,
+      "lockCode": this.selectedLockCode.LockCode,
+      "remark": this.content
+    }, success: (int code, String message, dynamic responseJson) {
       print("Mould/Lock: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
