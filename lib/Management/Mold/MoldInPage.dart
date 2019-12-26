@@ -87,19 +87,19 @@ class _MoldInPageState extends State<MoldInPage> {
   void _reloadListView() {
     for (int i = 0; i < 5; i++) {
       MESSelectionItemWidget w = this.selectionItemList[i];
-      String content = "";
+      String c = "";
       if (i == 0) {
-        content = avoidNull(this.responseJson["MouldNo"]);
+        c = avoidNull(this.responseJson["MouldNo"]);
       } else if (i == 1) {
-        content = avoidNull(this.responseJson["MouldName"]);
+        c = avoidNull(this.responseJson["MouldName"]);
       } else if (i == 2) {
-        content = avoidNull(this.responseJson["MouldStatus"]);
+        c = avoidNull(this.responseJson["MouldStatus"]);
       } else if (i == 3) {
-        content = avoidNull(this.responseJson["HoldStateDes"]);
+        c = avoidNull(this.responseJson["HoldStateDes"]);
       } else if (i == 4) {
-        content = avoidNull(this.responseJson["StorageStateDes"]);
+        c = avoidNull(this.responseJson["StorageStateDes"]);
       }
-      w.setContent(content);
+      w.setContent(c);
     }
   }
 
@@ -163,27 +163,21 @@ class _MoldInPageState extends State<MoldInPage> {
   Widget _buildSelectionItem(int index) {
     bool enabled = false;
     String title = "";
-    String content = "";
     if (index == 0) {
       enabled = false;
       title = "模号";
-      content = avoidNull(this.responseJson["MouldNo"]);
     } else if (index == 1) {
       enabled = false;
       title = "模具名称";
-      content = avoidNull(this.responseJson["MouldName"]);
     } else if (index == 2) {
       enabled = false;
       title = "状态";
-      content = avoidNull(this.responseJson["MouldStatus"]);
     } else if (index == 3) {
       enabled = false;
       title = "锁定状态";
-      content = avoidNull(this.responseJson["HoldStateDes"]);
     } else if (index == 4) {
       enabled = false;
       title = "出入库状态";
-      content = avoidNull(this.responseJson["StorageStateDes"]);
     }
 
     void Function() selectionBlock = () {
@@ -193,7 +187,6 @@ class _MoldInPageState extends State<MoldInPage> {
     MESSelectionItemWidget item = MESSelectionItemWidget(
       enabled: enabled,
       title: title,
-      content: content,
       selected: false,
       selectionBlock: selectionBlock,
     );
@@ -224,7 +217,7 @@ class _MoldInPageState extends State<MoldInPage> {
 
   void _realConfirmationAction() {
     HudTool.show();
-    HttpDigger().postWithUri("Mould/InStock", parameters: {"mouldCode":"D0D201910250001"}, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("Mould/InStock", parameters: {"mouldCode":this.moldCode}, success: (int code, String message, dynamic responseJson) {
       print("Mould/InStock: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);

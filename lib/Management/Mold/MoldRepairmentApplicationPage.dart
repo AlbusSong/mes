@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../Others/Tool/AlertTool.dart';
 import '../../Others/Network/HttpDigger.dart';
+import '../../Others/Tool/HudTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 import '../../Others/View/MESConntenInputWidget.dart';
+
+import 'package:flutter_picker/flutter_picker.dart';
+import 'package:barcode_scan/barcode_scan.dart';
 
 class MoldRepairmentApplicationPage extends StatefulWidget {
   @override
@@ -15,12 +19,19 @@ class MoldRepairmentApplicationPage extends StatefulWidget {
 }
 
 class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicationPage> {
-
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(hintText: "模具编码",);
   String content;
+  String moldCode;
   Map responseJson = Map();
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
+  final List<Map<String, String>> arrOfDepartMoldType = [
+    {"value":"PED", "title":"计划结束拆模"},
+    {"value":"AND", "title":"异常拆模"},
+  ];
+  Map<String, String> selectedDepartMoldType;
 
   @override
   void initState() {
@@ -28,20 +39,25 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
 
     _sBar.functionBlock = () {
       print("functionBlock");
+      _popSheetAlert();
+    };
+    _sBar.keyboardReturnBlock = (String c) {
+      this.moldCode = c;
+      _getDataFromServer();
     };
 
     for (int i = 0; i < 6; i++) {
       this.selectionItemList.add(_buildSelectionItem(i));
     }
-
-    _getDataFromServer();
   }
 
   void _getDataFromServer() {
+    HudTool.show();
     HttpDigger().postWithUri("Mould/LoadMould",
-        parameters: {"mouldCode": "D0D201910250001"},
+        parameters: {"mouldCode": this.moldCode},
         success: (int code, String message, dynamic responseJson) {
       print("Mould/LoadMould: $responseJson");
+      HudTool.dismiss();
       this.responseJson = responseJson;
       _reloadListView();
     });
@@ -50,28 +66,29 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
   void _reloadListView() {
     for (int i = 0; i < 5; i++) {
       MESSelectionItemWidget w = this.selectionItemList[i];
-      String content = "";
+      String c = "";
       if (i == 0) {
-        content = avoidNull(this.responseJson["MouldNo"]);
+        c = avoidNull(this.responseJson["MouldNo"]);
       } else if (i == 1) {
-        content = avoidNull(this.responseJson["MouldName"]);
+        c = avoidNull(this.responseJson["MouldName"]);
       } else if (i == 2) {
-        content = avoidNull(this.responseJson["MouldStatus"]);
+        c = avoidNull(this.responseJson["MouldStatus"]);
       } else if (i == 3) {
         String actUseCount = this.responseJson["AlertLife"].toString();
         String alertLife = this.responseJson["AlertLife"].toString();
         String ctrlLife = this.responseJson["CtrlLife"].toString();  
-        content = '$actUseCount/$alertLife/$ctrlLife';
+        c = '$actUseCount/$alertLife/$ctrlLife';
       } else if (i == 4) {
-        content = avoidNull(this.responseJson["HoldStateDes"]);
+        c = avoidNull(this.responseJson["HoldStateDes"]);
       }
-      w.setContent(content);
+      w.setContent(c);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("维修申请"),
@@ -131,7 +148,6 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
   Widget _buildSelectionItem(int index) {
     bool enabled = false;
     String title = "";
-    String content = "";
     if (index == 0) {
       enabled = false;
       title = "模号";
@@ -150,13 +166,14 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
     } else if (index == 5) {
       enabled = true;
       title = "拆模类型";
+      // content = this.selectedDepartMoldType != null ? this.selectedDepartMoldType["title"] : "-";
     }
 
     void Function () selectionBlock = () {
       _hasSelectedItem(index);
     };
 
-    MESSelectionItemWidget item = MESSelectionItemWidget(enabled: enabled, title: title, content: content, selected: false, selectionBlock: selectionBlock,);
+    MESSelectionItemWidget item = MESSelectionItemWidget(enabled: enabled, title: title, selected: false, selectionBlock: selectionBlock,);
     return item;
   }
 
@@ -167,9 +184,56 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
        MESSelectionItemWidget wgt = this.selectionItemList[index];
        wgt.setSelected((this.selectedIndex == i));
     }
+
+    if (index == 5) {
+      List<String> arrOfSelectionTitle = [];
+      for (Map<String, String> m in this.arrOfDepartMoldType) {
+        arrOfSelectionTitle.add(m["title"]);
+      }
+      _showPickerWithData(arrOfSelectionTitle, index);
+    }
+
+    hideKeyboard(context);
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first, index);
+        });
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(int indexOfSelectedItem, int index) {
+    if (index == 5) {      
+      this.selectedDepartMoldType = this.arrOfDepartMoldType[indexOfSelectedItem];
+      MESSelectionItemWidget wgt = this.selectionItemList[5];
+      wgt.setContent(this.selectedDepartMoldType["title"]);
+    }
   }
 
   Future _btnConfirmClicked() async {
+    if (isAvailable(this.moldCode) == false || this.responseJson.isNotEmpty == false) {
+      HudTool.showInfoWithStatus("请先获取模具信息");
+      return;
+    }
+
+    if (this.selectedDepartMoldType == null) {
+      HudTool.showInfoWithStatus("请选择拆模类型");
+      return;
+    }
+
+    if (isAvailable(this.content) == false) {
+      HudTool.showInfoWithStatus("请填写备注");
+      return;
+    }
+
     bool isOkay = await AlertTool.showStandardAlert(context, "确定申请?");
 
     if (isOkay) {
@@ -178,6 +242,60 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
   }
 
   void _realConfirmationAction() {
-    
+    HudTool.show();
+    HttpDigger().postWithUri("Mould/ApplyPR", parameters: {"mouldCode":this.moldCode, "type":this.selectedDepartMoldType["value"], "remark":this.content}, success: (int code, String message, dynamic responseJson) {
+      print("Mould/ApplyPR: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus(message);
+      Navigator.pop(context);
+    }, failure: (Error e) {
+      print("Mould/ApplyPR error: $e");
+    });
+  }
+
+  void _popSheetAlert() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        child: ListView(
+            children: List.generate(
+          2,
+          (index) => InkWell(
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 60.0,
+                  child: Text(bottomFunctionTitleList[index])),
+              onTap: () {
+                print('tapped item ${index + 1}');
+                Navigator.pop(context);
+                _tryToscan();
+              }),
+        )),
+        height: 120,
+      ),
+    );
+  }
+
+  Future _tryToscan() async {
+    print("start scanning");
+
+    try {
+      this.moldCode = await BarcodeScanner.scan();
+      _getDataFromServer();
+    } on Exception catch (e) {
+      if (e == BarcodeScanner.CameraAccessDenied) {
+        HudTool.showInfoWithStatus("相机权限未开启");
+      } else {
+        HudTool.showInfoWithStatus("未知错误");
+      }
+    } on FormatException {
+      HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
+    } catch (e) {
+      HudTool.showInfoWithStatus("未知错误");
+    }
   }
 }

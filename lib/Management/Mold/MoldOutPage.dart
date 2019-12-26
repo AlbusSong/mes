@@ -7,6 +7,8 @@ import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 
+import 'package:barcode_scan/barcode_scan.dart';
+
 class MoldOutPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -15,8 +17,9 @@ class MoldOutPage extends StatefulWidget {
 }
 
 class _MoldOutPageState extends State<MoldOutPage> {
-
+  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(hintText: "模具编码",);
+  String moldCode;
   String content;
   Map responseJson = Map();
   final List<MESSelectionItemWidget> selectionItemList = List();
@@ -28,20 +31,25 @@ class _MoldOutPageState extends State<MoldOutPage> {
 
     _sBar.functionBlock = () {
       print("functionBlock");
+      _popSheetAlert();
+    };
+    _sBar.keyboardReturnBlock = (String c) {
+      this.moldCode = c;
+      _getDataFromServer();
     };
 
     for (int i = 0; i < 5; i++) {
       this.selectionItemList.add(_buildSelectionItem(i));
     }
-
-    _getDataFromServer();
   }
 
   void _getDataFromServer() {
+    HudTool.show();
     HttpDigger().postWithUri("Mould/LoadMould",
-        parameters: {"mouldCode": "D0D201910250001"},
+        parameters: {"mouldCode": this.moldCode},
         success: (int code, String message, dynamic responseJson) {
       print("Mould/LoadMould: $responseJson");
+      HudTool.dismiss();
       this.responseJson = responseJson;
       _reloadListView();
     });
@@ -50,7 +58,7 @@ class _MoldOutPageState extends State<MoldOutPage> {
   void _reloadListView() {
     for (int i = 0; i < 5; i++) {
       MESSelectionItemWidget w = this.selectionItemList[i];
-      String content = "";
+      String c = "";
       if (i == 0) {
         content = avoidNull(this.responseJson["MouldNo"]);
       } else if (i == 1) {
@@ -62,7 +70,7 @@ class _MoldOutPageState extends State<MoldOutPage> {
       } else if (i == 4) {
         content = avoidNull(this.responseJson["StorageStateDes"]);
       }
-      w.setContent(content);
+      w.setContent(c);
     }
   }
 
@@ -151,6 +159,11 @@ class _MoldOutPageState extends State<MoldOutPage> {
   }
 
   Future _btnConfirmClicked() async {
+    if (isAvailable(this.moldCode) == false || this.responseJson.isNotEmpty == false) {
+      HudTool.showInfoWithStatus("请先获取模具信息");
+      return;
+    }
+
     bool isOkay = await AlertTool.showStandardAlert(context, "确定出库?");
 
     if (isOkay) {
@@ -160,7 +173,7 @@ class _MoldOutPageState extends State<MoldOutPage> {
 
   void _realConfirmationAction() {
     HudTool.show();
-    HttpDigger().postWithUri("Mould/OutStock", parameters: {"mouldCode":"D0D201910250001"}, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("Mould/OutStock", parameters: {"mouldCode":this.moldCode}, success: (int code, String message, dynamic responseJson) {
       print("Mould/OutStock: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -170,5 +183,47 @@ class _MoldOutPageState extends State<MoldOutPage> {
       HudTool.showInfoWithStatus(message);
       Navigator.pop(context);
     });
+  }
+
+  void _popSheetAlert() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        child: ListView(
+            children: List.generate(
+          2,
+          (index) => InkWell(
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 60.0,
+                  child: Text(bottomFunctionTitleList[index])),
+              onTap: () {
+                print('tapped item ${index + 1}');
+                Navigator.pop(context);
+                _tryToscan();
+              }),
+        )),
+        height: 120,
+      ),
+    );
+  }
+
+  Future _tryToscan() async {
+    print("start scanning");
+
+    try {
+      this.moldCode = await BarcodeScanner.scan();
+      _getDataFromServer();
+    } on Exception catch (e) {
+      if (e == BarcodeScanner.CameraAccessDenied) {
+        HudTool.showInfoWithStatus("相机权限未开启");
+      } else {
+        HudTool.showInfoWithStatus("未知错误");
+      }
+    } on FormatException {
+      HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
+    } catch (e) {
+      HudTool.showInfoWithStatus("未知错误");
+    }
   }
 }
