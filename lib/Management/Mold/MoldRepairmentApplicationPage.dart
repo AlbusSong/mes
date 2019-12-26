@@ -243,8 +243,8 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
 
   void _realConfirmationAction() {
     HudTool.show();
-    HttpDigger().postWithUri("Mould/ApplyPR", parameters: {"mouldCode":this.moldCode, "type":this.selectedDepartMoldType["value"], "remark":this.content}, success: (int code, String message, dynamic responseJson) {
-      print("Mould/ApplyPR: $responseJson");
+    HttpDigger().postWithUri("Mould/ApplyRP", parameters: {"mouldCode":this.moldCode, "type":this.selectedDepartMoldType["value"], "remark":this.content}, success: (int code, String message, dynamic responseJson) {
+      print("Mould/ApplyRP: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
         return;
@@ -252,8 +252,6 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
 
       HudTool.showInfoWithStatus(message);
       Navigator.pop(context);
-    }, failure: (Error e) {
-      print("Mould/ApplyPR error: $e");
     });
   }
 
