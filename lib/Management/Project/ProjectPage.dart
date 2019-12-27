@@ -7,6 +7,7 @@ import 'ProjectOrderMaterialPage.dart';
 import 'ProjectLotSearchPage.dart';
 import 'ProjectLotLockPage.dart';
 import 'ProjectLotUnlockPage.dart';
+import 'ProjectChangeGearPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -69,6 +70,12 @@ class ProjectPage extends StatelessWidget {
       w = ProjectLotLockPage();
     } else if (index == 4) {
       w = ProjectLotUnlockPage();
+    } else if (index == 5) {
+
+    } else if (index == 6) {
+
+    } else if (index == 7) {
+      w = ProjectChangeGearPage();
     }
 
     if (w != null) {
