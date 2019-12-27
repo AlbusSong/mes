@@ -53,7 +53,7 @@ class HomePage extends StatelessWidget {
       ),
     );
 
-    _checkLoginStatus();
+    // _checkLoginStatus();
 
     return scf;
   }
