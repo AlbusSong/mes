@@ -42,7 +42,7 @@ class _ProjectLotSearchPageState extends State<ProjectLotSearchPage> {
     return Scaffold(
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("Lot报工"),
+        title: Text("Lot查询"),
         centerTitle: true,
       ),
       body: _buildBody(),

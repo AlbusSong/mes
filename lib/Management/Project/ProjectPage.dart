@@ -5,6 +5,7 @@ import '../../Others/View/MESSquareItemWidget.dart';
 import 'ProjectLLotReportPage.dart';
 import 'ProjectOrderMaterialPage.dart';
 import 'ProjectLotSearchPage.dart';
+import 'ProjectLotLockPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -63,6 +64,8 @@ class ProjectPage extends StatelessWidget {
       w = ProjectLLotReportPage();
     } else if (index == 2) {
       w = ProjectLotSearchPage();
+    } else if (index == 3) {
+      w = ProjectLotLockPage();
     }
 
     if (w != null) {

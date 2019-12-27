@@ -6,7 +6,7 @@ import '../../Others/Tool/AlertTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
-import '../../Others/View/MESConntenInputWidget.dart';
+import '../../Others/View/MESContenInputWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
@@ -154,7 +154,7 @@ class _MoldInPageState extends State<MoldInPage> {
       // print("contentChangedBlock: $newContent");
       this.content = newContent;
     };
-    return MESConntenInputWidget(
+    return MESContenInputWidget(
       placeholder: "备注",
       contentChangedBlock: contentChangedBlock,
     );

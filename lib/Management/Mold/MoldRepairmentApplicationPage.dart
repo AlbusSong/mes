@@ -6,7 +6,7 @@ import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
-import '../../Others/View/MESConntenInputWidget.dart';
+import '../../Others/View/MESContenInputWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:barcode_scan/barcode_scan.dart';
@@ -142,7 +142,7 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
       // print("contentChangedBlock: $newContent");
       this.content = newContent;
     };
-    return MESConntenInputWidget(placeholder: "备注", contentChangedBlock: contentChangedBlock,);
+    return MESContenInputWidget(placeholder: "备注", contentChangedBlock: contentChangedBlock,);
   }
 
   Widget _buildSelectionItem(int index) {
