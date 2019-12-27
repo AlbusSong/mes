@@ -3,8 +3,8 @@ import '../Tool/GlobalTool.dart';
 import '../Const/Const.dart';
 
 
-class MESContenInputWidget extends StatefulWidget {
-  MESContenInputWidget({
+class MESContentInputWidget extends StatefulWidget {
+  MESContentInputWidget({
     this.placeholder,
     this.contentChangedBlock,
   });
@@ -14,12 +14,12 @@ class MESContenInputWidget extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _MESContenInputWidgetState(placeholder: this.placeholder, contentChangedBlock:this.contentChangedBlock);
+    return _MESContentInputWidgetState(placeholder: this.placeholder, contentChangedBlock:this.contentChangedBlock);
   }  
 }
 
-class _MESContenInputWidgetState extends State<MESContenInputWidget> {
-  _MESContenInputWidgetState({
+class _MESContentInputWidgetState extends State<MESContentInputWidget> {
+  _MESContentInputWidgetState({
     this.placeholder,
     this.contentChangedBlock,
   });

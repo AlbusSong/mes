@@ -13,7 +13,7 @@ import 'package:barcode_scan/barcode_scan.dart';
 class ProjectLLotReportPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _ProjectLLotReportPageState();  
+    return _ProjectLLotReportPageState();
   }
 }
 
@@ -37,7 +37,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
       ),
       body: _buildBody(),
     );
-  }  
+  }
 
   Widget _buildBody() {
     return Column(
@@ -49,18 +49,18 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
           ),
         ),
         Container(
-            height: 50,
-            width: double.infinity,
-            // color: randomColor(),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: hexColor(MAIN_COLOR),
-              child: Text("确认"),
-              onPressed: () {
-                // _btnConfirmClicked();
-              },
-            ),
+          height: 50,
+          width: double.infinity,
+          // color: randomColor(),
+          child: FlatButton(
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text("确认"),
+            onPressed: () {
+              // _btnConfirmClicked();
+            },
           ),
+        ),
       ],
     );
   }
@@ -68,31 +68,41 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   Widget _buildListView() {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      children: <Widget>[        
+      children: <Widget>[
         _buildSelectionInputItem(0),
         _buildSelectionInputItem(1),
-        ProjectInfoDisplayWidget(title: "工程",),
-        ProjectInfoDisplayWidget(title: "机型",),
+        ProjectInfoDisplayWidget(
+          title: "工程",
+        ),
+        ProjectInfoDisplayWidget(
+          title: "机型",
+        ),
         Container(
           color: Colors.white,
           child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-              child: ProjectInfoDisplayWidget(title: "机型",),
-            ),
-            SizedBox(width: 10,),
-            Expanded(
-              child: ProjectInfoDisplayWidget(title: "机型",),
-            ),
-          ],
-        ),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: ProjectInfoDisplayWidget(
+                  title: "机型",
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: ProjectInfoDisplayWidget(
+                  title: "机型",
+                ),
+              ),
+            ],
+          ),
         ),
         WidgetTool.createListViewLine(15, hexColor("f2f2f7")),
         _buildTextInputWidgetItem(0),
         _buildTextInputWidgetItem(1),
         _buildSelectionInputItem(2),
-      ],      
+      ],
     );
   }
 
@@ -108,7 +118,11 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
       placeholder = "请输入数字";
       canScan = false;
     }
-    ProjectTextInputWidget wgt = ProjectTextInputWidget(title: title, placeholder: placeholder, canScan: canScan,);
+    ProjectTextInputWidget wgt = ProjectTextInputWidget(
+      title: title,
+      placeholder: placeholder,
+      canScan: canScan,
+    );
 
     wgt.functionBlock = () {
       hideKeyboard(context);
@@ -136,7 +150,10 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
       _hasSelectedItem(index);
     };
 
-    MESSelectionItemWidget wgt = MESSelectionItemWidget(title: title, enabled: enabled,);
+    MESSelectionItemWidget wgt = MESSelectionItemWidget(
+      title: title,
+      enabled: enabled,
+    );
     wgt.selectionBlock = selectionBlock;
     return wgt;
   }

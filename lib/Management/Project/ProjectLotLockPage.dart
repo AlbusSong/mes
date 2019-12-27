@@ -5,7 +5,7 @@ import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
-import '../../Others/View/MESContenInputWidget.dart';
+import '../../Others/View/MESContentInputWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
@@ -63,18 +63,18 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
           ),
         ),
         Container(
-            height: 50,
-            width: double.infinity,
-            // color: randomColor(),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: hexColor(MAIN_COLOR),
-              child: Text("锁定"),
-              onPressed: () {
-                // _btnConfirmClicked();
-              },
-            ),
+          height: 50,
+          width: double.infinity,
+          // color: randomColor(),
+          child: FlatButton(
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text("锁定"),
+            onPressed: () {
+              // _btnConfirmClicked();
+            },
           ),
+        ),
       ],
     );
   }
@@ -107,7 +107,10 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       _hasSelectedItem(index);
     };
 
-    MESSelectionItemWidget wgt = MESSelectionItemWidget(title: title, enabled: enabled,);
+    MESSelectionItemWidget wgt = MESSelectionItemWidget(
+      title: title,
+      enabled: enabled,
+    );
     wgt.selectionBlock = selectionBlock;
     return wgt;
   }
@@ -121,7 +124,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       // print("contentChangedBlock: $newContent");
       this.content = newContent;
     };
-    return MESContenInputWidget(
+    return MESContentInputWidget(
       placeholder: "备注",
       contentChangedBlock: contentChangedBlock,
     );
@@ -134,18 +137,30 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("【注意事项】", style: TextStyle(fontSize: 18, color: hexColor("666666")),),
+          Text(
+            "【注意事项】",
+            style: TextStyle(fontSize: 18, color: hexColor("666666")),
+          ),
           Container(
             margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
             // color: randomColor(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(">锁定只针对LOT单位锁定", style: TextStyle(color: hexColor("333333"), fontSize: 10),),
-              Text(">如是LOT部分锁定，请先进行LOT分批后再锁定", style: TextStyle(color: hexColor("333333"), fontSize: 10),),
-              Text(">未构成LOT的工程检测锁定，不进行管理，通过标识区分", style: TextStyle(color: hexColor("333333"), fontSize: 10),),
-            ],
-          ),
+              children: <Widget>[
+                Text(
+                  ">锁定只针对LOT单位锁定",
+                  style: TextStyle(color: hexColor("333333"), fontSize: 10),
+                ),
+                Text(
+                  ">如是LOT部分锁定，请先进行LOT分批后再锁定",
+                  style: TextStyle(color: hexColor("333333"), fontSize: 10),
+                ),
+                Text(
+                  ">未构成LOT的工程检测锁定，不进行管理，通过标识区分",
+                  style: TextStyle(color: hexColor("333333"), fontSize: 10),
+                ),
+              ],
+            ),
           ),
         ],
       ),

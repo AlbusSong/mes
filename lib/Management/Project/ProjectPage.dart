@@ -7,6 +7,7 @@ import 'ProjectOrderMaterialPage.dart';
 import 'ProjectLotSearchPage.dart';
 import 'ProjectLotLockPage.dart';
 import 'ProjectLotUnlockPage.dart';
+import 'ReturnRepairment/ProjectReturnRepairmentPage.dart';
 import 'ProjectChangeGearPage.dart';
 import 'ProjectLotBatchPage.dart';
 
@@ -72,7 +73,7 @@ class ProjectPage extends StatelessWidget {
     } else if (index == 4) {
       w = ProjectLotUnlockPage();
     } else if (index == 5) {
-
+      w = ProjectReturnRepairmentPage();
     } else if (index == 6) {
       w = ProjectLotBatchPage();
     } else if (index == 7) {

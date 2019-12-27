@@ -6,7 +6,7 @@ import '../../Others/Tool/HudTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
-import '../../Others/View/MESContenInputWidget.dart';
+import '../../Others/View/MESContentInputWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
@@ -129,7 +129,7 @@ class _MoldUnlockPageState extends State<MoldUnlockPage> {
       // print("contentChangedBlock: $newContent");
       this.content = newContent;
     };
-    return MESContenInputWidget(placeholder: "备注", contentChangedBlock: contentChangedBlock,);
+    return MESContentInputWidget(placeholder: "备注", contentChangedBlock: contentChangedBlock,);
   }
 
   Widget _buildSelectionItem(int index) {

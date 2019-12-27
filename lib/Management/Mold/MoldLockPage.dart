@@ -7,7 +7,7 @@ import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
-import '../../Others/View/MESContenInputWidget.dart';
+import '../../Others/View/MESContentInputWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter_picker/flutter_picker.dart';
@@ -152,7 +152,7 @@ class _MoldLockPageState extends State<MoldLockPage> {
       // print("contentChangedBlock: $newContent");
       this.content = newContent;
     };
-    return MESContenInputWidget(
+    return MESContentInputWidget(
       placeholder: "备注",
       contentChangedBlock: contentChangedBlock,
     );
