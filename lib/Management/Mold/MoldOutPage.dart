@@ -60,15 +60,15 @@ class _MoldOutPageState extends State<MoldOutPage> {
       MESSelectionItemWidget w = this.selectionItemList[i];
       String c = "";
       if (i == 0) {
-        content = avoidNull(this.responseJson["MouldNo"]);
+        c = avoidNull(this.responseJson["MouldNo"]);
       } else if (i == 1) {
-        content = avoidNull(this.responseJson["MouldName"]);
+        c = avoidNull(this.responseJson["MouldName"]);
       } else if (i == 2) {
-        content = avoidNull(this.responseJson["MouldStatus"]);
+        c = avoidNull(this.responseJson["MouldStatus"]);
       } else if (i == 3) {
-        content = avoidNull(this.responseJson["HoldStateDes"]);
+        c = avoidNull(this.responseJson["HoldStateDes"]);
       } else if (i == 4) {
-        content = avoidNull(this.responseJson["StorageStateDes"]);
+        c = avoidNull(this.responseJson["StorageStateDes"]);
       }
       w.setContent(c);
     }
@@ -123,7 +123,6 @@ class _MoldOutPageState extends State<MoldOutPage> {
   Widget _buildSelectionItem(int index) {
     bool enabled = false;
     String title = "";
-    String content = "";
     if (index == 0) {
       enabled = false;
       title = "模号";
