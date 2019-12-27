@@ -24,7 +24,7 @@ class ProjectInfoDisplayWidget extends StatelessWidget {
             color: Colors.white,
             height: 15,
             child: Text(
-              "标题",
+              this.title,
               style: TextStyle(color: hexColor(MAIN_COLOR_BLACK), fontSize: 10),
             ),
           ),
@@ -40,9 +40,9 @@ class ProjectInfoDisplayWidget extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 5),
                     child: Text(
-                    this.content,
-                    style: TextStyle(color: hexColor("333333"), fontSize: 12),
-                  ),
+                      this.content,
+                      style: TextStyle(color: hexColor("333333"), fontSize: 12),
+                    ),
                   ),
                 ],
               ),

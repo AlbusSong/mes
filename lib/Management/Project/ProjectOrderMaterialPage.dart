@@ -5,19 +5,25 @@ import 'package:mes/Others/Tool/HudTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
-import 'Widget/ProjectTextInputWidget.dart';
 import 'Widget/ProjectInfoDisplayWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
-class ProjectLLotReport extends StatefulWidget {
+class ProjectOrderMaterialPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _ProjectLLotReportState();  
+    return _ProjectOrderMaterialPageState();
   }
 }
 
-class _ProjectLLotReportState extends State<ProjectLLotReport> {
+class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
+  final List<String> functionTitleList = [
+    "上升",
+    "下降",
+    "删除",
+    "追加",
+  ];
+  List<Widget> bottomFunctionWidgetList = List();
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
@@ -26,9 +32,30 @@ class _ProjectLLotReportState extends State<ProjectLLotReport> {
   void initState() {
     super.initState();
 
-    // for (int i = 0; i < 8; i++) {
-    //   this.selectionItemList.add(_buildSelectionItem(i));
-    // }
+    for (int i = 0; i < functionTitleList.length; i++) {
+      String functionTitle = functionTitleList[i];
+      Widget btn = Expanded(
+        child: Container(
+          height: 50,
+          color: hexColor(MAIN_COLOR),
+          child: FlatButton(
+            padding: EdgeInsets.all(0),
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text(functionTitle),
+            onPressed: () {
+              print(functionTitle);
+              // _functionItemClickedAtIndex(i);
+            },
+          ),
+        ),
+      );
+      bottomFunctionWidgetList.add(btn);
+
+      if (i != (functionTitleList.length - 1)) {
+        bottomFunctionWidgetList.add(SizedBox(width: 1));
+      }
+    }
   }
 
   @override
@@ -36,12 +63,12 @@ class _ProjectLLotReportState extends State<ProjectLLotReport> {
     return Scaffold(
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("Lot报工"),
+        title: Text("工单上料"),
         centerTitle: true,
       ),
       body: _buildBody(),
     );
-  }  
+  }
 
   Widget _buildBody() {
     return Column(
@@ -53,18 +80,14 @@ class _ProjectLLotReportState extends State<ProjectLLotReport> {
           ),
         ),
         Container(
-            height: 50,
-            width: double.infinity,
-            // color: randomColor(),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: hexColor(MAIN_COLOR),
-              child: Text("确认"),
-              onPressed: () {
-                // _btnConfirmClicked();
-              },
-            ),
+          height: 50,
+          width: double.infinity,
+          // color: randomColor(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: this.bottomFunctionWidgetList,
           ),
+        ),
       ],
     );
   }
@@ -72,57 +95,37 @@ class _ProjectLLotReportState extends State<ProjectLLotReport> {
   Widget _buildListView() {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      children: <Widget>[        
+      children: <Widget>[
         _buildSelectionInputItem(0),
         _buildSelectionInputItem(1),
-        ProjectInfoDisplayWidget(title: "工程",),
-        ProjectInfoDisplayWidget(title: "机型",),
+        ProjectInfoDisplayWidget(
+          title: "订单号",
+        ),
+        _buildSelectionInputItem(2),
         Container(
           color: Colors.white,
           child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-              child: ProjectInfoDisplayWidget(title: "机型",),
-            ),
-            SizedBox(width: 10,),
-            Expanded(
-              child: ProjectInfoDisplayWidget(title: "机型",),
-            ),
-          ],
-        ),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: ProjectInfoDisplayWidget(
+                  title: "物料需求",
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: ProjectInfoDisplayWidget(
+                  title: "已上料",
+                ),
+              ),
+            ],
+          ),
         ),
         WidgetTool.createListViewLine(15, hexColor("f2f2f7")),
-        _buildTextInputWidgetItem(0),
-        _buildTextInputWidgetItem(1),
-        _buildSelectionInputItem(2),
-      ],      
+      ],
     );
-  }
-
-  Widget _buildTextInputWidgetItem(int index) {
-    String title = "";
-    String placeholder = "";
-    bool canScan = true;
-    if (index == 0) {
-      title = "LotNo/模具ID";
-      placeholder = "扫描/输入";
-    } else if (index == 1) {
-      title = "数量";
-      placeholder = "请输入数字";
-      canScan = false;
-    }
-    ProjectTextInputWidget wgt = ProjectTextInputWidget(title: title, placeholder: placeholder, canScan: canScan,);
-
-    wgt.functionBlock = () {
-      hideKeyboard(context);
-      _popSheetAlert();
-    };
-    wgt.contentChangeBlock = (String newContent) {
-      print("contentChangeBlock: $newContent");
-    };
-
-    return wgt;
   }
 
   Widget _buildSelectionInputItem(int index) {
@@ -133,14 +136,16 @@ class _ProjectLLotReportState extends State<ProjectLLotReport> {
     } else if (index == 1) {
       title = "工单";
     } else if (index == 2) {
-      title = "档位";
-      enabled = false;
+      title = "追溯物料";
     }
     void Function() selectionBlock = () {
       _hasSelectedItem(index);
     };
 
-    MESSelectionItemWidget wgt = MESSelectionItemWidget(title: title, enabled: enabled,);
+    MESSelectionItemWidget wgt = MESSelectionItemWidget(
+      title: title,
+      enabled: enabled,
+    );
     wgt.selectionBlock = selectionBlock;
     return wgt;
   }

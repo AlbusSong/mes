@@ -3,6 +3,7 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
 import 'ProjectLLotReport.dart';
+import 'ProjectOrderMaterialPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -34,7 +35,6 @@ class ProjectPage extends StatelessWidget {
       ),
       body: _buildGridView(),
     );
-  
   }
 
   void _initSomeThings() {
@@ -57,17 +57,17 @@ class ProjectPage extends StatelessWidget {
   void _functionItemClickedAtIndex(int index) {
     Widget w;
     if (index == 0) {
-      
+      w = ProjectOrderMaterialPage();
     } else if (index == 1) {
       w = ProjectLLotReport();
     }
-    
+
     if (w != null) {
-      Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-              builder: (BuildContext context) => w));
+      Navigator.of(_scaffoldKey.currentContext)
+          .push(MaterialPageRoute(builder: (BuildContext context) => w));
     }
   }
-  
+
   Widget _buildGridView() {
     return GridView(
       padding: EdgeInsets.fromLTRB(10, 20, 10, 20),

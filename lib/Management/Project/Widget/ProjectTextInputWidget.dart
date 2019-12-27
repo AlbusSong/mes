@@ -28,9 +28,7 @@ class ProjectTextInputWidget extends StatelessWidget {
             margin: EdgeInsets.fromLTRB(10, 0, 10, 3),
             decoration: BoxDecoration(
               // color: Colors.white,
-              border: Border.all(
-                  width: 1,
-                  color: hexColor("999999")),
+              border: Border.all(width: 1, color: hexColor("999999")),
               borderRadius: BorderRadius.all(Radius.circular(4)),
             ),
             child: Row(
@@ -42,9 +40,9 @@ class ProjectTextInputWidget extends StatelessWidget {
                     child: TextField(
                       style: TextStyle(fontSize: 17, color: hexColor("333333")),
                       decoration: InputDecoration(
-                              hintText: this.placeholder,
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(top: 0)),
+                          hintText: this.placeholder,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.only(top: 0)),
                       onChanged: (String text) {
                         print("text: $text");
                         if (this.contentChangeBlock != null) {
