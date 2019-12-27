@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
-import 'ProjectLLotReport.dart';
+import 'ProjectLLotReportPage.dart';
 import 'ProjectOrderMaterialPage.dart';
+import 'ProjectLotSearchPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -59,7 +60,9 @@ class ProjectPage extends StatelessWidget {
     if (index == 0) {
       w = ProjectOrderMaterialPage();
     } else if (index == 1) {
-      w = ProjectLLotReport();
+      w = ProjectLLotReportPage();
+    } else if (index == 2) {
+      w = ProjectLotSearchPage();
     }
 
     if (w != null) {

@@ -10,14 +10,14 @@ import 'Widget/ProjectInfoDisplayWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
-class ProjectLLotReport extends StatefulWidget {
+class ProjectLLotReportPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _ProjectLLotReportState();  
+    return _ProjectLLotReportPageState();  
   }
 }
 
-class _ProjectLLotReportState extends State<ProjectLLotReport> {
+class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
@@ -25,10 +25,6 @@ class _ProjectLLotReportState extends State<ProjectLLotReport> {
   @override
   void initState() {
     super.initState();
-
-    // for (int i = 0; i < 8; i++) {
-    //   this.selectionItemList.add(_buildSelectionItem(i));
-    // }
   }
 
   @override
