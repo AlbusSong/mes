@@ -7,6 +7,8 @@ import '../../Others/View/SearchBarWithFunction.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
+import 'ProjectLotBatchDetailPage.dart';
+
 class ProjectLotBatchPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -15,11 +17,13 @@ class ProjectLotBatchPage extends StatefulWidget {
 }
 
 class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(
     hintText: "LOT NO或载具ID",
   );
   String lotNo;
+  List arrOfData;
 
   @override
   void initState() {
@@ -40,9 +44,10 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("Lot分批"),
+        title: Text("Lot分批-查询"),
         centerTitle: true,
       ),
       body: _buildBody(),
@@ -77,10 +82,102 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
   }
 
   Widget _buildListView() {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: <Widget>[
-      ],
+    return ListView.builder(
+        // itemCount: listLength(this.arrOfData),
+        itemCount: 2,
+        // itemExtent: 250,
+        itemBuilder: (context, index) {
+          // In our case, a DogCard for each doggo.
+          return GestureDetector(
+            onTap: () => _hasSelectedIndex(index),
+            child: _buildListItem(index),
+          );
+        });
+  }
+
+  Widget _buildListItem(int index) {
+    return Container(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                    height: 21,
+                    color: Colors.white,
+                    child: Text(
+                          "LOT NO: HSsls",
+                          style: TextStyle(
+                              color: hexColor("666666"),
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("载具ID：CAB1",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                        Text("未锁定",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("数量：35",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                        Text("档位：ASAA",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                        SizedBox(width: 10,),
+                      ],                                            
+                    ),
+                  ),
+                  Container(
+                    color: hexColor("dddddd"),
+                    height: 1,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 5),
+          Container(
+            margin: EdgeInsets.only(right: 8),
+            color: Colors.white,
+            child: Icon(
+              Icons.arrow_forward_ios,
+              color: hexColor("dddddd"),
+              size: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _hasSelectedIndex(int index) {
+    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
+      builder: (BuildContext context) => ProjectLotBatchDetailPage())
     );
   }
 
