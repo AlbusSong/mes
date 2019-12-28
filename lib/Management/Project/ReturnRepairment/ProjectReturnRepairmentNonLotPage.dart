@@ -13,8 +13,11 @@ class ProjectReturnRepairmentNonLotPage extends StatefulWidget {
   }  
 }
 
-class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairmentNonLotPage> {
+class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairmentNonLotPage> with AutomaticKeepAliveClientMixin {
   String content;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {

@@ -13,9 +13,11 @@ class ProjectReturnRepairmentLotPage extends StatefulWidget {
   }  
 }
 
-class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairmentLotPage> {
+class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairmentLotPage> with AutomaticKeepAliveClientMixin {
   String content;
 
+  bool get wantKeepAlive => true;
+  
   @override
   Widget build(BuildContext context) {
     return Container(

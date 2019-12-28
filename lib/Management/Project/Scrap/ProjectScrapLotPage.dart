@@ -13,9 +13,12 @@ class ProjectScrapLotPage extends StatefulWidget {
   }  
 }
 
-class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> {
+class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with AutomaticKeepAliveClientMixin {
   String content;
 
+  @override
+  bool get wantKeepAlive => true;
+  
   @override
   Widget build(BuildContext context) {
     return Container(
