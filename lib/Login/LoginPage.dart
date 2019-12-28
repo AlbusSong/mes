@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
-import 'package:mes/Others/tool/HudTool.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'LoginInputItem.dart';
@@ -132,23 +132,25 @@ class _LoginPageState extends State<LoginPage> {
 
     hideKeyboard(context);
 
-    HudTool.show();
+    // HudTool.show();
     HttpDigger().postWithUri("Login/OutOnline", parameters: {"UserName":this.username, "Password":this.password}, success: (int code, String message, dynamic responseJson) {
       print("Login/OutOnline: $responseJson");
       if (code == 0) {
-        HudTool.showInfoWithStatus(message);
+        // HudTool.showInfoWithStatus(message);
         return;
       }
 
       Navigator.pop(_scaffoldKey.currentContext);
       
-      HudTool.showInfoWithStatus(message);
+      // HudTool.showInfoWithStatus(message);
       MeInfo().isLogined = true;
       MeInfo().shouldRememberMe = this.shouldRememberMe;
       MeInfo().username = this.username;
       MeInfo().password = this.password;
       MeInfo().nickname = responseJson["Category"];
       MeInfo().storeLoginInfo();      
+    }, failure: (Error e) {
+      // HudTool.showInfoWithStatus("${e.toString()}");
     });
   }
 }
