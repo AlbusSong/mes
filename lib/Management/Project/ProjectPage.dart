@@ -10,6 +10,7 @@ import 'ProjectLotUnlockPage.dart';
 import 'ReturnRepairment/ProjectReturnRepairmentPage.dart';
 import 'ProjectChangeGearPage.dart';
 import 'ProjectLotBatchPage.dart';
+import 'ProjectRepairmentListPage.dart';
 import 'Scrap/ProjectScrapPage.dart';
 
 class ProjectPage extends StatelessWidget {
@@ -80,7 +81,7 @@ class ProjectPage extends StatelessWidget {
     } else if (index == 7) {
       w = ProjectChangeGearPage();
     } else if (index == 8) {
-
+      w = ProjectRepairmentListPage();
     } else if (index == 9) {
       w = ProjectScrapPage();
     }
