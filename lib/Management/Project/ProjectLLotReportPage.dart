@@ -10,6 +10,8 @@ import 'Widget/ProjectInfoDisplayWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
+import 'Model/ProjectWorkItemDataModel.dart';
+
 class ProjectLLotReportPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -21,10 +23,34 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
+  List arrOfWork;
 
   @override
   void initState() {
     super.initState();
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer() {
+    // 获取所有的作业中心
+    HttpDigger().postWithUri("LoadMaterial/GetAllWorkCenter", parameters: {},  shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/GetAllWorkCenter: $responseJson");;
+      this.arrOfWork = (responseJson as List)
+          .map((item) => ProjectWorkItemDataModel.fromJson(item))
+          .toList();
+      if (listLength(this.arrOfWork) > 0) {
+        ProjectWorkItemDataModel firstWorkData = this.arrOfWork.last;
+        _getPlanListFromServer(firstWorkData.LineCode);
+      }
+    });
+  }
+
+  void _getPlanListFromServer(String workLine) {
+    // 获取计划信息清单
+    HttpDigger().postWithUri("LotSubmit/PlanInfo", parameters: {"line":workLine}, shouldCache: false, success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/PlanInfo: $responseJson");;
+    });
   }
 
   @override

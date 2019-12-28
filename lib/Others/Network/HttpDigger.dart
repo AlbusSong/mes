@@ -50,8 +50,6 @@ class HttpDigger {
     responseType: ResponseType.json,
   ));
 
-
-
   void postWithUri(String uri,
       {Map parameters,
       bool shouldCache = false,
@@ -59,7 +57,6 @@ class HttpDigger {
       HttpFailure failure}) {
     print("NetworkRequest Url: ${baseUrl + uri}");
 
-    // String cacheKey = (baseUrl + uri + _generateArgListString(parameters));
     String md5OfParameters = generateMd5(jsonEncode(parameters));
     String cacheKey = (baseUrl + uri + "/" + md5OfParameters);
     print("cacheKey: $cacheKey");
@@ -67,27 +64,33 @@ class HttpDigger {
       Future<dynamic> cachedDataFuture = FlutterCache().getCachedData(cacheKey);
       cachedDataFuture.then((responseJsonString) {
         if (success != null) {
-          Map<String, dynamic> responseJson = jsonDecode(responseJsonString);
+          dynamic responseJson = jsonDecode(responseJsonString);
           if (responseJson == null) {
             success(0, "data is null", null);
             return;
           }
 
           bool s = false;
-          if (responseJson["Success"] != null) {
+          if ((responseJson is Map) && responseJson["Success"] != null) {
             s = responseJson["Success"];
           }
           // s = (responseJson["Success"] != null) ? responseJson["Success"] : false;
-          String message = responseJson["Message"];
-          responseJson["isCachedData"] = true;
+          String message = "";
+          if ((responseJson is Map) && responseJson["Message"] != null) {
+            message = responseJson["Message"];
+          }
+          if (responseJson is Map) {
+            responseJson["isCachedData"] = true;
+          }
           success(s ? 1 : 0, message, responseJson);
         }
       });
-    }    
+    }
 
-    Future<Response> responseFuture = dio.post(uri, data: parameters == null ? {} : parameters);
+    Future<Response> responseFuture =
+        dio.post(uri, data: parameters == null ? {} : parameters);
     responseFuture.then((responseObject) {
-      Map responseJson = responseObject.data;
+      dynamic responseJson = responseObject.data;
       if (success != null) {
         if (responseJson == null) {
           success(0, "data is null", null);
@@ -95,11 +98,14 @@ class HttpDigger {
         }
 
         bool s = false;
-        if (responseJson["Success"] != null) {
+        if ((responseJson is Map) && responseJson["Success"] != null) {
           s = responseJson["Success"];
         }
         // s = (responseJson["Success"] != null) ? responseJson["Success"] : false;
-        String message = responseJson["Message"];
+        String message = "";
+        if ((responseJson is Map) && responseJson["Message"] != null) {
+          message = responseJson["Message"];
+        }
         success(s ? 1 : 0, message, responseJson);
       }
 
@@ -112,27 +118,6 @@ class HttpDigger {
       }
     });
   }
-
-  // String _generateArgListString(Map<String, dynamic> parameters) {
-  //     List<String> arrOfKey = parameters.keys;
-  //     if (listLength(arrOfKey) == 0) {
-  //       return "";
-  //     }
-
-  //     String result = "?";
-  //     for (String key in arrOfKey) {
-  //       dynamic value = parameters[key];
-  //       String valueString;
-  //       if (value)
-  //       if (arrOfKey.indexOf(key) < (arrOfKey.length - 1)) {          
-  //         result += (key + "=" + parameters[key] + "&");
-  //       } else {
-  //         result += (key + "=" + parameters[key]);
-  //       }
-  //     }
-
-  //     return result;
-  //   }
 
   static void login(String username, String password,
       {HttpSuccess success, HttpFailure failure}) {
@@ -149,7 +134,8 @@ class HttpDigger {
       contentType: "application/json",
       responseType: ResponseType.json,
     ))
-      ..post("Login/OutOnline", data: {"UserName": username ?? "", "Password": password ?? ""})
+      ..post("Login/OutOnline",
+              data: {"UserName": username ?? "", "Password": password ?? ""})
           .then((responseObject) {
         if (success != null) {
           MeInfo().cookie = responseObject.headers.value("set-cookie");
