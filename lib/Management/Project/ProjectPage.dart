@@ -10,6 +10,7 @@ import 'ProjectLotUnlockPage.dart';
 import 'ReturnRepairment/ProjectReturnRepairmentPage.dart';
 import 'ProjectChangeGearPage.dart';
 import 'ProjectLotBatchPage.dart';
+import 'Scrap/ProjectScrapPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -78,6 +79,10 @@ class ProjectPage extends StatelessWidget {
       w = ProjectLotBatchPage();
     } else if (index == 7) {
       w = ProjectChangeGearPage();
+    } else if (index == 8) {
+
+    } else if (index == 9) {
+      w = ProjectScrapPage();
     }
 
     if (w != null) {
