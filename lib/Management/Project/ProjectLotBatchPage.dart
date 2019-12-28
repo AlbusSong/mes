@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
@@ -8,6 +10,8 @@ import '../../Others/View/SearchBarWithFunction.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 
 import 'ProjectLotBatchDetailPage.dart';
+
+import 'Model/ProjectItemModel.dart';
 
 class ProjectLotBatchPage extends StatefulWidget {
   @override
@@ -37,9 +41,21 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
       this.lotNo = c;
       _getDataFromServer();
     };
+
+    this.lotNo = "CAB1912173050FFF";
+    _getDataFromServer();
   }
 
-  void _getDataFromServer() {}
+  void _getDataFromServer() {
+    HttpDigger().postWithUri("LotSubmit/GetLotSearch", parameters: {"lotno":this.lotNo}, shouldCache: false, success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/GetLotSearch: $responseJson");
+      this.arrOfData = (jsonDecode(responseJson['Extend']) as List)
+          .map((item) => ProjectItemModel.fromJson(item))
+          .toList();
+      setState(() {        
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +99,7 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
 
   Widget _buildListView() {
     return ListView.builder(
-        // itemCount: listLength(this.arrOfData),
-        itemCount: 2,
+        itemCount: listLength(this.arrOfData),
         // itemExtent: 250,
         itemBuilder: (context, index) {
           // In our case, a DogCard for each doggo.
@@ -96,6 +111,7 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
   }
 
   Widget _buildListItem(int index) {
+    ProjectItemModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       child: Row(
@@ -112,7 +128,7 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
                     height: 21,
                     color: Colors.white,
                     child: Text(
-                          "LOT NO: HSsls",
+                          "LOT NO: ${itemData.LotNo}",
                           style: TextStyle(
                               color: hexColor("666666"),
                               fontSize: 15,
@@ -126,10 +142,10 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("载具ID：CAB1",
+                        Text("载具ID：${itemData.CToolNo}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        Text("未锁定",
+                        Text("${itemData.HoldDesc}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
@@ -142,10 +158,10 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("数量：35",
+                        Text("数量：${itemData.Qty}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        Text("档位：ASAA",
+                        Text("档位：${itemData.Grade}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                         SizedBox(width: 10,),

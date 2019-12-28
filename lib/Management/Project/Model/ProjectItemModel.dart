@@ -1,10 +1,10 @@
 import 'package:json_annotation/json_annotation.dart'; 
   
-part 'ProjectDetailModel.g.dart';
+part 'ProjectItemModel.g.dart';
 
 
 @JsonSerializable()
-  class ProjectDetailModel extends Object {
+  class ProjectItemModel extends Object {
 
   @JsonKey(name: 'LOTSize')
   int LOTSize;
@@ -102,11 +102,11 @@ part 'ProjectDetailModel.g.dart';
   @JsonKey(name: 'DataGroup')
   String DataGroup;
 
-  ProjectDetailModel(this.LOTSize,this.StatusDesc,this.HoldDesc,this.CTime,this.OTime,this.LevelManage,this.ProdClassCode,this.LotNo,this.Status,this.Hold,this.HoldCode,this.ProcessCode,this.ProcessName,this.ItemCode,this.ItemName,this.Dscb,this.Qty,this.Cost,this.CToolNo,this.Wono,this.OrderNo,this.Grade,this.LineCode,this.LineName,this.WorkCenterCode,this.WorkCenterName,this.Barcode,this.Delflag,this.CreateTime,this.ModifiedTime,this.Comment,this.DataGroup,);
+  ProjectItemModel(this.LOTSize,this.StatusDesc,this.HoldDesc,this.CTime,this.OTime,this.LevelManage,this.ProdClassCode,this.LotNo,this.Status,this.Hold,this.HoldCode,this.ProcessCode,this.ProcessName,this.ItemCode,this.ItemName,this.Dscb,this.Qty,this.Cost,this.CToolNo,this.Wono,this.OrderNo,this.Grade,this.LineCode,this.LineName,this.WorkCenterCode,this.WorkCenterName,this.Barcode,this.Delflag,this.CreateTime,this.ModifiedTime,this.Comment,this.DataGroup,);
 
-  factory ProjectDetailModel.fromJson(Map<String, dynamic> srcJson) => _$ProjectDetailModelFromJson(srcJson);
+  factory ProjectItemModel.fromJson(Map<String, dynamic> srcJson) => _$ProjectItemModelFromJson(srcJson);
 
-  Map<String, dynamic> toJson() => _$ProjectDetailModelToJson(this);
+  Map<String, dynamic> toJson() => _$ProjectItemModelToJson(this);
 
 }
 

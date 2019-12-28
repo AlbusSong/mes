@@ -8,7 +8,7 @@ import '../../Others/View/SearchBarWithFunction.dart';
 import 'dart:convert';
 import 'package:barcode_scan/barcode_scan.dart';
 
-import 'Model/ProjectDetailModel.dart';
+import 'Model/ProjectItemModel.dart';
 
 class ProjectLotSearchPage extends StatefulWidget {
   @override
@@ -23,7 +23,7 @@ class _ProjectLotSearchPageState extends State<ProjectLotSearchPage> {
     hintText: "LOT NO或载具ID",
   );
   String lotNo;
-  ProjectDetailModel detailData = ProjectDetailModel.fromJson({});
+  ProjectItemModel detailData = ProjectItemModel.fromJson({});
 
   @override
   void initState() {
@@ -48,7 +48,7 @@ class _ProjectLotSearchPageState extends State<ProjectLotSearchPage> {
       if (listLength(extend) == 0) {
         return;
       }
-      this.detailData = ProjectDetailModel.fromJson(extend[0]);
+      this.detailData = ProjectItemModel.fromJson(extend[0]);
       setState(() {});
     });
   }

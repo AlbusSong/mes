@@ -133,7 +133,6 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
         children: <Widget>[
           Container(
             padding: EdgeInsets.only(left: 30),
-            // color: randomColor(),
             height: 30,
             child: Text(
               " LotNo：HSOB19",
@@ -142,7 +141,6 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
           ),
           Container(
             padding: EdgeInsets.only(left: 30),
-            // color: randomColor(),
             height: 30,
             child: Text(
               "载具ID：CAB191217303asdjf",
@@ -151,7 +149,6 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
           ),
           Container(
             padding: EdgeInsets.only(left: 30),
-            // color: randomColor(),
             height: 30,
             child: Text(
               "    数量：35",
@@ -160,7 +157,6 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
           ),
           Container(
             padding: EdgeInsets.only(left: 30),
-            // color: randomColor(),
             height: 30,
             child: Text(
               "    档位：ASAA",

@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ProjectDetailModel.dart';
+part of 'ProjectItemModel.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ProjectDetailModel _$ProjectDetailModelFromJson(Map<String, dynamic> json) {
-  return ProjectDetailModel(
+ProjectItemModel _$ProjectItemModelFromJson(Map<String, dynamic> json) {
+  return ProjectItemModel(
     json['LOTSize'] as int,
     json['StatusDesc'] as String,
     json['HoldDesc'] as String,
@@ -43,7 +43,7 @@ ProjectDetailModel _$ProjectDetailModelFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$ProjectDetailModelToJson(ProjectDetailModel instance) =>
+Map<String, dynamic> _$ProjectItemModelToJson(ProjectItemModel instance) =>
     <String, dynamic>{
       'LOTSize': instance.LOTSize,
       'StatusDesc': instance.StatusDesc,
