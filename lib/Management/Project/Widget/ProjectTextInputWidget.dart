@@ -7,11 +7,14 @@ class ProjectTextInputWidget extends StatelessWidget {
     this.title = "",
     this.placeholder = "输入",
     this.canScan = true,
+    this.keyboardType = TextInputType.text,
   });
 
   String title;
   String placeholder;
   bool canScan;
+  TextInputType keyboardType;
+
   void Function() functionBlock;
   void Function(String newContent) contentChangeBlock;
   final _textInputController = TextEditingController();
@@ -44,6 +47,7 @@ class ProjectTextInputWidget extends StatelessWidget {
                     padding: EdgeInsets.only(left: 10),
                     child: TextField(
                       controller: _textInputController,
+                      keyboardType: this.keyboardType,
                       style: TextStyle(fontSize: 17, color: hexColor("333333")),
                       decoration: InputDecoration(
                           hintText: this.placeholder,

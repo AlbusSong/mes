@@ -5,6 +5,7 @@ import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
+import '../../Others/Tool/AlertTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 import 'Widget/ProjectTextInputWidget.dart';
@@ -154,7 +155,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
             color: hexColor(MAIN_COLOR),
             child: Text("确认"),
             onPressed: () {
-              // _btnConfirmClicked();
+              _btnConfirmClicked();
             },
           ),
         ),
@@ -199,6 +200,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     String title = "";
     String placeholder = "";
     bool canScan = true;
+    TextInputType keyboardType = TextInputType.text;
     if (index == 0) {
       title = "LotNo/模具ID";
       placeholder = "扫描/输入";
@@ -206,11 +208,13 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
       title = "数量";
       placeholder = "请输入数字";
       canScan = false;
+      keyboardType = TextInputType.number;
     }
     ProjectTextInputWidget wgt = ProjectTextInputWidget(
       title: title,
       placeholder: placeholder,
       canScan: canScan,
+      keyboardType: keyboardType,
     );
 
     wgt.functionBlock = () {
@@ -311,6 +315,39 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     }
 
     setState(() {});
+  }
+
+  Future _btnConfirmClicked() async {
+    if (this.selectedWork == null) {
+      HudTool.showInfoWithStatus("请选择作业中心");
+      return;
+    }
+
+    if (this.selectedPlanInfo == null) {
+      HudTool.showInfoWithStatus("请选择工单");
+      return;
+    }
+
+    if (isAvailable(this.lotNo)) {
+      HudTool.showInfoWithStatus("请输入模具ID");
+      return;
+    }
+
+    if (isAvailable(this.lotAmount)) {
+      HudTool.showInfoWithStatus("请输入模具数量");
+      return;
+    }
+
+    bool isOkay =
+        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定提交?");
+
+    if (isOkay) {
+      _confirmAction();
+    }
+  }
+
+  void _confirmAction() {
+    
   }
 
   void _popSheetAlert() {
