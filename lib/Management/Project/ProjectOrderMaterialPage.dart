@@ -7,7 +7,10 @@ import '../../Others/Const/Const.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 import 'Widget/ProjectInfoDisplayWidget.dart';
 
+import 'package:flutter_picker/flutter_picker.dart';
 import 'package:barcode_scan/barcode_scan.dart';
+
+import 'Model/ProjectLineModel.dart';
 
 class ProjectOrderMaterialPage extends StatefulWidget {
   @override
@@ -17,20 +20,45 @@ class ProjectOrderMaterialPage extends StatefulWidget {
 }
 
 class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
+  MESSelectionItemWidget _selectionWgt0;
+  MESSelectionItemWidget _selectionWgt1;
+  MESSelectionItemWidget _selectionWgt2;
+
+  ProjectInfoDisplayWidget _pInfoDisplayWgt0;
+  ProjectInfoDisplayWidget _pInfoDisplayWgt1;
+  ProjectInfoDisplayWidget _pInfoDisplayWgt2;
+
   final List<String> functionTitleList = [
     "上升",
     "下降",
     "删除",
     "追加",
   ];
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> bottomFunctionWidgetList = List();
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
+  List arrOfLineItem;
+  ProjectLineModel selectedLineItem;
 
   @override
   void initState() {
     super.initState();
+
+    _selectionWgt0 = _buildSelectionInputItem(0);
+    _selectionWgt1 = _buildSelectionInputItem(1);
+    _selectionWgt2 = _buildSelectionInputItem(2);
+
+    _pInfoDisplayWgt0 = ProjectInfoDisplayWidget(
+      title: "订单号",
+    );
+    _pInfoDisplayWgt1 = ProjectInfoDisplayWidget(
+      title: "物料需求",
+    );
+    _pInfoDisplayWgt2 = ProjectInfoDisplayWidget(
+      title: "已上料",
+    );
 
     for (int i = 0; i < functionTitleList.length; i++) {
       String functionTitle = functionTitleList[i];
@@ -56,11 +84,24 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
         bottomFunctionWidgetList.add(SizedBox(width: 1));
       }
     }
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer () {
+    // 获取所有有效的产线
+    HttpDigger().postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson){
+      print("LoadMaterial/AllLine: $responseJson");
+      this.arrOfLineItem = (responseJson['Extend'] as List)
+          .map((item) => ProjectLineModel.fromJson(item))
+          .toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("工单上料"),
@@ -96,29 +137,23 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: <Widget>[
-        _buildSelectionInputItem(0),
-        _buildSelectionInputItem(1),
-        ProjectInfoDisplayWidget(
-          title: "订单号",
-        ),
-        _buildSelectionInputItem(2),
+        _selectionWgt0,
+        _selectionWgt1,
+        _pInfoDisplayWgt0,
+        _selectionWgt2,
         Container(
           color: Colors.white,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Expanded(
-                child: ProjectInfoDisplayWidget(
-                  title: "物料需求",
-                ),
+                child: _pInfoDisplayWgt1,
               ),
               SizedBox(
                 width: 10,
               ),
               Expanded(
-                child: ProjectInfoDisplayWidget(
-                  title: "已上料",
-                ),
+                child: _pInfoDisplayWgt2,
               ),
             ],
           ),
@@ -132,7 +167,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     String title = "";
     bool enabled = true;
     if (index == 0) {
-      title = "作业中心";
+      title = "产线";
     } else if (index == 1) {
       title = "工单";
     } else if (index == 2) {
@@ -151,7 +186,42 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   }
 
   void _hasSelectedItem(int index) {
-    print("_hasSelectedItem: $index");
+    List<String> arrOfSelectionTitle = [];
+    if (index == 0) {
+      for (ProjectLineModel m in this.arrOfLineItem) {
+        arrOfSelectionTitle.add('${m.LineCode}|${m.LineName}');
+      }
+    } else if (index == 1) {
+    }
+
+    _showPickerWithData(arrOfSelectionTitle, index);
+
+    hideKeyboard(context);
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
+    if (index == 0) {
+      this.selectedLineItem = this.arrOfLineItem[indexOfSelectedItem];
+      _selectionWgt0.setContent(title);
+    } else if (index == 1) {
+    }
+
+    setState(() {});
   }
 
   void _popSheetAlert() {
