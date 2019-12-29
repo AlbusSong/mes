@@ -14,6 +14,11 @@ class ProjectTextInputWidget extends StatelessWidget {
   bool canScan;
   void Function() functionBlock;
   void Function(String newContent) contentChangeBlock;
+  final _textInputController = TextEditingController();
+
+  void setContent(String c) {
+    _textInputController.text = c;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +43,7 @@ class ProjectTextInputWidget extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.only(left: 10),
                     child: TextField(
+                      controller: _textInputController,
                       style: TextStyle(fontSize: 17, color: hexColor("333333")),
                       decoration: InputDecoration(
                           hintText: this.placeholder,

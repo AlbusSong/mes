@@ -90,7 +90,18 @@ class HttpDigger {
     Future<Response> responseFuture =
         dio.post(uri, data: parameters == null ? {} : parameters);
     responseFuture.then((responseObject) {
-      dynamic responseJson = responseObject.data;
+      dynamic responseObjectData = responseObject.data;
+      Map responseJson;
+      if ((responseObjectData is Map) == false) {
+        responseJson = {
+          "Success":true,
+          "Message":"",
+          "Extend":responseObjectData,
+        };
+      } else {
+        responseJson = responseObjectData;
+      }
+
       if (success != null) {
         if (responseJson == null) {
           success(0, "data is null", null);

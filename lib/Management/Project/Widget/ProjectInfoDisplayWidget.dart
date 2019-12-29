@@ -2,14 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 
-class ProjectInfoDisplayWidget extends StatelessWidget {
+class ProjectInfoDisplayWidget extends StatefulWidget {
   ProjectInfoDisplayWidget({
     this.title = "",
     this.content = "-",
   });
 
+  _ProjectInfoDisplayWidgetState _theState;
+
   final String title;
   final String content;
+
+  void setContent(String c) {
+    _theState.setContent(c);
+  }
+
+  @override
+  State<StatefulWidget> createState() {
+    _theState = _ProjectInfoDisplayWidgetState(title: title, content: content);
+    return _theState;
+  }
+
+}
+
+class _ProjectInfoDisplayWidgetState extends State<ProjectInfoDisplayWidget> {
+  _ProjectInfoDisplayWidgetState({
+    this.title = "",
+    this.content = "-",
+  });
+
+
+  final String title;
+  String content;
+
+  void setContent(String c) {
+    this.content = c;
+    setState(() {
+      
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
