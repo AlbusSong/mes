@@ -301,6 +301,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
       _selectionWgt0.setContent(title);
     } else if (index == 1) {
       this.selectedPlanInfo = this.arrOfPlanInfo[indexOfSelectedItem];
+      this.lotAmount = '${this.selectedPlanInfo.LOTSize}';
 
       _getGradeInfoFromServer(this.selectedPlanInfo.ProdClass);
 
@@ -318,22 +319,22 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   }
 
   Future _btnConfirmClicked() async {
-    if (this.selectedWork == null) {
+    if (this.selectedWork == null || isAvailable(this.selectedWork.LineCode) == false) {
       HudTool.showInfoWithStatus("请选择作业中心");
       return;
     }
 
-    if (this.selectedPlanInfo == null) {
+    if (this.selectedPlanInfo == null || isAvailable(this.selectedPlanInfo.LineCode) == false) {
       HudTool.showInfoWithStatus("请选择工单");
       return;
     }
 
-    if (isAvailable(this.lotNo)) {
+    if (isAvailable(this.lotNo) == false) {
       HudTool.showInfoWithStatus("请输入模具ID");
       return;
     }
 
-    if (isAvailable(this.lotAmount)) {
+    if (isAvailable(this.lotAmount) == false) {
       HudTool.showInfoWithStatus("请输入模具数量");
       return;
     }
@@ -347,7 +348,25 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   }
 
   void _confirmAction() {
-    
+    Map<String, dynamic> mDict = Map();
+    mDict["tool"] = this.lotNo;
+    mDict["wono"] = this.selectedPlanInfo.Wono;
+    mDict["grade"] = "185";
+    mDict["qty"] = this.lotAmount;
+    mDict["line"] = this.selectedPlanInfo.ProdClass;
+    mDict["productCode"] = this.selectedPlanInfo.ProductCode;
+
+    HudTool.show();
+    HttpDigger().postWithUri("LotSubmit/Submit", parameters: {}, success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/Submit: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus(message);
+      Navigator.pop(context);
+    });
   }
 
   void _popSheetAlert() {
