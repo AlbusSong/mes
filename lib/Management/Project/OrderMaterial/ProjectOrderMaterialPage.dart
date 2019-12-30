@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
-import '../../Others/Network/HttpDigger.dart';
+import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
-import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Const/Const.dart';
-import '../../Others/View/MESSelectionItemWidget.dart';
-import 'Widget/ProjectInfoDisplayWidget.dart';
+import '../../../Others/Tool/GlobalTool.dart';
+import '../../../Others/Const/Const.dart';
+import '../../../Others/View/MESSelectionItemWidget.dart';
+import '../Widget/ProjectInfoDisplayWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 
-import 'Model/ProjectLineModel.dart';
-import 'Model/ProjectTodayWorkOrderModel.dart';
-import 'Model/ProjectMaterialItemModel.dart';
+import '../Model/ProjectLineModel.dart';
+import '../Model/ProjectTodayWorkOrderModel.dart';
+import '../Model/ProjectMaterialItemModel.dart';
+
+import 'ProjectAddMaterialTagPage.dart';
 
 class ProjectOrderMaterialPage extends StatefulWidget {
   @override
@@ -81,7 +83,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
             child: Text(functionTitle),
             onPressed: () {
               print(functionTitle);
-              // _functionItemClickedAtIndex(i);
+              _functionItemClickedAtIndex(i);
             },
           ),
         ),
@@ -94,7 +96,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     }
 
     _getDataFromServer();
-  }
+  }  
 
   void _getDataFromServer() {
     // 获取所有有效的产线
@@ -462,6 +464,18 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     }
 
     setState(() {});
+  }
+
+  void _functionItemClickedAtIndex(int index) {
+    if (index == 0) {
+
+    } else if (index == 1) {
+
+    } else if (index == 2) {
+
+    } else if (index == 3) {
+      Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => ProjectAddMaterialTagPage()));
+    }
   }
 
   void _popSheetAlert() {
