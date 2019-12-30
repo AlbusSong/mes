@@ -46,6 +46,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   List arrOfTodayWork;
   ProjectTodayWorkOrderModel selectedTodayWork;
   ProjectMaterialItemModel materialInfo;
+  List arrOfMaterialTag;
 
   @override
   void initState() {
@@ -93,9 +94,11 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     _getDataFromServer();
   }
 
-  void _getDataFromServer () {
+  void _getDataFromServer() {
     // 获取所有有效的产线
-    HttpDigger().postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson){
+    HttpDigger()
+        .postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/AllLine: $responseJson");
       this.arrOfLineItem = (responseJson['Extend'] as List)
           .map((item) => ProjectLineModel.fromJson(item))
@@ -141,12 +144,38 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
         HudTool.dismiss();
       }
 
-      List arr =responseJson["Extend"];
+      List arr = responseJson["Extend"];
       if (listLength(arr) == 0) {
         return;
       }
       this.materialInfo = ProjectMaterialItemModel.fromJson(arr[0]);
-      _selectionWgt2.setContent('${this.materialInfo.ItemType}|${this.materialInfo.ItemCode}|${this.materialInfo.ItemName}');
+      _selectionWgt2.setContent(
+          '${this.materialInfo.ItemType}|${this.materialInfo.ItemCode}|${this.materialInfo.ItemName}');
+
+      _getTagListFromServer(wono, this.materialInfo.BomID.toString());
+    });
+  }
+
+  void _getTagListFromServer(String wono, String materialId) {
+    // 获取所有绑定的标签清单
+    HudTool.show();
+    HttpDigger().postWithUri("LoadMaterial/LoadTag",
+        parameters: {"wono": wono, "item": materialInfo}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/LoadTag: $responseJson");
+      HudTool.dismiss();
+
+      List arr = responseJson["Extend"];
+      if (listLength(arr) == 0) {
+        this.arrOfMaterialTag = null;
+      } else {
+        this.arrOfMaterialTag = (arr as List)
+          .map((item) => ProjectMaterialItemModel.fromJson(item))
+          .toList();
+      }
+      
+      setState(() {        
+      });
     });
   }
 
@@ -186,6 +215,12 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   }
 
   Widget _buildListView() {
+    return ListView.builder(
+        itemCount: listLength(this.arrOfMaterialTag) + 5,
+        // itemExtent: 250,
+        itemBuilder: (context, index) {
+          return _buildListViewItem(index);
+        });
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: <Widget>[
@@ -213,6 +248,41 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
         WidgetTool.createListViewLine(15, hexColor("f2f2f7")),
       ],
     );
+  }
+
+  Widget _buildListViewItem(int index) {
+    if (index == 0) {
+      return _selectionWgt0;
+    } else if (index == 1) {
+      return _selectionWgt1;
+    } else if (index == 2) {
+      return _pInfoDisplayWgt0; 
+    } else if (index == 3) {
+      return _selectionWgt2;
+    } else if (index == 4) {
+      return Container(
+          color: Colors.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: _pInfoDisplayWgt1,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: _pInfoDisplayWgt2,
+              ),
+            ],
+          ),
+        );
+    } else {
+      return Container(
+        height: 250,
+        color: randomColor(),
+      );
+    }
   }
 
   Widget _buildSelectionInputItem(int index) {
@@ -269,12 +339,13 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     picker.show(_scaffoldKey.currentState);
   }
 
-  void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
     if (index == 0) {
       this.selectedLineItem = this.arrOfLineItem[indexOfSelectedItem];
       _getPlanListFromServer(this.selectedLineItem.LineCode);
 
-      _selectionWgt0.setContent(title);      
+      _selectionWgt0.setContent(title);
     } else if (index == 1) {
       this.selectedTodayWork = this.arrOfTodayWork[indexOfSelectedItem];
       _getMaterialInfoFromServer(this.selectedTodayWork.Wono);
@@ -282,7 +353,8 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       _selectionWgt1.setContent(title);
       _pInfoDisplayWgt0.setContent(this.selectedTodayWork.Rpno);
       _pInfoDisplayWgt1.setContent(this.selectedTodayWork.WoPlanQty.toString());
-      _pInfoDisplayWgt2.setContent(this.selectedTodayWork.WoOutPutQty.toString());
+      _pInfoDisplayWgt2
+          .setContent(this.selectedTodayWork.WoOutPutQty.toString());
     }
 
     setState(() {});
