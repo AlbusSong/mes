@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../Others/Network/HttpDigger.dart';
+import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
-import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Const/Const.dart';
-import '../../Others/View/SelectionBar.dart';
+import '../../../Others/Tool/GlobalTool.dart';
+import '../../../Others/Const/Const.dart';
+import '../../../Others/View/SelectionBar.dart';
+
+import 'ProjectRepairmentDetailPage.dart';
 
 class ProjectRepairmentListPage extends StatefulWidget {
   @override
@@ -13,6 +15,7 @@ class ProjectRepairmentListPage extends StatefulWidget {
 }
 
 class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final SelectionBar _sBar = SelectionBar();
   String lotNo;
@@ -31,6 +34,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("Lot查询"),
@@ -185,6 +189,6 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
   }
 
   void _hasSelectedIndex(int index) {
-
+    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => ProjectRepairmentDetailPage()));
   }
 }

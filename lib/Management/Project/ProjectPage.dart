@@ -10,7 +10,7 @@ import 'ProjectLotUnlockPage.dart';
 import 'ReturnRepairment/ProjectReturnRepairmentPage.dart';
 import 'ProjectChangeGearPage.dart';
 import 'ProjectLotBatchPage.dart';
-import 'ProjectRepairmentListPage.dart';
+import 'Repairment/ProjectRepairmentListPage.dart';
 import 'Scrap/ProjectScrapPage.dart';
 
 class ProjectPage extends StatelessWidget {
