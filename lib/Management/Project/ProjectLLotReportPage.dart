@@ -118,7 +118,8 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     HttpDigger().postWithUri("LotSubmit/GetGrade",
         parameters: {"proclass": prodClass}, shouldCache: false,
         success: (int code, String message, dynamic responseJson) {
-      print("LotSubmit/GetGrade: $responseJson");      
+      print("LotSubmit/GetGrade: $responseJson");  
+      _selectionWgt2.setContent("BBB");
       this.selectedGradeInfo = jsonDecode(responseJson['Extend']);
       print("selectedGradeInfo: $selectedGradeInfo");
     });
@@ -351,10 +352,12 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     Map<String, dynamic> mDict = Map();
     mDict["tool"] = this.lotNo;
     mDict["wono"] = this.selectedPlanInfo.Wono;
-    mDict["grade"] = "185";
+    mDict["grade"] = "BBB";
     mDict["qty"] = this.lotAmount;
     mDict["line"] = this.selectedPlanInfo.ProdClass;
     mDict["productCode"] = this.selectedPlanInfo.ProductCode;
+
+    print("LotSubmit/Submit mDict: $mDict");
 
     HudTool.show();
     HttpDigger().postWithUri("LotSubmit/Submit", parameters: {}, success: (int code, String message, dynamic responseJson) {
@@ -396,8 +399,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     print("start scanning");
 
     try {
-      String c = await BarcodeScanner.scan();
-      print("c: $c");
+      this.lotNo = await BarcodeScanner.scan();
     } on Exception catch (e) {
       if (e == BarcodeScanner.CameraAccessDenied) {
         HudTool.showInfoWithStatus("相机权限未开启");
