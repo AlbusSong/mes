@@ -47,6 +47,8 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   ProjectTodayWorkOrderModel selectedTodayWork;
   ProjectMaterialItemModel materialInfo;
   List arrOfMaterialTag;
+  ProjectMaterialItemModel selectedMaterialTag;
+
 
   @override
   void initState() {
@@ -167,15 +169,14 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
 
       List arr = responseJson["Extend"];
       if (listLength(arr) == 0) {
-        this.arrOfMaterialTag = null;
+        this.arrOfMaterialTag = List();
       } else {
         this.arrOfMaterialTag = (arr as List)
-          .map((item) => ProjectMaterialItemModel.fromJson(item))
-          .toList();
+            .map((item) => ProjectMaterialItemModel.fromJson(item))
+            .toList();
       }
-      
-      setState(() {        
-      });
+
+      setState(() {});
     });
   }
 
@@ -216,38 +217,11 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
 
   Widget _buildListView() {
     return ListView.builder(
-        itemCount: listLength(this.arrOfMaterialTag) + 5,
+        itemCount: listLength(this.arrOfMaterialTag) + 6 + 3,
         // itemExtent: 250,
         itemBuilder: (context, index) {
           return _buildListViewItem(index);
         });
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: <Widget>[
-        _selectionWgt0,
-        _selectionWgt1,
-        _pInfoDisplayWgt0,
-        _selectionWgt2,
-        Container(
-          color: Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                child: _pInfoDisplayWgt1,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: _pInfoDisplayWgt2,
-              ),
-            ],
-          ),
-        ),
-        WidgetTool.createListViewLine(15, hexColor("f2f2f7")),
-      ],
-    );
   }
 
   Widget _buildListViewItem(int index) {
@@ -256,33 +230,163 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     } else if (index == 1) {
       return _selectionWgt1;
     } else if (index == 2) {
-      return _pInfoDisplayWgt0; 
+      return _pInfoDisplayWgt0;
     } else if (index == 3) {
       return _selectionWgt2;
     } else if (index == 4) {
       return Container(
-          color: Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                child: _pInfoDisplayWgt1,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: _pInfoDisplayWgt2,
-              ),
-            ],
-          ),
-        );
+        color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              child: _pInfoDisplayWgt1,
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: _pInfoDisplayWgt2,
+            ),
+          ],
+        ),
+      );
+    } else if (index == 5) {
+      return WidgetTool.createListViewLine(10, hexColor("f2f2f7"));
     } else {
-      return Container(
-        height: 250,
-        color: randomColor(),
+      int realIndex = index - 5;
+      return GestureDetector(
+        child: _buildMaterialTagItem(realIndex),
+        onTap: () {
+          _onMaterialTagItemClicked(realIndex);
+        },
       );
     }
+  }
+
+  void _onMaterialTagItemClicked(int index) {
+    this.selectedIndex = index;
+    if (listLength(this.arrOfMaterialTag) > 0) {
+      this.selectedMaterialTag = this.arrOfMaterialTag[this.selectedIndex];
+    }
+
+    setState(() {      
+    });
+  }
+
+  Widget _buildMaterialTagItem(int index) {
+    return Container(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+            // color: randomColor(),
+            constraints: BoxConstraints(minWidth: 25),
+            child: Text((index + 1).toString(), style: TextStyle(color: hexColor("999999"), fontSize: 15),),
+          ),
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                    height: 25,
+                    color: Colors.white,
+                    child: Text(
+                          "标签：D20180404000006",
+                          maxLines: 2,
+                          style: TextStyle(
+                              color: hexColor(MAIN_COLOR_BLACK),
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold),
+                        ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("物料ID：13251001",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("物料批次：20180404",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("订单号：P228217",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                        Text("单位：UNT",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("已上料：82",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                        Text("使用量：20",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                      ],
+                    ),
+                  ),                  
+                  Container(
+                    color: hexColor("dddddd"),
+                    height: 1,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 5),
+          Opacity(
+            opacity: (this.selectedIndex == index) ? 1.0 : 0.0,
+            child: Container(
+              margin: EdgeInsets.only(right: 8),
+              color: Colors.white,
+              child: Icon(
+                Icons.check,
+                color: hexColor(MAIN_COLOR),
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSelectionInputItem(int index) {
