@@ -88,7 +88,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
           .map((item) => ProjectWorkItemDataModel.fromJson(item))
           .toList();
       if (listLength(this.arrOfWork) > 0) {
-        ProjectWorkItemDataModel firstWorkData = this.arrOfWork.last;
+        ProjectWorkItemDataModel firstWorkData = this.arrOfWork.first;
         _getPlanListFromServer(firstWorkData.WorkCenterCode);
       }
     });

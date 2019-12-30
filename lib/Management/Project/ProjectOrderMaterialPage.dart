@@ -11,6 +11,8 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 
 import 'Model/ProjectLineModel.dart';
+import 'Model/ProjectTodayWorkOrderModel.dart';
+import 'Model/ProjectMaterialItemModel.dart';
 
 class ProjectOrderMaterialPage extends StatefulWidget {
   @override
@@ -41,6 +43,9 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   int selectedIndex = -1;
   List arrOfLineItem;
   ProjectLineModel selectedLineItem;
+  List arrOfTodayWork;
+  ProjectTodayWorkOrderModel selectedTodayWork;
+  ProjectMaterialItemModel materialInfo;
 
   @override
   void initState() {
@@ -95,6 +100,53 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       this.arrOfLineItem = (responseJson['Extend'] as List)
           .map((item) => ProjectLineModel.fromJson(item))
           .toList();
+
+      if (listLength(this.arrOfLineItem) > 0) {
+        ProjectLineModel firstWorkData = this.arrOfLineItem.first;
+        _getPlanListFromServer(firstWorkData.LineCode);
+      }
+    });
+  }
+
+  void _getPlanListFromServer(String workLine, {shouldShowHud = true}) {
+    // 获取计划信息清单
+    print("workLine: $workLine");
+    if (shouldShowHud == true) {
+      HudTool.show();
+    }
+    HttpDigger().postWithUri("LoadMaterial/TodayWo",
+        parameters: {"line": workLine}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/TodayWo: $responseJson");
+      if (shouldShowHud == true) {
+        HudTool.dismiss();
+      }
+      this.arrOfTodayWork = (responseJson["Extend"] as List)
+          .map((item) => ProjectTodayWorkOrderModel.fromJson(item))
+          .toList();
+    });
+  }
+
+  void _getMaterialInfoFromServer(String wono, {shouldShowHud = true}) {
+    // 获取追溯物料
+    print("wono: $wono");
+    if (shouldShowHud == true) {
+      HudTool.show();
+    }
+    HttpDigger().postWithUri("LoadMaterial/RPTItem",
+        parameters: {"wono": wono}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/RPTItem: $responseJson");
+      if (shouldShowHud == true) {
+        HudTool.dismiss();
+      }
+
+      List arr =responseJson["Extend"];
+      if (listLength(arr) == 0) {
+        return;
+      }
+      this.materialInfo = ProjectMaterialItemModel.fromJson(arr[0]);
+      _selectionWgt2.setContent('${this.materialInfo.ItemType}|${this.materialInfo.ItemCode}|${this.materialInfo.ItemName}');
     });
   }
 
@@ -192,6 +244,9 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
         arrOfSelectionTitle.add('${m.LineCode}|${m.LineName}');
       }
     } else if (index == 1) {
+      for (ProjectTodayWorkOrderModel m in this.arrOfTodayWork) {
+        arrOfSelectionTitle.add('${m.Wono}|${m.StateDesc}');
+      }
     }
 
     _showPickerWithData(arrOfSelectionTitle, index);
@@ -217,8 +272,17 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
     if (index == 0) {
       this.selectedLineItem = this.arrOfLineItem[indexOfSelectedItem];
-      _selectionWgt0.setContent(title);
+      _getPlanListFromServer(this.selectedLineItem.LineCode);
+
+      _selectionWgt0.setContent(title);      
     } else if (index == 1) {
+      this.selectedTodayWork = this.arrOfTodayWork[indexOfSelectedItem];
+      _getMaterialInfoFromServer(this.selectedTodayWork.Wono);
+
+      _selectionWgt1.setContent(title);
+      _pInfoDisplayWgt0.setContent(this.selectedTodayWork.Rpno);
+      _pInfoDisplayWgt1.setContent(this.selectedTodayWork.WoPlanQty.toString());
+      _pInfoDisplayWgt2.setContent(this.selectedTodayWork.WoOutPutQty.toString());
     }
 
     setState(() {});
