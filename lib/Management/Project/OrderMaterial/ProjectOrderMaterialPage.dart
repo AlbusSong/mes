@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
@@ -52,7 +53,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   ProjectTodayWorkOrderModel selectedTodayWork;
   ProjectMaterialItemModel materialInfo;
   List arrOfMaterialTag;
-  ProjectMaterialItemModel selectedMaterialTag;
+  ProjectTagInfoModel selectedMaterialTag;
 
 
   @override
@@ -468,7 +469,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     setState(() {});
   }
 
-  void _functionItemClickedAtIndex(int index) {
+  Future _functionItemClickedAtIndex(int index) async {
     if (this.selectedLineItem == null) {
       HudTool.showInfoWithStatus("请选择产线");
       return;
@@ -483,17 +484,59 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       return;
     }
 
-    if (index == 0) {
+    if (index != 3 && this.selectedMaterialTag == null) {
+      HudTool.showInfoWithStatus("请选择一项标签");
+      return;
+    }
 
-    } else if (index == 1) {
 
-    } else if (index == 2) {
 
-    } else if (index == 3) {
+    if (index == 3) {
       Widget w = ProjectAddMaterialTagPage(this.materialInfo.ItemCode, this.selectedTodayWork.Wono);
       Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
+    } else {
+      String hintTitle = "确定上升?";
+      if (index == 1) {
+        hintTitle = "确定下降?";
+      } else if (index == 2) {
+        hintTitle = "确定删除?";
+      }
+      bool isOkay =
+        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, hintTitle);
+
+    if (isOkay) {
+      _realConfirmationAction(index);
+    }
     }
   }
+
+void _realConfirmationAction(int index) {
+  String uri = "LoadMaterial/Up";
+  if (index == 1) {
+    uri = "LoadMaterial/Down";
+  } else if (index == 2) {
+    uri = "LoadMaterial/Delete";
+  }
+
+  Map mDict = Map();
+  mDict["wono"] = this.selectedTodayWork.Wono;
+  mDict["item"] = this.materialInfo.ItemCode;
+  mDict["tag"] = this.selectedMaterialTag.TagID;
+  mDict["id"] = this.selectedTodayWork.ID;
+  print('$uri: $mDict');
+
+  HudTool.show();
+  HttpDigger().postWithUri(uri, parameters: mDict, success: (int code, String message, dynamic responseJson){
+    print('$uri: $responseJson');
+    if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.pop(context);
+  });
+}
 
   void _popSheetAlert() {
     showModalBottomSheet(
