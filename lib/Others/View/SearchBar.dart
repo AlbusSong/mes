@@ -10,6 +10,12 @@ class SearchBar extends StatelessWidget {
   void Function (String newContent) contentChangeBlock;
   void Function (String content) keyboardReturnBlock;
 
+  final TextEditingController _txtController = TextEditingController();
+
+  void setContent(String c) {
+    _txtController.text = c;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,6 +54,7 @@ class SearchBar extends StatelessWidget {
                         // color: hexColor("ffff00"),
                         height: 45,
                         child: TextField(
+                          controller: _txtController,
                           style: TextStyle(
                               fontSize: 15, color: hexColor("333333")),
                           // maxLines: 1,

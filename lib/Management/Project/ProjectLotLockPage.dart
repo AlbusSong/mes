@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
@@ -8,6 +10,10 @@ import '../../Others/View/MESSelectionItemWidget.dart';
 import '../../Others/View/MESContentInputWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flutter_picker/flutter_picker.dart';
+
+import 'Model/ProjectItemModel.dart';
+import 'Model/ProjectLockCodeModel.dart';
 
 class ProjectLotLockPage extends StatefulWidget {
   @override
@@ -17,16 +23,28 @@ class ProjectLotLockPage extends StatefulWidget {
 }
 
 class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
+  MESSelectionItemWidget _selectionWgt0;
+  MESSelectionItemWidget _selectionWgt1;
+  MESSelectionItemWidget _selectionWgt2;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(
     hintText: "LOT NO或载具ID",
   );
-  String content;
+  String remarkContent;
   String lotNo;
+  ProjectItemModel detailData = ProjectItemModel.fromJson({});
+  List arrOfLockCode;
+  ProjectLockCodeModel selectedLockCode;
 
   @override
   void initState() {
     super.initState();
+
+    _selectionWgt0 = _buildSelectionInputItem(0);
+    _selectionWgt1 = _buildSelectionInputItem(1);
+    _selectionWgt2 = _buildSelectionInputItem(2);
 
     _sBar.functionBlock = () {
       print("functionBlock");
@@ -36,13 +54,39 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       this.lotNo = c;
       _getDataFromServer();
     };
+
+    _getLockCodeListFromServer();
   }
 
-  void _getDataFromServer() {}
+  void _getDataFromServer() {
+    // CAB1912173050FFF
+    HudTool.show();
+    HttpDigger().postWithUri("LotSubmit/GetLotSearch", parameters: {"lotno":this.lotNo},  shouldCache: true, success: (int code, String message, dynamic responseJson){
+      print("LotSubmit/GetLotSearch: $responseJson");
+      HudTool.dismiss();
+      List extend = jsonDecode(responseJson["Extend"]);
+      if (listLength(extend) == 0) {
+        return;
+      }
+      this.detailData = ProjectItemModel.fromJson(extend[0]);
+      _selectionWgt0.setContent(this.detailData.LotNo);
+      _selectionWgt1.setContent(this.detailData.LOTSize.toString());
+    }); 
+  }
+
+  void _getLockCodeListFromServer() {
+    HttpDigger().postWithUri("LotSubmit/GetLockCode", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson){
+      print("LotSubmit/GetLockCode: $responseJson");
+      this.arrOfLockCode = (responseJson['Extend'] as List)
+          .map((item) => ProjectLockCodeModel.fromJson(item))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("Lot锁定"),
@@ -71,7 +115,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
             color: hexColor(MAIN_COLOR),
             child: Text("锁定"),
             onPressed: () {
-              // _btnConfirmClicked();
+              _btnConfirmClicked();
             },
           ),
         ),
@@ -83,9 +127,9 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: <Widget>[
-        _buildSelectionInputItem(0),
-        _buildSelectionInputItem(1),
-        _buildSelectionInputItem(2),
+        _selectionWgt0,
+        _selectionWgt1,
+        _selectionWgt2,
         _buildContentInputItem(),
         _buildFooter(),
       ],
@@ -117,12 +161,58 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
 
   void _hasSelectedItem(int index) {
     print("_hasSelectedItem: $index");
+
+    List<String> arrOfSelectionTitle = [];
+    if (index == 0) {
+
+    } else if (index == 1) {
+      
+    } else if (index == 2) {
+      for (ProjectLockCodeModel m in this.arrOfLockCode) {
+        arrOfSelectionTitle.add('${m.LockCode}|${m.Description}');
+      }
+    }
+
+    if (arrOfSelectionTitle.length == 0) {
+      return;
+    }
+
+    _showPickerWithData(arrOfSelectionTitle, index);
+
+    hideKeyboard(context);
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    // picker.show(Scaffold.of(context));
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
+    if (index == 0) {
+
+    } else if (index == 1) {
+    } else if (index == 2) {
+      this.selectedLockCode = this.arrOfLockCode[indexOfSelectedItem];
+
+      _selectionWgt2.setContent(title);      
+    }
   }
 
   Widget _buildContentInputItem() {
     void Function(String) contentChangedBlock = (String newContent) {
       // print("contentChangedBlock: $newContent");
-      this.content = newContent;
+      this.remarkContent = newContent;
     };
     return MESContentInputWidget(
       placeholder: "备注",
@@ -167,6 +257,49 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     );
   }
 
+  Future _btnConfirmClicked () async {
+    if (isAvailable(this.lotNo) == false) {
+      HudTool.showInfoWithStatus("请输入/扫码获取Lot NO");
+      return;
+    }
+
+    if (this.selectedLockCode == null) {
+      HudTool.showInfoWithStatus("请选择锁定代码");
+      return;
+    }
+
+    if (isAvailable(this.remarkContent) == false) {
+      HudTool.showInfoWithStatus("请输入备注");
+      return;
+    }
+
+    bool isOkay = await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定锁定?");
+
+    if (isOkay) {
+      _confirmAction();
+    }    
+  }
+
+  void _confirmAction() {
+    // LotSubmit/LotLock
+    Map mDict = Map();
+    mDict["lotno"] = this.detailData.LotNo;
+    mDict["holdcode"] = this.selectedLockCode.LockCode;
+    mDict["comment"] = this.remarkContent;
+
+    HudTool.show();
+    HttpDigger().postWithUri("LotSubmit/LotLock", parameters: mDict, success: (int code, String message, dynamic responseJson){
+      print("LotSubmit/LotLock: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.pop(context);
+    });
+  }
+
   void _popSheetAlert() {
     showModalBottomSheet(
       context: context,
@@ -195,7 +328,9 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
 
     try {
       String c = await BarcodeScanner.scan();
-      print("c: $c");
+      _sBar.setContent(c);
+      this.lotNo = c;      
+      _getDataFromServer();
     } on Exception catch (e) {
       if (e == BarcodeScanner.CameraAccessDenied) {
         HudTool.showInfoWithStatus("相机权限未开启");

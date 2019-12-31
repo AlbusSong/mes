@@ -272,6 +272,10 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
       }
     }
 
+    if (arrOfSelectionTitle.length == 0) {
+      return;
+    }
+
     _showPickerWithData(arrOfSelectionTitle, index);
 
     hideKeyboard(context);
