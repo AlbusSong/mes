@@ -355,7 +355,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     mDict["grade"] = "BBB";
     mDict["qty"] = this.lotAmount;
     mDict["line"] = this.selectedPlanInfo.WorkCenterCode;
-    mDict["productCode"] = this.selectedPlanInfo.ProductCode;
+    mDict["productCode"] = this.selectedPlanInfo.ItemCode;
 
     print("LotSubmit/Submit mDict: $mDict");
 
@@ -400,6 +400,8 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
 
     try {
       this.lotNo = await BarcodeScanner.scan();
+      _selectionWgt2.setContent(this.lotNo);
+      HudTool.showInfoWithStatus("扫码成功：\n${this.lotNo}");
     } on Exception catch (e) {
       if (e == BarcodeScanner.CameraAccessDenied) {
         HudTool.showInfoWithStatus("相机权限未开启");
