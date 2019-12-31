@@ -47,13 +47,14 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
   }
 
   void _getDataFromServer() {
-    HttpDigger().postWithUri("LotSubmit/GetLotSearch", parameters: {"lotno":this.lotNo}, shouldCache: false, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LotSubmit/GetLotSearch",
+        parameters: {"lotno": this.lotNo}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLotSearch: $responseJson");
       this.arrOfData = (jsonDecode(responseJson['Extend']) as List)
           .map((item) => ProjectItemModel.fromJson(item))
           .toList();
-      setState(() {        
-      });
+      setState(() {});
     });
   }
 
@@ -81,18 +82,18 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
           ),
         ),
         Container(
-            height: 50,
-            width: double.infinity,
-            // color: randomColor(),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: hexColor(MAIN_COLOR),
-              child: Text("确认"),
-              onPressed: () {
-                // _btnConfirmClicked();
-              },
-            ),
+          height: 50,
+          width: double.infinity,
+          // color: randomColor(),
+          child: FlatButton(
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text("确认"),
+            onPressed: () {
+              // _btnConfirmClicked();
+            },
           ),
+        ),
       ],
     );
   }
@@ -128,12 +129,12 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
                     height: 21,
                     color: Colors.white,
                     child: Text(
-                          "LOT NO: ${itemData.LotNo}",
-                          style: TextStyle(
-                              color: hexColor("666666"),
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      "LOT NO: ${itemData.LotNo}",
+                      style: TextStyle(
+                          color: hexColor("666666"),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                   Container(
                     color: Colors.white,
@@ -164,8 +165,10 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
                         Text("档位：${itemData.Grade}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        SizedBox(width: 10,),
-                      ],                                            
+                        SizedBox(
+                          width: 10,
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -193,8 +196,7 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
 
   void _hasSelectedIndex(int index) {
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-      builder: (BuildContext context) => ProjectLotBatchDetailPage())
-    );
+        builder: (BuildContext context) => ProjectLotBatchDetailPage()));
   }
 
   void _popSheetAlert() {

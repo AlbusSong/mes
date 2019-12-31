@@ -55,7 +55,6 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   List arrOfMaterialTag;
   ProjectTagInfoModel selectedMaterialTag;
 
-
   @override
   void initState() {
     super.initState();
@@ -100,7 +99,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     }
 
     _getDataFromServer();
-  }  
+  }
 
   void _getDataFromServer() {
     // 获取所有有效的产线
@@ -174,10 +173,10 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
         success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/LoadTag: $responseJson");
       HudTool.dismiss();
-      List arr = jsonDecode(responseJson["Extend"]);      
+      List arr = jsonDecode(responseJson["Extend"]);
       this.arrOfMaterialTag = (arr as List)
-            .map((item) => ProjectTagInfoModel.fromJson(item))
-            .toList();
+          .map((item) => ProjectTagInfoModel.fromJson(item))
+          .toList();
       setState(() {});
     });
   }
@@ -272,8 +271,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       this.selectedMaterialTag = this.arrOfMaterialTag[this.selectedIndex];
     }
 
-    setState(() {      
-    });
+    setState(() {});
   }
 
   Widget _buildMaterialTagItem(int index) {
@@ -287,7 +285,10 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
             padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
             // color: randomColor(),
             constraints: BoxConstraints(minWidth: 25),
-            child: Text((index + 1).toString(), style: TextStyle(color: hexColor("999999"), fontSize: 15),),
+            child: Text(
+              (index + 1).toString(),
+              style: TextStyle(color: hexColor("999999"), fontSize: 15),
+            ),
           ),
           Expanded(
             child: Container(
@@ -300,13 +301,13 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                          "标签：${itemData.TagID}",
-                          maxLines: 2,
-                          style: TextStyle(
-                              color: hexColor(MAIN_COLOR_BLACK),
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      "标签：${itemData.TagID}",
+                      maxLines: 2,
+                      style: TextStyle(
+                          color: hexColor(MAIN_COLOR_BLACK),
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                   Container(
                     color: Colors.white,
@@ -365,7 +366,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
                     ),
-                  ),                  
+                  ),
                   Container(
                     color: hexColor("dddddd"),
                     height: 1,
@@ -489,11 +490,11 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       return;
     }
 
-
-
     if (index == 3) {
-      Widget w = ProjectAddMaterialTagPage(this.materialInfo.ItemCode, this.selectedTodayWork.Wono);
-      Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
+      Widget w = ProjectAddMaterialTagPage(
+          this.materialInfo.ItemCode, this.selectedTodayWork.Wono);
+      Navigator.of(_scaffoldKey.currentContext)
+          .push(MaterialPageRoute(builder: (BuildContext context) => w));
     } else {
       String hintTitle = "确定上升?";
       if (index == 1) {
@@ -501,42 +502,44 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       } else if (index == 2) {
         hintTitle = "确定删除?";
       }
-      bool isOkay =
-        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, hintTitle);
+      
+      bool isOkay = await AlertTool.showStandardAlert(
+          _scaffoldKey.currentContext, hintTitle);
 
-    if (isOkay) {
-      _realConfirmationAction(index);
-    }
+      if (isOkay) {
+        _realConfirmationAction(index);
+      }
     }
   }
 
-void _realConfirmationAction(int index) {
-  String uri = "LoadMaterial/Up";
-  if (index == 1) {
-    uri = "LoadMaterial/Down";
-  } else if (index == 2) {
-    uri = "LoadMaterial/Delete";
-  }
+  void _realConfirmationAction(int index) {
+    String uri = "LoadMaterial/Up";
+    if (index == 1) {
+      uri = "LoadMaterial/Down";
+    } else if (index == 2) {
+      uri = "LoadMaterial/Delete";
+    }
 
-  Map mDict = Map();
-  mDict["wono"] = this.selectedTodayWork.Wono;
-  mDict["item"] = this.materialInfo.ItemCode;
-  mDict["tag"] = this.selectedMaterialTag.TagID;
-  mDict["id"] = this.selectedTodayWork.ID;
-  print('$uri: $mDict');
+    Map mDict = Map();
+    mDict["wono"] = this.selectedTodayWork.Wono;
+    mDict["item"] = this.materialInfo.ItemCode;
+    mDict["tag"] = this.selectedMaterialTag.TagID;
+    mDict["id"] = this.selectedTodayWork.ID;
+    print('$uri: $mDict');
 
-  HudTool.show();
-  HttpDigger().postWithUri(uri, parameters: mDict, success: (int code, String message, dynamic responseJson){
-    print('$uri: $responseJson');
-    if (code == 0) {
+    HudTool.show();
+    HttpDigger().postWithUri(uri, parameters: mDict,
+        success: (int code, String message, dynamic responseJson) {
+      print('$uri: $responseJson');
+      if (code == 0) {
         HudTool.showInfoWithStatus(message);
         return;
       }
 
       HudTool.showInfoWithStatus("操作成功");
       Navigator.pop(context);
-  });
-}
+    });
+  }
 
   void _popSheetAlert() {
     showModalBottomSheet(

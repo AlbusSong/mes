@@ -41,7 +41,7 @@ class _ProjectReturnRepairmentPageState
       physics: const NeverScrollableScrollPhysics() ,
       children: <Widget>[
         ProjectReturnRepairmentNonLotPage(),
-        ProjectReturnRepairmentLotPage(),
+        ProjectReturnRepairmentLotPage(_scaffoldKey),
       ],
       onPageChanged: (currentIndex) {
         print("currentIndex: $currentIndex");

@@ -17,6 +17,7 @@ class ProjectTextInputWidget extends StatelessWidget {
 
   void Function() functionBlock;
   void Function(String newContent) contentChangeBlock;
+  void Function(String content) keyboardReturnBlock;
   final _textInputController = TextEditingController();
 
   void setContent(String c) {
@@ -57,6 +58,11 @@ class ProjectTextInputWidget extends StatelessWidget {
                         print("text: $text");
                         if (this.contentChangeBlock != null) {
                           this.contentChangeBlock(text);
+                        }
+                      },
+                      onSubmitted: (String text) {
+                        if (this.keyboardReturnBlock != null) {
+                          this.keyboardReturnBlock(text);
                         }
                       },
                     ),
