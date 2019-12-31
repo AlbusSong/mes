@@ -3,16 +3,35 @@ import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/View/SearchBar.dart';
 
+import '../Model/ProjectTagInfoModel.dart';
+
 class ProjectAddMaterialTagPage extends StatefulWidget {
+  ProjectAddMaterialTagPage(
+    {
+      this.materialInfoId,
+    }
+  );
+
+  final String materialInfoId;
+
   @override
   State<StatefulWidget> createState() {
-    return _ProjectAddMaterialTagPageState();
+    return _ProjectAddMaterialTagPageState(materialInfoId: this.materialInfoId);
   }
 }
 
 class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
+  _ProjectAddMaterialTagPageState(
+    {
+      this.materialInfoId,
+    }
+  );
+
+  final String materialInfoId;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final SearchBar _sBar = SearchBar(
     hintText: "LOT NO或载具ID",
@@ -27,11 +46,26 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
      _sBar.keyboardReturnBlock = (String c) {
       _getDataFromServer();
     };
+
+    _getDataFromServer();
   }
 
   void _getDataFromServer() {
-
-  }
+    if (isAvailable(this.materialInfoId) == false) {      
+      return;
+    }
+    // 获取所有有效的产线
+    HudTool.show();
+    HttpDigger().postWithUri("LoadMaterial/GetTagInfo", parameters: {"item":this.materialInfoId}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/GetTagInfo: $responseJson");
+      HudTool.dismiss();
+      this.arrOfData = (responseJson['Extend'] as List)
+          .map((item) => ProjectTagInfoModel.fromJson(item))
+          .toList();
+      setState(() {        
+      });
+    });
+  }      
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +109,8 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
 
   Widget _buildListView() {
     return ListView.builder(
-        // itemCount: listLength(this.arrOfData),
-        itemCount: 10,
+        itemCount: listLength(this.arrOfData),
+        // itemCount: 10,
         itemBuilder: (context, index) {
           // In our case, a DogCard for each doggo.
           return GestureDetector(
@@ -87,6 +121,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
   }
 
   Widget _buildListItem(int index) {
+    ProjectTagInfoModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       child: Row(
@@ -103,7 +138,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                          "标签：D20180404000006",
+                          "标签：${itemData.TagID}",
                           maxLines: 2,
                           style: TextStyle(
                               color: hexColor(MAIN_COLOR_BLACK),
@@ -118,7 +153,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("物料ID：13251001",
+                        Text("物料ID：${itemData.ItemCode}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
@@ -131,7 +166,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("物料批次：20180404",
+                        Text("物料批次：${itemData.ProductionBatch}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -144,12 +179,9 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("订单号：P228217",
+                        Text("数量：${itemData.Qty}",
                             style: TextStyle(
-                                color: hexColor("999999"), fontSize: 15)),
-                        Text("单位：UNT",
-                            style: TextStyle(
-                                color: hexColor("999999"), fontSize: 15)),
+                                color: hexColor("999999"), fontSize: 15))
                       ],
                     ),
                   ),
@@ -160,10 +192,10 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("已上料：82",
+                        Text("订单号：${itemData.OrderNo}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        Text("使用量：20",
+                        Text("单位：${itemData.Unit}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],

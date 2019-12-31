@@ -354,7 +354,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     mDict["wono"] = this.selectedPlanInfo.Wono;
     mDict["grade"] = "BBB";
     mDict["qty"] = this.lotAmount;
-    mDict["line"] = this.selectedPlanInfo.ProdClass;
+    mDict["line"] = this.selectedPlanInfo.WorkCenterCode;
     mDict["productCode"] = this.selectedPlanInfo.ProductCode;
 
     print("LotSubmit/Submit mDict: $mDict");

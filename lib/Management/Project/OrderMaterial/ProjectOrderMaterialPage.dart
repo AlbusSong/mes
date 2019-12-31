@@ -156,7 +156,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       _selectionWgt2.setContent(
           '${this.materialInfo.ItemType}|${this.materialInfo.ItemCode}|${this.materialInfo.ItemName}');
 
-      _getTagListFromServer(wono, this.materialInfo.BomID.toString());
+      _getTagListFromServer(wono, this.materialInfo.ItemCode);
     });
   }
 
@@ -467,6 +467,20 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   }
 
   void _functionItemClickedAtIndex(int index) {
+    if (this.selectedLineItem == null) {
+      HudTool.showInfoWithStatus("请选择产线");
+      return;
+    }
+    if (this.selectedTodayWork == null) {
+      HudTool.showInfoWithStatus("请选择工单");
+      return;
+    }
+
+    if (this.materialInfo == null) {
+      HudTool.showInfoWithStatus("没有追溯物料");
+      return;
+    }
+
     if (index == 0) {
 
     } else if (index == 1) {
@@ -474,7 +488,8 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     } else if (index == 2) {
 
     } else if (index == 3) {
-      Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => ProjectAddMaterialTagPage()));
+      Widget w = ProjectAddMaterialTagPage(materialInfoId: this.materialInfo.ItemCode,);
+      Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
     }
   }
 
