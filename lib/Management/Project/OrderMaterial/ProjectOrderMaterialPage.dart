@@ -423,6 +423,8 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       for (ProjectTodayWorkOrderModel m in this.arrOfTodayWork) {
         arrOfSelectionTitle.add('${m.Wono}|${m.StateDesc}');
       }
+    } else if (index == 2) {
+      return;
     }
 
     _showPickerWithData(arrOfSelectionTitle, index);
@@ -488,7 +490,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     } else if (index == 2) {
 
     } else if (index == 3) {
-      Widget w = ProjectAddMaterialTagPage(materialInfoId: this.materialInfo.ItemCode,);
+      Widget w = ProjectAddMaterialTagPage(this.materialInfo.ItemCode, this.selectedTodayWork.Wono);
       Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
     }
   }

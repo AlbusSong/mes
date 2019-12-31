@@ -10,27 +10,27 @@ import '../Model/ProjectTagInfoModel.dart';
 
 class ProjectAddMaterialTagPage extends StatefulWidget {
   ProjectAddMaterialTagPage(
-    {
       this.materialInfoId,
-    }
+      this.wono,
   );
 
   final String materialInfoId;
+  final String wono;
 
   @override
   State<StatefulWidget> createState() {
-    return _ProjectAddMaterialTagPageState(materialInfoId: this.materialInfoId);
+    return _ProjectAddMaterialTagPageState(materialInfoId, wono);
   }
 }
 
 class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
   _ProjectAddMaterialTagPageState(
-    {
-      this.materialInfoId,
-    }
+    this.materialInfoId,
+    this.wono,
   );
 
   final String materialInfoId;
+  final String wono;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final SearchBar _sBar = SearchBar(
@@ -234,6 +234,11 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
   }
 
   Future _btnConfirmClicked() async {
+    if (this.selectedIndex < 0) {
+      HudTool.showInfoWithStatus("请选择一项");
+      return;
+    }
+
     bool isOkay =
         await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定添加?");
 
@@ -242,7 +247,18 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
     }
   }
 
-  void _confirmAction() {
+  void _confirmAction() {    
+    ProjectTagInfoModel tagInfo = this.arrOfData[this.selectedIndex];
+    HudTool.show();
+    HttpDigger().postWithUri("LoadMaterial/BarcodeScan", parameters: {"wono":this.wono, "item":this.materialInfoId, "tag":tagInfo.TagID}, success: (int code, String message, dynamic responseJson){
+      print("LoadMaterial/BarcodeScan: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
 
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.pop(context);
+    });
   }
 }
