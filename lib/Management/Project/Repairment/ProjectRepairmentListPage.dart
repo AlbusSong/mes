@@ -5,7 +5,11 @@ import '../../../Others/Tool/GlobalTool.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/View/SelectionBar.dart';
 
+import 'package:flutter_picker/flutter_picker.dart';
+
 import 'ProjectRepairmentDetailPage.dart';
+
+import '../Model/ProjectProcessItemModel.dart';
 
 class ProjectRepairmentListPage extends StatefulWidget {
   @override
@@ -18,7 +22,10 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final SelectionBar _sBar = SelectionBar();
+
   String lotNo;
+  List arrOfProcess;
+  ProjectProcessItemModel selectedProcess;
 
   @override
   void initState() {
@@ -26,10 +33,46 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
 
     _sBar.setSelectionBlock(() {
       print("setSelectionBlock");
+      List<String> arrOfSelectionTitle = [];
+      for (ProjectProcessItemModel m in this.arrOfProcess) {
+        arrOfSelectionTitle.add('${m.ProcessCode}|${m.ProcessName}');
+      }
+
+      if (arrOfSelectionTitle.length == 0) {
+        return;
+      }
+
+      _showPickerWithData(arrOfSelectionTitle, 0);
+    });
+
+    _getProcessListFromServer();
+  }
+
+  void _getDataFromServer() {
+    HudTool.show();
+    HttpDigger()
+        .postWithUri("Repair/GetRepairList", parameters: {"workcenter":this.selectedProcess.WorkCenter, "lotno":"", "rpwo":""}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
+      print("Repair/GetRepairList: $responseJson");
+      HudTool.dismiss();
+      // this.arrOfProcess = (responseJson['Extend'] as List)
+      //     .map((item) => ProjectProcessItemModel.fromJson(item))
+      //     .toList();
     });
   }
 
-  void _getDataFromServer() {}
+  void _getProcessListFromServer() {
+    HudTool.show();
+    HttpDigger()
+        .postWithUri("Repair/GetAllProcess", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
+      print("Repair/GetAllProcess: $responseJson");
+      HudTool.dismiss();
+      this.arrOfProcess = (responseJson['Extend'] as List)
+          .map((item) => ProjectProcessItemModel.fromJson(item))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +80,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
       key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("Lot查询"),
+        title: Text("修理清单"),
         centerTitle: true,
       ),
       body: _buildBody(),
@@ -88,13 +131,13 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                          "返修工单：D20180404000006",
-                          maxLines: 2,
-                          style: TextStyle(
-                              color: hexColor(MAIN_COLOR_BLACK),
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      "返修工单：D20180404000006",
+                      maxLines: 2,
+                      style: TextStyle(
+                          color: hexColor(MAIN_COLOR_BLACK),
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                   Container(
                     color: Colors.white,
@@ -121,7 +164,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                                 color: hexColor("999999"), fontSize: 15))
                       ],
                     ),
-                  ),                  
+                  ),
                   Container(
                     color: Colors.white,
                     margin: EdgeInsets.only(left: 10),
@@ -161,10 +204,12 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                         Text("返修代码：20",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        SizedBox(width: 10,),
+                        SizedBox(
+                          width: 10,
+                        ),
                       ],
                     ),
-                  ),                  
+                  ),
                   Container(
                     color: hexColor("dddddd"),
                     height: 1,
@@ -189,6 +234,31 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
   }
 
   void _hasSelectedIndex(int index) {
-    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => ProjectRepairmentDetailPage()));
+    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
+        builder: (BuildContext context) => ProjectRepairmentDetailPage()));
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    // picker.show(Scaffold.of(context));
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    _sBar.setContent(title);
+    this.selectedProcess = this.arrOfProcess[indexOfSelectedItem];
+
+    _getDataFromServer();
   }
 }
