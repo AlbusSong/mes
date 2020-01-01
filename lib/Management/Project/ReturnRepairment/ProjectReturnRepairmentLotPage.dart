@@ -23,12 +23,14 @@ class ProjectReturnRepairmentLotPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> parentScaffoldKey;
 
   @override
-  State<StatefulWidget> createState() {   
+  State<StatefulWidget> createState() {
     return _ProjectReturnRepairmentLotPageState(parentScaffoldKey);
-  }  
+  }
 }
 
-class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairmentLotPage> with AutomaticKeepAliveClientMixin {
+class _ProjectReturnRepairmentLotPageState
+    extends State<ProjectReturnRepairmentLotPage>
+    with AutomaticKeepAliveClientMixin {
   _ProjectReturnRepairmentLotPageState(
     this.parentScaffoldKey,
   );
@@ -56,7 +58,7 @@ class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairment
     super.initState();
 
     _pTextInputWgt0 = _buildTextInputWidgetItem(0);
-    
+
     _selectionWgt0 = _buildSelectionInputItem(0);
     _selectionWgt1 = _buildSelectionInputItem(1);
     _selectionWgt2 = _buildSelectionInputItem(2);
@@ -65,8 +67,10 @@ class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairment
 
   void _getDataFromServer() {
     HudTool.show();
-    HttpDigger().postWithUri("Repair/GetLotInfo", parameters: {"lotno":this.lotNo}, shouldCache: true, success: (int code, String message, dynamic responseJson){
-      print("Repair/GetLotInfo: $responseJson");    
+    HttpDigger().postWithUri("Repair/GetLotInfo",
+        parameters: {"lotno": this.lotNo}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("Repair/GetLotInfo: $responseJson");
       HudTool.dismiss();
       List arr = jsonDecode(responseJson["Extend"]);
       if (listLength(arr) > 0) {
@@ -75,14 +79,17 @@ class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairment
         _getRepairCodeListFromServer();
 
         _selectionWgt0.setContent(this.lotInfoData.Wono);
-        _selectionWgt1.setContent('${this.lotInfoData.ItemCode}|${this.lotInfoData.ProcessName}');
+        _selectionWgt1.setContent(
+            '${this.lotInfoData.ItemCode}|${this.lotInfoData.ProcessName}');
         _selectionWgt2.setContent(this.lotInfoData.Qty.toString());
       }
     });
   }
 
   void _getRepairCodeListFromServer() {
-    HttpDigger().postWithUri("Repair/GetRepairCode", parameters: {"line":this.lotInfoData.LineCode}, shouldCache: true, success: (int code, String message, dynamic responseJson){
+    HttpDigger().postWithUri("Repair/GetRepairCode",
+        parameters: {"line": this.lotInfoData.LineCode}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("Repair/GetRepairCode: $responseJson");
       this.arrOfRepairCode = (responseJson["Extend"] as List)
           .map((item) => ProjectRepairCodeModel.fromJson(item))
@@ -90,7 +97,7 @@ class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairment
       print("arrOfRepairCode: $arrOfRepairCode");
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -99,9 +106,9 @@ class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairment
         children: <Widget>[
           Expanded(
             child: Container(
-            color: hexColor("f2f2f7"),
-            child: _buildListView(),
-          ),
+              color: hexColor("f2f2f7"),
+              child: _buildListView(),
+            ),
           ),
           Container(
             height: 50,
@@ -222,9 +229,10 @@ class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairment
     picker.show(parentScaffoldKey.currentState);
   }
 
-  void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
-    if (index == 3) { 
-      this.selectedRepairCode = this.arrOfRepairCode[indexOfSelectedItem];      
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    if (index == 3) {
+      this.selectedRepairCode = this.arrOfRepairCode[indexOfSelectedItem];
       _selectionWgt3.setContent(title);
     }
   }
@@ -294,16 +302,17 @@ class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairment
     }
 
     bool isOkay = await AlertTool.showStandardAlert(
-          parentScaffoldKey.currentContext, "确认返修？");
+        parentScaffoldKey.currentContext, "确认返修？");
 
-      if (isOkay) {
-        _realConfirmationAction();
-      }
+    if (isOkay) {
+      _realConfirmationAction();
+    }
   }
 
   void _realConfirmationAction() {
     HudTool.show();
-    HttpDigger().postWithUri("Repair/RepairLot", parameters: {"mdl":""}, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("Repair/RepairLot", parameters: {"mdl": ""},
+        success: (int code, String message, dynamic responseJson) {
       print("Repair/RepairLot: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -343,8 +352,8 @@ class _ProjectReturnRepairmentLotPageState extends State<ProjectReturnRepairment
 
     try {
       String c = await BarcodeScanner.scan();
-      _pTextInputWgt0.setContent(c);      
-      this.lotNo = c;      
+      _pTextInputWgt0.setContent(c);
+      this.lotNo = c;
       _getDataFromServer();
     } on Exception catch (e) {
       if (e == BarcodeScanner.CameraAccessDenied) {

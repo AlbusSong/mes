@@ -41,7 +41,7 @@ class _ProjectScrapPageState
       physics: const NeverScrollableScrollPhysics() ,
       children: <Widget>[
         ProjectScrapNonLotPage(),
-        ProjectScrapLotPage(),
+        ProjectScrapLotPage(_scaffoldKey),
       ],
       onPageChanged: (currentIndex) {
         print("currentIndex: $currentIndex");

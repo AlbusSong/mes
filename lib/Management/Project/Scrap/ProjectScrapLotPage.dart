@@ -1,23 +1,101 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../../../Others/View/MESContentInputWidget.dart';
 import '../Widget/ProjectTextInputWidget.dart';
 
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flutter_picker/flutter_picker.dart';
+
+import '../Model/ProjectLotInfoModel.dart';
+import '../Model/ProjectScrapItemModel.dart';
+
 class ProjectScrapLotPage extends StatefulWidget {
+  ProjectScrapLotPage(
+    this.parentScaffoldKey,
+  );
+  final GlobalKey<ScaffoldState> parentScaffoldKey;
+
   @override
   State<StatefulWidget> createState() {   
-    return _ProjectScrapLotPageState();
+    return _ProjectScrapLotPageState(parentScaffoldKey);
   }  
 }
 
 class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with AutomaticKeepAliveClientMixin {
-  String content;
+  _ProjectScrapLotPageState(
+    this.parentScaffoldKey,
+  );
+  final GlobalKey<ScaffoldState> parentScaffoldKey;
+
+  ProjectTextInputWidget _pTextInputWgt0;
+
+  MESSelectionItemWidget _selectionWgt0;
+  MESSelectionItemWidget _selectionWgt1;
+  MESSelectionItemWidget _selectionWgt2;
+  MESSelectionItemWidget _selectionWgt3;
+
+  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+
+  String remarkContent;
+  String lotNo;
+  ProjectLotInfoModel lotInfoData;
+  List arrOfScrapCode;
+  ProjectScrapItemModel selectedScrapCode;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {    
+    super.initState();
+
+    _pTextInputWgt0 = _buildTextInputWidgetItem(0);
+
+    _selectionWgt0 = _buildSelectionInputItem(0);
+    _selectionWgt1 = _buildSelectionInputItem(1);
+    _selectionWgt2 = _buildSelectionInputItem(2);
+    _selectionWgt3 = _buildSelectionInputItem(3);
+
+    _getRepairCodeListFromServer();
+  }
+
+  void _getDataFromServer() {
+    HudTool.show();
+    HttpDigger().postWithUri("Repair/SGetLotInfo",
+        parameters: {"lotno": this.lotNo}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("Repair/SGetLotInfo: $responseJson");
+      HudTool.dismiss();
+
+      List arr = jsonDecode(responseJson["Extend"]);
+      if (listLength(arr) > 0) {
+        this.lotInfoData = ProjectLotInfoModel.fromJson(arr.first);
+
+        _selectionWgt0.setContent(this.lotInfoData.Wono);
+        _selectionWgt1.setContent(
+            '${this.lotInfoData.ItemCode}|${this.lotInfoData.ProcessName}');
+        _selectionWgt2.setContent(this.lotInfoData.Qty.toString());
+      }
+    });
+  }
+
+  void _getRepairCodeListFromServer() {
+    HttpDigger().postWithUri("Repair/GetScrapCode",
+        parameters: {}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("Repair/GetScrapCode: $responseJson");
+      this.arrOfScrapCode = (responseJson["Extend"] as List)
+          .map((item) => ProjectScrapItemModel.fromJson(item))
+          .toList();
+      // print("arrOfScrapCode: $arrOfScrapCode");
+    });
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -40,7 +118,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
               color: hexColor(MAIN_COLOR),
               child: Text("报废"),
               onPressed: () {
-                // _btnConfirmClicked();
+                _btnConfirmClicked();
               },
             ),
           ),
@@ -52,11 +130,11 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
   Widget _buildListView() {
     return ListView(
       children: <Widget>[
-        _buildTextInputWidgetItem(0),
-        _buildSelectionInputItem(0),
-        _buildSelectionInputItem(1),
-        _buildSelectionInputItem(2),
-        _buildSelectionInputItem(3),        
+        _pTextInputWgt0,
+        _selectionWgt0,
+        _selectionWgt1,
+        _selectionWgt2,
+        _selectionWgt3,      
         _buildContentInputItem(),
         _buildFooter(),
       ],
@@ -66,7 +144,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
   Widget _buildTextInputWidgetItem(int index) {
     String title = "";
     String placeholder = "";
-    bool canScan = false;
+    bool canScan = true;
     if (index == 0) {
       title = "LotNo/载具";
       placeholder = "请输入/扫描";
@@ -76,6 +154,15 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
       placeholder: placeholder,
       canScan: canScan,
     );
+
+    wgt.keyboardReturnBlock = (String c) {
+      this.lotNo = c;
+      _getDataFromServer();
+    };
+
+    wgt.functionBlock = () {
+      _popSheetAlert();
+    };
 
     return wgt;
   }
@@ -108,12 +195,51 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
 
   void _hasSelectedItem(int index) {
     print("_hasSelectedItem: $index");
+
+    List<String> arrOfSelectionTitle = [];
+    if (index == 3) {
+      for (ProjectScrapItemModel m in this.arrOfScrapCode) {
+        arrOfSelectionTitle.add('${m.ScrapCode}');
+      }
+    }
+
+    if (arrOfSelectionTitle.length == 0) {
+      return;
+    }
+
+    _showPickerWithData(arrOfSelectionTitle, index);
+
+    hideKeyboard(context);
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    // picker.show(Scaffold.of(context));
+    picker.show(parentScaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    if (index == 3) {
+      this.selectedScrapCode = this.arrOfScrapCode[indexOfSelectedItem];
+      _selectionWgt3.setContent(title);
+    }
   }
 
   Widget _buildContentInputItem() {
     void Function(String) contentChangedBlock = (String newContent) {
       // print("contentChangedBlock: $newContent");
-      this.content = newContent;
+      this.remarkContent = newContent;
     };
     return MESContentInputWidget(
       placeholder: "备注",
@@ -156,5 +282,88 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
         ],
       ),
     );
+  }
+
+  Future _btnConfirmClicked() async {
+    if (this.lotInfoData == null) {
+      HudTool.showInfoWithStatus("请先获取Lot信息");
+      return;
+    }
+
+    if (this.selectedScrapCode == null) {
+      HudTool.showInfoWithStatus("请选择报废代码");
+      return;
+    }
+
+    if (this.remarkContent == null) {
+      HudTool.showInfoWithStatus("请填写备注");
+      return;
+    }
+
+    bool isOkay = await AlertTool.showStandardAlert(
+        parentScaffoldKey.currentContext, "确认报废？");
+
+    if (isOkay) {
+      _realConfirmationAction();
+    }
+  }
+
+  void _realConfirmationAction() {
+    HudTool.show();
+    HttpDigger().postWithUri("Repair/ScrapLot", parameters: {"mdl": ""},
+        success: (int code, String message, dynamic responseJson) {
+      print("Repair/ScrapLot: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus(message);
+      Navigator.pop(context);
+    });
+  }
+
+  void _popSheetAlert() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        child: ListView(
+            children: List.generate(
+          2,
+          (index) => InkWell(
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 60.0,
+                  child: Text(bottomFunctionTitleList[index])),
+              onTap: () {
+                print('tapped item ${index + 1}');
+                Navigator.pop(context);
+                _tryToscan();
+              }),
+        )),
+        height: 120,
+      ),
+    );
+  }
+
+  Future _tryToscan() async {
+    print("start scanning");
+
+    try {
+      String c = await BarcodeScanner.scan();
+      _pTextInputWgt0.setContent(c);
+      this.lotNo = c;
+      _getDataFromServer();
+    } on Exception catch (e) {
+      if (e == BarcodeScanner.CameraAccessDenied) {
+        HudTool.showInfoWithStatus("相机权限未开启");
+      } else {
+        HudTool.showInfoWithStatus("未知错误，请重试");
+      }
+    } on FormatException {
+      HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
+    } catch (e) {
+      HudTool.showInfoWithStatus("未知错误，请重试");
+    }
   }
 }
