@@ -41,9 +41,6 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
       this.lotNo = c;
       _getDataFromServer();
     };
-
-    this.lotNo = "CAB1912173050FFF";
-    _getDataFromServer();
   }
 
   void _getDataFromServer() {

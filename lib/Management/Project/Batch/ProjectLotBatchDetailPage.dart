@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../../Others/Network/HttpDigger.dart';
@@ -10,12 +11,13 @@ import '../Widget/ProjectTextInputWidget.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 
 import '../Model/ProjectItemModel.dart';
+import '../Model/ProjectGradeItemModel.dart';
 
 class ProjectLotBatchDetailPage extends StatefulWidget {
   ProjectLotBatchDetailPage(
     this.data,
   );
-  final ProjectItemModel data;
+  final ProjectItemModel data;  
 
   @override
   State<StatefulWidget> createState() {
@@ -29,13 +31,17 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
   );
   final ProjectItemModel data;
 
+  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+
   MESSelectionItemWidget _selectionWgt0;
   MESSelectionItemWidget _selectionWgt1;
 
   ProjectTextInputWidget _pTextInputWgt0;
   ProjectTextInputWidget _pTextInputWgt1;
 
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  List arrOfGradeItem;
+  ProjectGradeItemModel selectedGradeItem;
+  
   String lotNo;  
 
   @override
@@ -57,10 +63,9 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
         parameters: {"proclass": prodClass}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetGrade: $responseJson");
-      _selectionWgt0.setContent(this.data.Cost.toString());  
-      _selectionWgt1.setContent(this.data.Grade);      
-      // this.selectedGradeInfo = jsonDecode(responseJson['Extend']);
-      // print("selectedGradeInfo: $selectedGradeInfo");
+      this.arrOfGradeItem = (jsonDecode(responseJson['Extend']) as List)
+          .map((item) => ProjectGradeItemModel.fromJson(item))
+          .toList();
     });
   }
 
