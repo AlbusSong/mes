@@ -44,10 +44,12 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
   }
 
   void _getDataFromServer() {
+    HudTool.show();
     HttpDigger().postWithUri("LotSubmit/GetLotSearch",
         parameters: {"lotno": this.lotNo}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLotSearch: $responseJson");
+      HudTool.dismiss();
       this.arrOfData = (jsonDecode(responseJson['Extend']) as List)
           .map((item) => ProjectItemModel.fromJson(item))
           .toList();
