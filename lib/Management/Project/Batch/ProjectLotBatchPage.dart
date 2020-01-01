@@ -1,17 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import '../../Others/Network/HttpDigger.dart';
+import 'package:mes/Management/Project/Model/ProjectLotInfoModel.dart';
+import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
-import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Const/Const.dart';
-import '../../Others/View/SearchBarWithFunction.dart';
+import '../../../Others/Tool/GlobalTool.dart';
+import '../../../Others/View/SearchBarWithFunction.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
 import 'ProjectLotBatchDetailPage.dart';
 
-import 'Model/ProjectItemModel.dart';
+import '../Model/ProjectItemModel.dart';
 
 class ProjectLotBatchPage extends StatefulWidget {
   @override
@@ -79,19 +79,6 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
           child: Container(
             color: hexColor("f2f2f7"),
             child: _buildListView(),
-          ),
-        ),
-        Container(
-          height: 50,
-          width: double.infinity,
-          // color: randomColor(),
-          child: FlatButton(
-            textColor: Colors.white,
-            color: hexColor(MAIN_COLOR),
-            child: Text("确认"),
-            onPressed: () {
-              // _btnConfirmClicked();
-            },
           ),
         ),
       ],
@@ -195,8 +182,9 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
   }
 
   void _hasSelectedIndex(int index) {
+    ProjectItemModel itemData = this.arrOfData[index];
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-        builder: (BuildContext context) => ProjectLotBatchDetailPage()));
+        builder: (BuildContext context) => ProjectLotBatchDetailPage(itemData)));
   }
 
   void _popSheetAlert() {
@@ -226,8 +214,10 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
     print("start scanning");
 
     try {
-      String c = await BarcodeScanner.scan();
-      print("c: $c");
+      String c = await BarcodeScanner.scan();      
+      _sBar.setContent(c);
+      this.lotNo = c;
+      _getDataFromServer();
     } on Exception catch (e) {
       if (e == BarcodeScanner.CameraAccessDenied) {
         HudTool.showInfoWithStatus("相机权限未开启");

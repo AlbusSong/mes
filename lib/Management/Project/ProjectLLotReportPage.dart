@@ -116,7 +116,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   void _getGradeInfoFromServer(String prodClass) {
     // 获取档位信息
     HttpDigger().postWithUri("LotSubmit/GetGrade",
-        parameters: {"proclass": prodClass}, shouldCache: false,
+        parameters: {"proclass": prodClass}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetGrade: $responseJson");  
       _selectionWgt2.setContent("BBB");

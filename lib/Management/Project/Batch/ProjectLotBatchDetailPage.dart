@@ -1,23 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
-import '../../Others/Network/HttpDigger.dart';
+import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
-import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Const/Const.dart';
-import '../../Others/View/MESSelectionItemWidget.dart';
-import 'Widget/ProjectTextInputWidget.dart';
+import '../../../Others/Tool/GlobalTool.dart';
+import '../../../Others/Const/Const.dart';
+import '../../../Others/View/MESSelectionItemWidget.dart';
+import '../Widget/ProjectTextInputWidget.dart';
 
 import 'package:barcode_scan/barcode_scan.dart';
 
+import '../Model/ProjectItemModel.dart';
+
 class ProjectLotBatchDetailPage extends StatefulWidget {
+  ProjectLotBatchDetailPage(
+    this.data,
+  );
+  final ProjectItemModel data;
+
   @override
   State<StatefulWidget> createState() {
-    return _ProjectLotBatchDetailPageState();
+    return _ProjectLotBatchDetailPageState(data);
   }  
 }
 
 class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
+  _ProjectLotBatchDetailPageState(
+    this.data,
+  );
+  final ProjectItemModel data;
+
+  MESSelectionItemWidget _selectionWgt0;
+  MESSelectionItemWidget _selectionWgt1;
+
+  ProjectTextInputWidget _pTextInputWgt0;
+  ProjectTextInputWidget _pTextInputWgt1;
+
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  String lotNo;  
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectionWgt0 = _buildSelectionInputItem(0);    
+    _selectionWgt1 = _buildSelectionInputItem(1);
+
+    _pTextInputWgt0 = _buildTextInputWidgetItem(0);
+    _pTextInputWgt1 = _buildTextInputWidgetItem(1);
+
+    _getGradeInfoFromServer(this.data.ProdClassCode);
+  }
+
+  void _getGradeInfoFromServer(String prodClass) {
+    // 获取档位信息
+    HttpDigger().postWithUri("LotSubmit/GetGrade",
+        parameters: {"proclass": prodClass}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/GetGrade: $responseJson");
+      _selectionWgt0.setContent(this.data.Cost.toString());  
+      _selectionWgt1.setContent(this.data.Grade);      
+      // this.selectedGradeInfo = jsonDecode(responseJson['Extend']);
+      // print("selectedGradeInfo: $selectedGradeInfo");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,10 +108,10 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
         WidgetTool.createListViewLine(10, hexColor("f2f2f7")),
         _buildInfoCell(),
         WidgetTool.createListViewLine(10, hexColor("f2f2f7")),
-        _buildTextInputWidgetItem(0),
-        _buildTextInputWidgetItem(1),
-        _buildSelectionInputItem(0),
-        _buildSelectionInputItem(1),
+        _pTextInputWgt0,
+        _pTextInputWgt1,
+        _selectionWgt0,
+        _selectionWgt1,
       ],
     );
   }
@@ -135,7 +181,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
             padding: EdgeInsets.only(left: 30),
             height: 30,
             child: Text(
-              " LotNo：HSOB19",
+              " LotNo：${this.data.LotNo}",
               style: TextStyle(fontSize: 16, color: hexColor("999999")),
             ),
           ),
@@ -143,7 +189,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
             padding: EdgeInsets.only(left: 30),
             height: 30,
             child: Text(
-              "载具ID：CAB191217303asdjf",
+              "载具ID：${this.data.CToolNo}",
               style: TextStyle(fontSize: 16, color: hexColor("999999")),
             ),
           ),
@@ -151,7 +197,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
             padding: EdgeInsets.only(left: 30),
             height: 30,
             child: Text(
-              "    数量：35",
+              "    数量：${this.data.Qty}",
               style: TextStyle(fontSize: 16, color: hexColor("999999")),
             ),            
           ),
@@ -159,7 +205,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
             padding: EdgeInsets.only(left: 30),
             height: 30,
             child: Text(
-              "    档位：ASAA",
+              "    档位：${this.data.Grade}",
               style: TextStyle(fontSize: 16, color: hexColor("999999")),
             ),
           ),
@@ -196,7 +242,8 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
 
     try {
       String c = await BarcodeScanner.scan();
-      print("c: $c");
+      _pTextInputWgt1.setContent(c);
+      this.lotNo = c;
     } on Exception catch (e) {
       if (e == BarcodeScanner.CameraAccessDenied) {
         HudTool.showInfoWithStatus("相机权限未开启");
