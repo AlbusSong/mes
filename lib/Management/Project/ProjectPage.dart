@@ -12,6 +12,7 @@ import 'ProjectChangeGearPage.dart';
 import 'Batch/ProjectLotBatchPage.dart';
 import 'Repairment/ProjectRepairmentListPage.dart';
 import 'Scrap/ProjectScrapPage.dart';
+import 'ProjectLotLockHandlingPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -27,6 +28,7 @@ class ProjectPage extends StatelessWidget {
     {"title": "档位变更", "icon": "", "badgeValue": 0},
     {"title": "修理", "icon": "", "badgeValue": 0},
     {"title": "报废", "icon": "", "badgeValue": 0},
+    {"title": "Lot锁定处理", "icon": "", "badgeValue": 0},
   ];
 
   final List<MESSquareItemWidget> functionItemArray = [];
@@ -84,6 +86,8 @@ class ProjectPage extends StatelessWidget {
       w = ProjectRepairmentListPage();
     } else if (index == 9) {
       w = ProjectScrapPage();
+    } else if (index == 10) {
+      w = ProjectLotLockHandlingPage();
     }
 
     if (w != null) {
