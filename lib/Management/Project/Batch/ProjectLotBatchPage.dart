@@ -7,7 +7,7 @@ import 'package:mes/Others/Tool/HudTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
 import '../../../Others/View/SearchBarWithFunction.dart';
 
-import 'package:barcode_scan/barcode_scan.dart';
+// import 'package:barcode_scan/barcode_scan.dart';
 
 import 'ProjectLotBatchDetailPage.dart';
 
@@ -212,21 +212,21 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
   Future _tryToscan() async {
     print("start scanning");
 
-    try {
-      String c = await BarcodeScanner.scan();      
-      _sBar.setContent(c);
-      this.lotNo = c;
-      _getDataFromServer();
-    } on Exception catch (e) {
-      if (e == BarcodeScanner.CameraAccessDenied) {
-        HudTool.showInfoWithStatus("相机权限未开启");
-      } else {
-        HudTool.showInfoWithStatus("未知错误，请重试");
-      }
-    } on FormatException {
-      HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    } catch (e) {
-      HudTool.showInfoWithStatus("未知错误，请重试");
-    }
+    // try {
+    //   String c = await BarcodeScanner.scan();      
+    //   _sBar.setContent(c);
+    //   this.lotNo = c;
+    //   _getDataFromServer();
+    // } on Exception catch (e) {
+    //   if (e == BarcodeScanner.CameraAccessDenied) {
+    //     HudTool.showInfoWithStatus("相机权限未开启");
+    //   } else {
+    //     HudTool.showInfoWithStatus("未知错误，请重试");
+    //   }
+    // } on FormatException {
+    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
+    // } catch (e) {
+    //   HudTool.showInfoWithStatus("未知错误，请重试");
+    // }
   }
 }

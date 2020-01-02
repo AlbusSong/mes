@@ -10,7 +10,7 @@ import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../../../Others/View/MESContentInputWidget.dart';
 import '../Widget/ProjectTextInputWidget.dart';
 
-import 'package:barcode_scan/barcode_scan.dart';
+// import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 
 import '../Model/ProjectLotInfoModel.dart';
@@ -350,21 +350,21 @@ class _ProjectReturnRepairmentLotPageState
   Future _tryToscan() async {
     print("start scanning");
 
-    try {
-      String c = await BarcodeScanner.scan();
-      _pTextInputWgt0.setContent(c);
-      this.lotNo = c;
-      _getDataFromServer();
-    } on Exception catch (e) {
-      if (e == BarcodeScanner.CameraAccessDenied) {
-        HudTool.showInfoWithStatus("相机权限未开启");
-      } else {
-        HudTool.showInfoWithStatus("未知错误，请重试");
-      }
-    } on FormatException {
-      HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    } catch (e) {
-      HudTool.showInfoWithStatus("未知错误，请重试");
-    }
+    // try {
+    //   String c = await BarcodeScanner.scan();
+    //   _pTextInputWgt0.setContent(c);
+    //   this.lotNo = c;
+    //   _getDataFromServer();
+    // } on Exception catch (e) {
+    //   if (e == BarcodeScanner.CameraAccessDenied) {
+    //     HudTool.showInfoWithStatus("相机权限未开启");
+    //   } else {
+    //     HudTool.showInfoWithStatus("未知错误，请重试");
+    //   }
+    // } on FormatException {
+    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
+    // } catch (e) {
+    //   HudTool.showInfoWithStatus("未知错误，请重试");
+    // }
   }
 }

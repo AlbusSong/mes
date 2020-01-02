@@ -7,6 +7,8 @@ PODS:
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
   - MTBBarcodeScanner (5.0.11)
+  - qrscan (0.0.1):
+    - Flutter
   - shared_preferences (0.0.1):
     - Flutter
   - sqflite (0.0.1):
@@ -16,6 +18,7 @@ PODS:
 DEPENDENCIES:
   - barcode_scan (from `.symlinks/plugins/barcode_scan/ios`)
   - Flutter (from `Flutter`)
+  - qrscan (from `.symlinks/plugins/qrscan/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
 
@@ -29,6 +32,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/barcode_scan/ios"
   Flutter:
     :path: Flutter
+  qrscan:
+    :path: ".symlinks/plugins/qrscan/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
   sqflite:
@@ -39,6 +44,7 @@ SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
+  qrscan: 42f49ba37d3c423a3b140434003e821135cfc4c3
   shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
   sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
 
