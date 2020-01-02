@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import 'dart:convert';
 import 'FlutterCache.dart';
 
@@ -126,6 +127,9 @@ class HttpDigger {
     }).catchError((error) {
       if (failure != null) {
         failure(error);
+      } else {
+        print("$uri error: $error");
+        HudTool.showInfoWithStatus("网络或服务器错误");
       }
     });
   }
