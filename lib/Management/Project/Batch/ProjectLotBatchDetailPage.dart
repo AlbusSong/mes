@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../../Others/Network/HttpDigger.dart';
-import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../Widget/ProjectTextInputWidget.dart';
-
-// import 'package:barcode_scan/barcode_scan.dart';
 
 import '../Model/ProjectItemModel.dart';
 import '../Model/ProjectGradeItemModel.dart';
@@ -17,12 +15,12 @@ class ProjectLotBatchDetailPage extends StatefulWidget {
   ProjectLotBatchDetailPage(
     this.data,
   );
-  final ProjectItemModel data;  
+  final ProjectItemModel data;
 
   @override
   State<StatefulWidget> createState() {
     return _ProjectLotBatchDetailPageState(data);
-  }  
+  }
 }
 
 class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
@@ -41,14 +39,14 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
 
   List arrOfGradeItem;
   ProjectGradeItemModel selectedGradeItem;
-  
-  String lotNo;  
+
+  String lotNo;
 
   @override
   void initState() {
     super.initState();
 
-    _selectionWgt0 = _buildSelectionInputItem(0);    
+    _selectionWgt0 = _buildSelectionInputItem(0);
     _selectionWgt1 = _buildSelectionInputItem(1);
 
     _pTextInputWgt0 = _buildTextInputWidgetItem(0);
@@ -78,7 +76,8 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
         centerTitle: true,
       ),
       body: _buildBody(),
-    );;
+    );
+    ;
   }
 
   Widget _buildBody() {
@@ -91,18 +90,18 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
           ),
         ),
         Container(
-            height: 50,
-            width: double.infinity,
-            // color: randomColor(),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: hexColor(MAIN_COLOR),
-              child: Text("确认"),
-              onPressed: () {
-                // _btnConfirmClicked();
-              },
-            ),
+          height: 50,
+          width: double.infinity,
+          // color: randomColor(),
+          child: FlatButton(
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text("确认"),
+            onPressed: () {
+              // _btnConfirmClicked();
+            },
           ),
+        ),
       ],
     );
   }
@@ -128,8 +127,8 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
     if (index == 0) {
       title = "分批数量";
       placeholder = "请输入数字(只能输入数字)";
-      canScan = false;      
-    } else if (index == 1) {      
+      canScan = false;
+    } else if (index == 1) {
       title = "LotNo/模具ID";
       placeholder = "扫描/输入";
     }
@@ -204,7 +203,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
             child: Text(
               "    数量：${this.data.Qty}",
               style: TextStyle(fontSize: 16, color: hexColor("999999")),
-            ),            
+            ),
           ),
           Container(
             padding: EdgeInsets.only(left: 30),
@@ -245,20 +244,8 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
   Future _tryToscan() async {
     print("start scanning");
 
-    // try {
-    //   String c = await BarcodeScanner.scan();
-    //   _pTextInputWgt1.setContent(c);
-    //   this.lotNo = c;
-    // } on Exception catch (e) {
-    //   if (e == BarcodeScanner.CameraAccessDenied) {
-    //     HudTool.showInfoWithStatus("相机权限未开启");
-    //   } else {
-    //     HudTool.showInfoWithStatus("未知错误，请重试");
-    //   }
-    // } on FormatException {
-    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    // } catch (e) {
-    //   HudTool.showInfoWithStatus("未知错误，请重试");
-    // }
+    String c = await BarcodeScanTool.tryToScanBarcode();
+    _pTextInputWgt1.setContent(c);
+    this.lotNo = c;
   }
 }

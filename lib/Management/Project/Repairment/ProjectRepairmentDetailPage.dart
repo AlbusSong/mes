@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../Widget/ProjectTextInputWidget.dart';
 import 'package:mes/Others/View/MESContentInputWidget.dart';
 
-// import 'package:barcode_scan/barcode_scan.dart';
 
 class ProjectRepairmentDetailPage extends StatefulWidget {
   @override
@@ -236,19 +236,7 @@ class _ProjectRepairmentDetailPageState extends State<ProjectRepairmentDetailPag
   Future _tryToscan() async {
     print("start scanning");
 
-    // try {
-    //   String c = await BarcodeScanner.scan();
-    //   print("c: $c");
-    // } on Exception catch (e) {
-    //   if (e == BarcodeScanner.CameraAccessDenied) {
-    //     HudTool.showInfoWithStatus("相机权限未开启");
-    //   } else {
-    //     HudTool.showInfoWithStatus("未知错误，请重试");
-    //   }
-    // } on FormatException {
-    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    // } catch (e) {
-    //   HudTool.showInfoWithStatus("未知错误，请重试");
-    // }
+    String c = await BarcodeScanTool.tryToScanBarcode();
+    print("c: c");
   }
 }

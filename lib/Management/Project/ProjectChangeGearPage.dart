@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 
-// import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 
 import 'Model/ProjectGradeItemModel.dart';
@@ -254,12 +254,12 @@ class _ProjectChangeGearPageState extends State<ProjectChangeGearPage> {
   Future _btnConfirmClicked() async {
     if (this.lotDetailData == null) {
       HudTool.showInfoWithStatus("请先获取Lot信息");
-      return;      
+      return;
     }
 
     if (this.selectedGradeItem == null) {
       HudTool.showInfoWithStatus("请选择变更档位");
-      return;      
+      return;
     }
 
     bool isOkay =
@@ -272,7 +272,10 @@ class _ProjectChangeGearPageState extends State<ProjectChangeGearPage> {
 
   void _confirmAction() {
     HudTool.show();
-    HttpDigger().postWithUri("LotSubmit/LotGradeChange", parameters: {"lotno":this.lotNo, "grade":this.selectedGradeItem.ProdClassCode}, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LotSubmit/LotGradeChange", parameters: {
+      "lotno": this.lotNo,
+      "grade": this.selectedGradeItem.ProdClassCode
+    }, success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/LotLock: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -310,21 +313,8 @@ class _ProjectChangeGearPageState extends State<ProjectChangeGearPage> {
   Future _tryToscan() async {
     print("start scanning");
 
-    // try {
-    //   String c = await BarcodeScanner.scan();
-    //   _sBar.setContent(c);
-    //   this.lotNo = c;
-    //   _getDataFromServer();
-    // } on Exception catch (e) {
-    //   if (e == BarcodeScanner.CameraAccessDenied) {
-    //     HudTool.showInfoWithStatus("相机权限未开启");
-    //   } else {
-    //     HudTool.showInfoWithStatus("未知错误，请重试");
-    //   }
-    // } on FormatException {
-    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    // } catch (e) {
-    //   HudTool.showInfoWithStatus("未知错误，请重试");
-    // }
+    this.lotNo = await BarcodeScanTool.tryToScanBarcode();
+    _sBar.setContent(this.lotNo);
+    _getDataFromServer();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../../Others/Network/HttpDigger.dart';
+import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
@@ -9,7 +10,6 @@ import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../Widget/ProjectInfoDisplayWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
-// import 'package:barcode_scan/barcode_scan.dart';
 
 import '../Model/ProjectLineModel.dart';
 import '../Model/ProjectTodayWorkOrderModel.dart';
@@ -539,47 +539,5 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       HudTool.showInfoWithStatus("操作成功");
       Navigator.pop(context);
     });
-  }
-
-  void _popSheetAlert() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        child: ListView(
-            children: List.generate(
-          2,
-          (index) => InkWell(
-              child: Container(
-                  alignment: Alignment.center,
-                  height: 60.0,
-                  child: Text(bottomFunctionTitleList[index])),
-              onTap: () {
-                print('tapped item ${index + 1}');
-                Navigator.pop(context);
-                _tryToscan();
-              }),
-        )),
-        height: 120,
-      ),
-    );
-  }
-
-  Future _tryToscan() async {
-    print("start scanning");
-
-    // try {
-    //   String c = await BarcodeScanner.scan();
-    //   print("c: $c");
-    // } on Exception catch (e) {
-    //   if (e == BarcodeScanner.CameraAccessDenied) {
-    //     HudTool.showInfoWithStatus("相机权限未开启");
-    //   } else {
-    //     HudTool.showInfoWithStatus("未知错误，请重试");
-    //   }
-    // } on FormatException {
-    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    // } catch (e) {
-    //   HudTool.showInfoWithStatus("未知错误，请重试");
-    // }
   }
 }

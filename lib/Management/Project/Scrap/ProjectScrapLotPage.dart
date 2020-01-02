@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/Const/Const.dart';
+import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../../Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
@@ -9,7 +10,6 @@ import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../../../Others/View/MESContentInputWidget.dart';
 import '../Widget/ProjectTextInputWidget.dart';
 
-// import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 
 import '../Model/ProjectLotInfoModel.dart';
@@ -22,12 +22,13 @@ class ProjectScrapLotPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> parentScaffoldKey;
 
   @override
-  State<StatefulWidget> createState() {   
+  State<StatefulWidget> createState() {
     return _ProjectScrapLotPageState(parentScaffoldKey);
-  }  
+  }
 }
 
-class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with AutomaticKeepAliveClientMixin {
+class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
+    with AutomaticKeepAliveClientMixin {
   _ProjectScrapLotPageState(
     this.parentScaffoldKey,
   );
@@ -52,7 +53,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
   bool get wantKeepAlive => true;
 
   @override
-  void initState() {    
+  void initState() {
     super.initState();
 
     _pTextInputWgt0 = _buildTextInputWidgetItem(0);
@@ -86,9 +87,9 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
   }
 
   void _getRepairCodeListFromServer() {
-    HttpDigger().postWithUri("Repair/GetScrapCode",
-        parameters: {}, shouldCache: true,
-        success: (int code, String message, dynamic responseJson) {
+    HttpDigger()
+        .postWithUri("Repair/GetScrapCode", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
       print("Repair/GetScrapCode: $responseJson");
       this.arrOfScrapCode = (responseJson["Extend"] as List)
           .map((item) => ProjectScrapItemModel.fromJson(item))
@@ -96,7 +97,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
       // print("arrOfScrapCode: $arrOfScrapCode");
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -105,9 +106,9 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
         children: <Widget>[
           Expanded(
             child: Container(
-            color: hexColor("f2f2f7"),
-            child: _buildListView(),
-          ),
+              color: hexColor("f2f2f7"),
+              child: _buildListView(),
+            ),
           ),
           Container(
             height: 50,
@@ -134,7 +135,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
         _selectionWgt0,
         _selectionWgt1,
         _selectionWgt2,
-        _selectionWgt3,      
+        _selectionWgt3,
         _buildContentInputItem(),
         _buildFooter(),
       ],
@@ -348,22 +349,10 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage> with Automati
 
   Future _tryToscan() async {
     print("start scanning");
-
-    // try {
-    //   String c = await BarcodeScanner.scan();
-    //   _pTextInputWgt0.setContent(c);
-    //   this.lotNo = c;
-    //   _getDataFromServer();
-    // } on Exception catch (e) {
-    //   if (e == BarcodeScanner.CameraAccessDenied) {
-    //     HudTool.showInfoWithStatus("相机权限未开启");
-    //   } else {
-    //     HudTool.showInfoWithStatus("未知错误，请重试");
-    //   }
-    // } on FormatException {
-    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    // } catch (e) {
-    //   HudTool.showInfoWithStatus("未知错误，请重试");
-    // }
+    
+    String c = await BarcodeScanTool.tryToScanBarcode();
+    _pTextInputWgt0.setContent(c);
+    this.lotNo = c;
+    _getDataFromServer();
   }
 }

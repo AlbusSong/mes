@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
@@ -9,7 +10,6 @@ import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 import '../../Others/View/MESContentInputWidget.dart';
 
-// import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 
 import 'Model/ProjectItemModel.dart';
@@ -61,7 +61,9 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   void _getDataFromServer() {
     // CAB1912173050FFF
     HudTool.show();
-    HttpDigger().postWithUri("LotSubmit/GetLotSearch", parameters: {"lotno":this.lotNo},  shouldCache: true, success: (int code, String message, dynamic responseJson){
+    HttpDigger().postWithUri("LotSubmit/GetLotSearch",
+        parameters: {"lotno": this.lotNo}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLotSearch: $responseJson");
       HudTool.dismiss();
       List extend = jsonDecode(responseJson["Extend"]);
@@ -71,11 +73,13 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       this.detailData = ProjectItemModel.fromJson(extend[0]);
       _selectionWgt0.setContent(this.detailData.LotNo);
       _selectionWgt1.setContent(this.detailData.LOTSize.toString());
-    }); 
+    });
   }
 
   void _getLockCodeListFromServer() {
-    HttpDigger().postWithUri("LotSubmit/GetLockCode", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson){
+    HttpDigger()
+        .postWithUri("LotSubmit/GetLockCode", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLockCode: $responseJson");
       this.arrOfLockCode = (responseJson['Extend'] as List)
           .map((item) => ProjectLockCodeModel.fromJson(item))
@@ -164,9 +168,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
 
     List<String> arrOfSelectionTitle = [];
     if (index == 0) {
-
     } else if (index == 1) {
-      
     } else if (index == 2) {
       for (ProjectLockCodeModel m in this.arrOfLockCode) {
         arrOfSelectionTitle.add('${m.LockCode}|${m.Description}');
@@ -198,14 +200,14 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     picker.show(_scaffoldKey.currentState);
   }
 
-  void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
     if (index == 0) {
-
     } else if (index == 1) {
     } else if (index == 2) {
       this.selectedLockCode = this.arrOfLockCode[indexOfSelectedItem];
 
-      _selectionWgt2.setContent(title);      
+      _selectionWgt2.setContent(title);
     }
   }
 
@@ -257,7 +259,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     );
   }
 
-  Future _btnConfirmClicked () async {
+  Future _btnConfirmClicked() async {
     if (isAvailable(this.lotNo) == false) {
       HudTool.showInfoWithStatus("请输入/扫码获取Lot NO");
       return;
@@ -273,11 +275,12 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       return;
     }
 
-    bool isOkay = await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定锁定?");
+    bool isOkay =
+        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定锁定?");
 
     if (isOkay) {
       _confirmAction();
-    }    
+    }
   }
 
   void _confirmAction() {
@@ -288,7 +291,8 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     mDict["comment"] = this.remarkContent;
 
     HudTool.show();
-    HttpDigger().postWithUri("LotSubmit/LotLock", parameters: mDict, success: (int code, String message, dynamic responseJson){
+    HttpDigger().postWithUri("LotSubmit/LotLock", parameters: mDict,
+        success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/LotLock: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -326,21 +330,9 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   Future _tryToscan() async {
     print("start scanning");
 
-    // try {
-    //   String c = await BarcodeScanner.scan();
-    //   _sBar.setContent(c);
-    //   this.lotNo = c;      
-    //   _getDataFromServer();
-    // } on Exception catch (e) {
-    //   if (e == BarcodeScanner.CameraAccessDenied) {
-    //     HudTool.showInfoWithStatus("相机权限未开启");
-    //   } else {
-    //     HudTool.showInfoWithStatus("未知错误，请重试");
-    //   }
-    // } on FormatException {
-    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    // } catch (e) {
-    //   HudTool.showInfoWithStatus("未知错误，请重试");
-    // }
+    String c = await BarcodeScanTool.tryToScanBarcode();
+    _sBar.setContent(c);
+    this.lotNo = c;
+    _getDataFromServer();
   }
 }

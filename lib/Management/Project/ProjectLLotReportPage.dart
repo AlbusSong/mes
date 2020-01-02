@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
@@ -12,7 +13,6 @@ import 'Widget/ProjectTextInputWidget.dart';
 import 'Widget/ProjectInfoDisplayWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
-// import 'package:barcode_scan/barcode_scan.dart';
 
 import 'Model/ProjectWorkItemDataModel.dart';
 import 'Model/ProjectWorkOrderModel.dart';
@@ -118,7 +118,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     HttpDigger().postWithUri("LotSubmit/GetGrade",
         parameters: {"proclass": prodClass}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
-      print("LotSubmit/GetGrade: $responseJson");  
+      print("LotSubmit/GetGrade: $responseJson");
       _selectionWgt2.setContent("BBB");
       this.selectedGradeInfo = jsonDecode(responseJson['Extend']);
       print("selectedGradeInfo: $selectedGradeInfo");
@@ -191,7 +191,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
         ),
         WidgetTool.createListViewLine(15, hexColor("f2f2f7")),
         _pTextInputWgt0,
-        _pTextInputWgt1,        
+        _pTextInputWgt1,
         _selectionWgt2,
       ],
     );
@@ -311,7 +311,8 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
       _getGradeInfoFromServer(this.selectedPlanInfo.ProdClass);
 
       _selectionWgt1.setContent(title);
-      _pInfoDisplayWgt0.setContent('${this.selectedPlanInfo.ProcessCode}|${this.selectedPlanInfo.ProcessName}');
+      _pInfoDisplayWgt0.setContent(
+          '${this.selectedPlanInfo.ProcessCode}|${this.selectedPlanInfo.ProcessName}');
       _pInfoDisplayWgt1.setContent(
           '${this.selectedPlanInfo.ItemCode}|${this.selectedPlanInfo.ItemName}');
       _pInfoDisplayWgt2.setContent('${this.selectedPlanInfo.WoPlanQty}');
@@ -324,12 +325,14 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   }
 
   Future _btnConfirmClicked() async {
-    if (this.selectedWork == null || isAvailable(this.selectedWork.LineCode) == false) {
+    if (this.selectedWork == null ||
+        isAvailable(this.selectedWork.LineCode) == false) {
       HudTool.showInfoWithStatus("请选择作业中心");
       return;
     }
 
-    if (this.selectedPlanInfo == null || isAvailable(this.selectedPlanInfo.LineCode) == false) {
+    if (this.selectedPlanInfo == null ||
+        isAvailable(this.selectedPlanInfo.LineCode) == false) {
       HudTool.showInfoWithStatus("请选择工单");
       return;
     }
@@ -364,7 +367,8 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     print("LotSubmit/Submit mDict: $mDict");
 
     HudTool.show();
-    HttpDigger().postWithUri("LotSubmit/Submit", parameters: {}, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LotSubmit/Submit", parameters: {},
+        success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/Submit: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -402,20 +406,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   Future _tryToscan() async {
     print("start scanning");
 
-    // try {
-    //   this.lotNo = await BarcodeScanner.scan();
-    //   _selectionWgt2.setContent(this.lotNo);
-    //   HudTool.showInfoWithStatus("扫码成功：\n${this.lotNo}");
-    // } on Exception catch (e) {
-    //   if (e == BarcodeScanner.CameraAccessDenied) {
-    //     HudTool.showInfoWithStatus("相机权限未开启");
-    //   } else {
-    //     HudTool.showInfoWithStatus("未知错误，请重试");
-    //   }
-    // } on FormatException {
-    //   HudTool.showInfoWithStatus("一/二维码的值为空，请检查");
-    // } catch (e) {
-    //   HudTool.showInfoWithStatus("未知错误，请重试");
-    // }
+    this.lotNo = await BarcodeScanTool.tryToScanBarcode();
+    _selectionWgt2.setContent(this.lotNo);
   }
 }
