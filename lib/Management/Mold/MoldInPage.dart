@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/NativeCommunicationTool.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Tool/AlertTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
-import '../../Others/View/MESContentInputWidget.dart';
 
 import 'Model/MoldInModel.dart';
 
@@ -35,8 +35,8 @@ class _MoldInPageState extends State<MoldInPage> {
     super.initState();
 
     _sBar.functionBlock = () {
-      print("functionBlock");
-      _popSheetAlert();
+      print("getBatteryLevel: ${NativeCommunicationTool().getBatteryLevel()}");
+      // _popSheetAlert();
     };
     _sBar.keyboardReturnBlock = (String c) {
       this.moldCode = c;
@@ -148,17 +148,6 @@ class _MoldInPageState extends State<MoldInPage> {
     );
   }
 
-  Widget _buildContentInputItem() {
-    void Function(String) contentChangedBlock = (String newContent) {
-      // print("contentChangedBlock: $newContent");
-      this.content = newContent;
-    };
-    return MESContentInputWidget(
-      placeholder: "备注",
-      contentChangedBlock: contentChangedBlock,
-    );
-  }
-
   Widget _buildSelectionItem(int index) {
     bool enabled = false;
     String title = "";
@@ -192,7 +181,7 @@ class _MoldInPageState extends State<MoldInPage> {
     return item;
   }
 
-  void _hasSelectedItem(int index) {
+  void _hasSelectedItem(int index) {    
     print("_hasSelectedItem: $index");
     this.selectedIndex = index;
     for (int i = 0; i < this.selectionItemList.length; i++) {

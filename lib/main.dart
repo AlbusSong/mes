@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'Others/Model/MeInfo.dart';
 import 'Home/HomePage.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Tool/NativeCommunicationTool.dart';
 import 'Others/Const/Const.dart';
 import 'package:mes/Others/Network/FlutterCache.dart';
 
@@ -17,6 +18,7 @@ void main() {
 
 void _initSomeThings() {
   FlutterCache();
+  NativeCommunicationTool();
 }
   
 class MESApp extends StatelessWidget {
