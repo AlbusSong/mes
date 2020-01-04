@@ -1,6 +1,6 @@
 # mes
 
-MES App
+MES app
 
 ## Getting Started
 
