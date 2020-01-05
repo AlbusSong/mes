@@ -149,10 +149,13 @@ public class BarcodeScanActivity extends Activity implements QRCodeView.Delegate
     @Override
     public void onScanQRCodeSuccess(String result) {
         Log.i("RST", "result:" + result);
-        setTitle("扫描结果为：" + result);
+        setTitle("扫描结果：" + result);
         vibrate();
 
-        mZBarView.startSpot(); // 开始识别
+//        mZBarView.startSpot(); // 开始识别
+        this.onStop();
+        this.onDestroy();
+        finish();
     }
 
     @Override
