@@ -302,6 +302,7 @@ class _MoldLockPageState extends State<MoldLockPage> {
     print("start scanning");
 
     this.moldCode = await BarcodeScanTool.tryToScanBarcode();
+    _sBar.setContent(this.moldCode);
     _getDataFromServer();
   }
 }

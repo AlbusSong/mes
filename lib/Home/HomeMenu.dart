@@ -54,9 +54,7 @@ class _HomeMenuState extends State<HomeMenu> {
     print("_functionItemClickedAtIndex: $index");
     // Navigator.of(context).pop();
     if (index == 0) {
-      {
-        print("tryToScanBarcode: ${NativeCommunicationTool().tryToScanBarcode()}");
-        return;
+      {       
         bool shouldLogout = await _showLogoutDialog();
         if (shouldLogout) {
           print("shouldLogout: $shouldLogout");

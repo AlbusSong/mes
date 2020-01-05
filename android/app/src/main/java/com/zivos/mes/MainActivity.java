@@ -21,6 +21,9 @@ import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "flutterNativeChannel";
 
+    private MethodCall mCurrentCall;
+    private Result mCurrentResult;
+
   @Override
   public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
     GeneratedPluginRegistrant.registerWith(flutterEngine);
@@ -29,6 +32,9 @@ public class MainActivity extends FlutterActivity {
             new MethodCallHandler() {
               @Override
               public void onMethodCall(MethodCall call, Result result) {
+                  mCurrentCall = call;
+                  mCurrentResult = result;
+
                 if (call.method.equals("getBatteryLevel")) {
                     result.success("Jalsdkf");
 //                  int batteryLevel = 5;
@@ -40,7 +46,7 @@ public class MainActivity extends FlutterActivity {
 //                  }
                 } else if (call.method.equals("tryToScanBarcode")) {
                     tryToScanBarcode();
-                    result.success("HLaskldfasldfjlasdjflassjf");
+//                    result.success("HLaskldfasldfjlasdjflassjf");
                 } else {
                   result.notImplemented();
                 }
@@ -60,7 +66,14 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        String resStr = data.getStringExtra("barcodeResult").toString();
-        Log.i("TRS", "HHHH: " + resStr);
+        if (resultCode == 100001) {
+            String resStr = data.getStringExtra("barcodeResult").toString();
+            Log.i("RST", "HHHH: " + resStr);
+            if (this.mCurrentCall != null && this.mCurrentCall.method.equals("tryToScanBarcode")) {
+                if (this.mCurrentResult != null) {
+                    this.mCurrentResult.success(resStr);
+                }
+            }
+        }
     }
 }
