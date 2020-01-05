@@ -150,6 +150,12 @@ public class BarcodeScanActivity extends Activity implements QRCodeView.Delegate
     public void onScanQRCodeSuccess(String result) {
         Log.i("RST", "result:" + result);
         setTitle("扫描结果：" + result);
+
+        Intent in = new Intent();
+        in.putExtra("data", result);
+
+        setResult(100001, in);
+
         vibrate();
 
 //        mZBarView.startSpot(); // 开始识别

@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
+import io.flutter.Log;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugins.GeneratedPluginRegistrant;
@@ -49,7 +50,17 @@ public class MainActivity extends FlutterActivity {
   }
 
   private void tryToScanBarcode() {
-      System.out.print("alsdjflajee");
-      startActivity(new Intent(this, BarcodeScanActivity.class));
+      Intent in = new Intent(this, BarcodeScanActivity.class);
+      startActivityForResult(in, 100001);
+//      startActivity(new Intent(this, BarcodeScanActivity.class));
+//      String cc = in.getStringExtra("data");
+//      Log.i("TRS", cc);
   }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String resStr = data.getStringExtra("data").toString();
+        Log.i("TRS", "HHHH: " + resStr);
+    }
 }
