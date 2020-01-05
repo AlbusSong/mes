@@ -24,5 +24,11 @@ class NativeCommunicationTool {
       String result = await _platform.invokeMethod('getBatteryLevel');
       print("batteryLevel: $result");
       return result;
-    }
+  }
+
+  Future<String> tryToScanBarcode() async {
+    String result = await _platform.invokeMethod("tryToScanBarcode");
+    print("tryToScanBarcode: $result");
+    return result;
+  }
 }

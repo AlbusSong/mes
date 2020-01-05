@@ -35,7 +35,7 @@ class _MoldInPageState extends State<MoldInPage> {
     super.initState();
 
     _sBar.functionBlock = () {
-      print("getBatteryLevel: ${NativeCommunicationTool().getBatteryLevel()}");
+      print("tryToScanBarcode: ${NativeCommunicationTool().tryToScanBarcode()}");
       // _popSheetAlert();
     };
     _sBar.keyboardReturnBlock = (String c) {

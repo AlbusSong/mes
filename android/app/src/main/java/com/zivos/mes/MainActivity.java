@@ -1,5 +1,7 @@
 package com.zivos.mes;
 
+import android.content.Intent;
+
 import androidx.annotation.NonNull;
 
 import io.flutter.embedding.android.FlutterActivity;
@@ -10,6 +12,10 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+
+import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
+//import pub.devrel.easypermissions.AfterPermissionGranted;
+//import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "flutterNativeChannel";
@@ -31,11 +37,19 @@ public class MainActivity extends FlutterActivity {
 //                  } else {
 //                    result.error("UNAVAILABLE", "Battery level not available.", null);
 //                  }
+                } else if (call.method.equals("tryToScanBarcode")) {
+                    tryToScanBarcode();
+                    result.success("HLaskldfasldfjlasdjflassjf");
                 } else {
                   result.notImplemented();
                 }
               }
             }
     );
+  }
+
+  private void tryToScanBarcode() {
+      System.out.print("alsdjflajee");
+      startActivity(new Intent(this, BarcodeScanActivity.class));
   }
 }
