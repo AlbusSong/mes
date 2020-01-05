@@ -3,6 +3,7 @@ package com.zivos.mes;
 import android.app.Activity;
 import android.os.Bundle;
 
+//import cn.bingoogolapple.photopicker.activity.BGAPhotoPickerActivity;
 import cn.bingoogolapple.qrcode.core.BarcodeType;
 import cn.bingoogolapple.qrcode.core.QRCodeView;
 import cn.bingoogolapple.qrcode.zbar.BarcodeFormat;
@@ -14,8 +15,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -27,6 +30,21 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Vibrator;
+import android.util.Log;
+import android.view.View;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.bingoogolapple.qrcode.core.BarcodeType;
+import cn.bingoogolapple.qrcode.core.QRCodeView;
+import cn.bingoogolapple.qrcode.zbar.BarcodeFormat;
+import cn.bingoogolapple.qrcode.zbar.ZBarView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -43,8 +61,99 @@ public class BarcodeScanActivity extends Activity {
 //        mZBarView = findViewById(R.id.zbarview);
 //        mZBarView.setDelegate(this);
 
-        initView();
+//        initView();
+        initView2();
     }
+
+
+    private void initView2() {
+
+//        ScrollView main = new ScrollView(this);
+//        main.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+//        main.setBackgroundColor(Color.RED);
+//
+//        //根布局参数
+        LinearLayout.LayoutParams layoutParamsRoot = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        layoutParamsRoot.gravity = Gravity.CENTER;
+        //根布局
+        LinearLayout layoutRoot = new LinearLayout(this);
+        layoutRoot.setLayoutParams(layoutParamsRoot);
+        layoutRoot.setOrientation(LinearLayout.VERTICAL);
+//
+//
+//        //上边距（dp值）
+//        int topMargin = dip2px(this, 5);
+//        //imageMain宽度（dp值）
+//        int widthMain = dip2px(this, 240);
+//        //imageMain高度（dp值）
+//        int heightMain = dip2px(this, 420);
+//
+//        LinearLayout.LayoutParams layoutParamsImageMain = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, heightMain);
+//        layoutParamsImageMain.topMargin = topMargin;
+//        layoutParamsImageMain.bottomMargin = topMargin;
+//        layoutParamsImageMain.leftMargin = topMargin;
+//        layoutParamsImageMain.rightMargin = topMargin;
+//        layoutParamsImageMain.gravity = Gravity.CENTER_HORIZONTAL;
+//
+//        //初始化ImageView
+//        ImageView imageMain = new ImageView(this);
+//        imageMain.setBackgroundColor(Color.BLUE);
+//        imageMain.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//        imageMain.setAdjustViewBounds(true);
+//        imageMain.setImageResource(R.mipmap.login_background);
+//        layoutRoot.addView(imageMain, layoutParamsImageMain);
+
+        LinearLayout lineLayout = (LinearLayout)getLayoutInflater().inflate(R.layout.activity_test_scan, layoutRoot);
+        Log.i("SSS", "hahahh" + lineLayout.toString());
+        setContentView(lineLayout);
+        mZBarView = findViewById(R.id.zbarview);
+//        mZBarView.setDelegate(this);
+        if (mZBarView != null) {
+            Log.i("SSS", "LLLLLLL" + mZBarView.toString());
+        } else {
+            Log.i("SSS", "JLJJJJJJJJJJJJJ");
+        }
+//        layoutRoot.addView(mZBarView);
+
+//        main.addView(layoutRoot);
+
+//        setContentView(main);
+    }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        mZBarView.startCamera(); // 打开后置摄像头开始预览，但是并未开始识别
+////        mZBarView.startCamera(Camera.CameraInfo.CAMERA_FACING_FRONT); // 打开前置摄像头开始预览，但是并未开始识别
+//
+//        mZBarView.startSpotAndShowRect(); // 显示扫描框，并开始识别
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        mZBarView.stopCamera(); // 关闭摄像头预览，并且隐藏扫描框
+//        super.onStop();
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        mZBarView.onDestroy(); // 销毁二维码扫描控件
+//        super.onDestroy();
+//    }
+//
+//    private void vibrate() {
+////        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+////        vibrator.vibrate(200);
+//    }
+//
+//    @Override
+//    public void onScanQRCodeSuccess(String result) {
+//        Log.i("RST", "result:" + result);
+//        setTitle("扫描结果为：" + result);
+//        vibrate();
+//
+//        mZBarView.startSpot(); // 开始识别
+//    }
 
     private void initView() {
         ScrollView main = new ScrollView(this);
@@ -170,7 +279,8 @@ public class BarcodeScanActivity extends Activity {
             @Override
             public void onClick(View v) {
 //                Toast.makeText(PureCodeActivity.this, "账号:" + editInfo.getText().toString() + " 密码：" + passWord.getText().toString(), Toast.LENGTH_SHORT).show();
-                System.out.print("ahahsdhfsad");
+//                System.out.print("ahahsdhfsad");
+                Log.i("BARCODESCAN", "alljsflasdjflasjf");
             }
         });
         buttonCancel.setOnClickListener(new View.OnClickListener() {

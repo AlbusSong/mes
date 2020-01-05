@@ -3,6 +3,7 @@ import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Const/Const.dart';
+import 'package:mes/Others/Tool/NativeCommunicationTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 
 import '../Login/LoginPage.dart';
@@ -54,6 +55,8 @@ class _HomeMenuState extends State<HomeMenu> {
     // Navigator.of(context).pop();
     if (index == 0) {
       {
+        print("tryToScanBarcode: ${NativeCommunicationTool().tryToScanBarcode()}");
+        return;
         bool shouldLogout = await _showLogoutDialog();
         if (shouldLogout) {
           print("shouldLogout: $shouldLogout");

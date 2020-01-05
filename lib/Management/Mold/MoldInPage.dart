@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
-import 'package:mes/Others/Tool/NativeCommunicationTool.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Tool/AlertTool.dart';
@@ -35,8 +34,7 @@ class _MoldInPageState extends State<MoldInPage> {
     super.initState();
 
     _sBar.functionBlock = () {
-      print("tryToScanBarcode: ${NativeCommunicationTool().tryToScanBarcode()}");
-      // _popSheetAlert();
+      _popSheetAlert();
     };
     _sBar.keyboardReturnBlock = (String c) {
       this.moldCode = c;
