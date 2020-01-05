@@ -48,7 +48,7 @@ import cn.bingoogolapple.qrcode.zbar.ZBarView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class BarcodeScanActivity extends Activity {
+public class BarcodeScanActivity extends Activity implements QRCodeView.Delegate {
     private ZBarView mZBarView;
     private EditText editInfo;
     private EditText passWord;
@@ -107,7 +107,7 @@ public class BarcodeScanActivity extends Activity {
         Log.i("SSS", "hahahh" + lineLayout.toString());
         setContentView(lineLayout);
         mZBarView = findViewById(R.id.zbarview);
-//        mZBarView.setDelegate(this);
+        mZBarView.setDelegate(this);
         if (mZBarView != null) {
             Log.i("SSS", "LLLLLLL" + mZBarView.toString());
         } else {
@@ -120,40 +120,50 @@ public class BarcodeScanActivity extends Activity {
 //        setContentView(main);
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        mZBarView.startCamera(); // 打开后置摄像头开始预览，但是并未开始识别
-////        mZBarView.startCamera(Camera.CameraInfo.CAMERA_FACING_FRONT); // 打开前置摄像头开始预览，但是并未开始识别
-//
-//        mZBarView.startSpotAndShowRect(); // 显示扫描框，并开始识别
-//    }
-//
-//    @Override
-//    protected void onStop() {
-//        mZBarView.stopCamera(); // 关闭摄像头预览，并且隐藏扫描框
-//        super.onStop();
-//    }
-//
-//    @Override
-//    protected void onDestroy() {
-//        mZBarView.onDestroy(); // 销毁二维码扫描控件
-//        super.onDestroy();
-//    }
-//
-//    private void vibrate() {
-////        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-////        vibrator.vibrate(200);
-//    }
-//
-//    @Override
-//    public void onScanQRCodeSuccess(String result) {
-//        Log.i("RST", "result:" + result);
-//        setTitle("扫描结果为：" + result);
-//        vibrate();
-//
-//        mZBarView.startSpot(); // 开始识别
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mZBarView.startCamera(); // 打开后置摄像头开始预览，但是并未开始识别
+//        mZBarView.startCamera(Camera.CameraInfo.CAMERA_FACING_FRONT); // 打开前置摄像头开始预览，但是并未开始识别
+
+        mZBarView.startSpotAndShowRect(); // 显示扫描框，并开始识别
+    }
+
+    @Override
+    protected void onStop() {
+        mZBarView.stopCamera(); // 关闭摄像头预览，并且隐藏扫描框
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mZBarView.onDestroy(); // 销毁二维码扫描控件
+        super.onDestroy();
+    }
+
+    private void vibrate() {
+//        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+//        vibrator.vibrate(200);
+    }
+
+    @Override
+    public void onScanQRCodeSuccess(String result) {
+        Log.i("RST", "result:" + result);
+        setTitle("扫描结果为：" + result);
+        vibrate();
+
+        mZBarView.startSpot(); // 开始识别
+    }
+
+    @Override
+    public void onCameraAmbientBrightnessChanged(boolean isDark) {
+        Log.i("RST", "亮度变了");
+    }
+
+    @Override
+    public  void onScanQRCodeOpenCameraError() {
+        Log.i("RST", "打开相机出问题了");
+    }
 
     private void initView() {
         ScrollView main = new ScrollView(this);
