@@ -60,7 +60,7 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        String resStr = data.getStringExtra("data").toString();
+        String resStr = data.getStringExtra("barcodeResult").toString();
         Log.i("TRS", "HHHH: " + resStr);
     }
 }

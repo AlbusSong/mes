@@ -149,10 +149,10 @@ public class BarcodeScanActivity extends Activity implements QRCodeView.Delegate
     @Override
     public void onScanQRCodeSuccess(String result) {
         Log.i("RST", "result:" + result);
-        setTitle("扫描结果：" + result);
+//        setTitle("扫描结果：" + result);
 
         Intent in = new Intent();
-        in.putExtra("data", result);
+        in.putExtra("barcodeResult", result);
 
         setResult(100001, in);
 
