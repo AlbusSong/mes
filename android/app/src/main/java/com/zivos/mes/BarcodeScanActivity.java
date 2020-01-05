@@ -142,8 +142,8 @@ public class BarcodeScanActivity extends Activity implements QRCodeView.Delegate
     }
 
     private void vibrate() {
-//        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-//        vibrator.vibrate(200);
+        Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        v.vibrate(200);
     }
 
     @Override
