@@ -56,6 +56,14 @@ String avoidNull(String s) {
   return s;
 }
 
+int stringLength(String s) {
+  if (s == null) {
+    return 0;
+  }
+
+  return s.length;
+}
+
 bool isAvailable(String s) {
   if (s == null) {
     return false;

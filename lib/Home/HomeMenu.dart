@@ -56,7 +56,7 @@ class _HomeMenuState extends State<HomeMenu> {
     if (index == 0) {
       {       
         bool shouldLogout = await _showLogoutDialog();
-        if (shouldLogout) {
+        if (shouldLogout != null && shouldLogout == true) {
           print("shouldLogout: $shouldLogout");
           MeInfo().isLogined = false;
           MeInfo().storeLoginInfo();

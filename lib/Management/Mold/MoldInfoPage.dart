@@ -186,9 +186,7 @@ class _MoldInfoPageState extends State<MoldInfoPage> {
     print("start scanning");
 
     String c = await BarcodeScanTool.tryToScanBarcode();
-    print("cccc: $c");
     _sBar.setContent(c);
-    HudTool.showInfoWithStatus("扫码结果：$c");
     this.moldCode = c;
     _getDataFromServer();
   }

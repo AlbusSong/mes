@@ -406,7 +406,11 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   Future _tryToscan() async {
     print("start scanning");
 
-    this.lotNo = await BarcodeScanTool.tryToScanBarcode();
-    _selectionWgt2.setContent(this.lotNo);
+    String c = await BarcodeScanTool.tryToScanBarcode();
+    this.lotNo = c;
+    if (stringLength(c) >= 16) {
+      this.lotNo = c.substring(0, 16);
+    }
+    _pTextInputWgt0.setContent(this.lotNo);
   }
 }
