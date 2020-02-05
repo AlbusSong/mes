@@ -3,10 +3,7 @@ import '../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
-
-import 'dart:convert';
 
 import 'Model/ProjectItemModel.dart';
 
@@ -44,7 +41,7 @@ class _ProjectLotSearchPageState extends State<ProjectLotSearchPage> {
     HttpDigger().postWithUri("LotSubmit/GetLotSearch", parameters: {"lotno":this.lotNo}, shouldCache: false, success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLotSearch: $responseJson");
       HudTool.dismiss();
-      List extend = jsonDecode(responseJson["Extend"]);
+      List extend = responseJson["Extend"];
       if (listLength(extend) == 0) {
         return;
       }
