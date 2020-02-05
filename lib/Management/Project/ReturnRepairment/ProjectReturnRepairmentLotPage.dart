@@ -72,16 +72,16 @@ class _ProjectReturnRepairmentLotPageState
         success: (int code, String message, dynamic responseJson) {
       print("Repair/GetLotInfo: $responseJson");
       HudTool.dismiss();
-      List arr = jsonDecode(responseJson["Extend"]);
+      List arr = responseJson["Extend"];
       if (listLength(arr) > 0) {
         this.lotInfoData = ProjectLotInfoModel.fromJson(arr.first);
-
-        _getRepairCodeListFromServer();
 
         _selectionWgt0.setContent(this.lotInfoData.Wono);
         _selectionWgt1.setContent(
             '${this.lotInfoData.ItemCode}|${this.lotInfoData.ProcessName}');
         _selectionWgt2.setContent(this.lotInfoData.Qty.toString());
+
+        _getRepairCodeListFromServer();
       }
     });
   }

@@ -34,7 +34,9 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
     };
   }
 
-  void _getDataFromServer() {}
+  void _getDataFromServer() {
+
+  }
 
   @override
   Widget build(BuildContext context) {
