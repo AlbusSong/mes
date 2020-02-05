@@ -180,7 +180,7 @@ class _ProjectChangeGearPageState extends State<ProjectChangeGearPage> {
     List<String> arrOfSelectionTitle = [];
     if (index == 4) {
       for (ProjectGradeItemModel m in this.arrOfGradeItem) {
-        arrOfSelectionTitle.add('${m.ProdClassName}');
+        arrOfSelectionTitle.add('${m.Level}');
       }
     }
 

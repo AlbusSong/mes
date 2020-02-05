@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
@@ -10,6 +10,8 @@ import '../Widget/ProjectTextInputWidget.dart';
 
 import '../Model/ProjectItemModel.dart';
 import '../Model/ProjectGradeItemModel.dart';
+
+import 'package:flutter_picker/flutter_picker.dart';
 
 class ProjectLotBatchDetailPage extends StatefulWidget {
   ProjectLotBatchDetailPage(
@@ -27,6 +29,9 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
   _ProjectLotBatchDetailPageState(
     this.data,
   );
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   final ProjectItemModel data;
 
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
@@ -61,15 +66,30 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
         parameters: {"proclass": prodClass}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetGrade: $responseJson");
-      this.arrOfGradeItem = (jsonDecode(responseJson['Extend']) as List)
+      this.arrOfGradeItem = (responseJson['Extend2'] as List)
           .map((item) => ProjectGradeItemModel.fromJson(item))
           .toList();
+    });
+  }
+
+  void _checkBatchLotNoFromServer (String candidateLotNo) {
+    HudTool.show();
+    HttpDigger().postWithUri("LotSubmit/GetCheckLot", parameters: {"lotno": candidateLotNo, "oldlot": this.data.LotNo}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/GetCheckLot: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.lotNo = candidateLotNo;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("Lot分批-分批"),
@@ -142,6 +162,9 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
       hideKeyboard(context);
       _popSheetAlert();
     };
+    wgt.keyboardReturnBlock = (String content) {
+      _checkBatchLotNoFromServer(content);
+    };
     wgt.contentChangeBlock = (String newContent) {
       print("contentChangeBlock: $newContent");
     };
@@ -172,6 +195,23 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
 
   void _hasSelectedItem(int index) {
     print("_hasSelectedItem: $index");
+
+    List<String> arrOfSelectionTitle = [];
+    if (index == 0) {
+    } else if (index == 0) {
+    } else if (index == 1) {
+      for (ProjectGradeItemModel m in this.arrOfGradeItem) {
+        arrOfSelectionTitle.add('${m.Level}');
+      }
+    }
+
+    if (arrOfSelectionTitle.length == 0) {
+      return;
+    }
+
+    _showPickerWithData(arrOfSelectionTitle, index);
+
+    hideKeyboard(context);
   }
 
   Widget _buildInfoCell() {
@@ -218,6 +258,30 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
     );
   }
 
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    // picker.show(Scaffold.of(context));
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
+    if (index == 1) {
+      this.selectedGradeItem = this.arrOfGradeItem[indexOfSelectedItem];
+
+      _selectionWgt1.setContent(title);
+    }
+  }
+
   void _popSheetAlert() {
     showModalBottomSheet(
       context: context,
@@ -246,6 +310,6 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
 
     String c = await BarcodeScanTool.tryToScanBarcode();
     _pTextInputWgt1.setContent(c);
-    this.lotNo = c;
+    _checkBatchLotNoFromServer(c);
   }
 }

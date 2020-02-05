@@ -48,7 +48,7 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLotSearch: $responseJson");
       HudTool.dismiss();
-      this.arrOfData = (jsonDecode(responseJson['Extend']) as List)
+      this.arrOfData = (responseJson['Extend'] as List)
           .map((item) => ProjectItemModel.fromJson(item))
           .toList();
       setState(() {});

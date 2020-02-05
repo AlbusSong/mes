@@ -23,7 +23,7 @@ class ProjectPage extends StatelessWidget {
     {"title": "Lot查询", "icon": "", "badgeValue": 0},
     {"title": "Lot锁定", "icon": "", "badgeValue": 0},
     {"title": "Lot解锁", "icon": "", "badgeValue": 0},
-    {"title": "报修", "icon": "", "badgeValue": 0},
+    {"title": "返修", "icon": "", "badgeValue": 0},
     {"title": "Lot分批", "icon": "", "badgeValue": 0},
     {"title": "档位变更", "icon": "", "badgeValue": 0},
     {"title": "修理", "icon": "", "badgeValue": 0},

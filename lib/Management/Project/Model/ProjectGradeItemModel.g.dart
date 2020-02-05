@@ -9,15 +9,11 @@ part of 'ProjectGradeItemModel.dart';
 ProjectGradeItemModel _$ProjectGradeItemModelFromJson(
     Map<String, dynamic> json) {
   return ProjectGradeItemModel(
-    json['ProdClassID'] as int,
+    json['LevelMatchID'] as int,
     json['ProdClassCode'] as String,
-    json['ProdClassName'] as String,
-    json['Cwar'] as String,
-    json['LevelManage'] as String,
-    json['Description'] as String,
+    json['Level'] as String,
+    json['IsDefaultLevel'] as bool,
     json['Delflag'] as bool,
-    json['CreateTime'] as String,
-    json['Creator'] as String,
     json['RowVersion'] as String,
   );
 }
@@ -25,14 +21,10 @@ ProjectGradeItemModel _$ProjectGradeItemModelFromJson(
 Map<String, dynamic> _$ProjectGradeItemModelToJson(
         ProjectGradeItemModel instance) =>
     <String, dynamic>{
-      'ProdClassID': instance.ProdClassID,
+      'LevelMatchID': instance.LevelMatchID,
       'ProdClassCode': instance.ProdClassCode,
-      'ProdClassName': instance.ProdClassName,
-      'Cwar': instance.Cwar,
-      'LevelManage': instance.LevelManage,
-      'Description': instance.Description,
+      'Level': instance.Level,
+      'IsDefaultLevel': instance.IsDefaultLevel,
       'Delflag': instance.Delflag,
-      'CreateTime': instance.CreateTime,
-      'Creator': instance.Creator,
       'RowVersion': instance.RowVersion,
     };
