@@ -367,7 +367,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     print("LotSubmit/Submit mDict: $mDict");
 
     HudTool.show();
-    HttpDigger().postWithUri("LotSubmit/Submit", parameters: {},
+    HttpDigger().postWithUri("LotSubmit/Submit", parameters: mDict,
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/Submit: $responseJson");
       if (code == 0) {
@@ -375,7 +375,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
         return;
       }
 
-      HudTool.showInfoWithStatus(message);
+      HudTool.showInfoWithStatus("报工成功");
       Navigator.pop(context);
     });
   }

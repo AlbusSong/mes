@@ -9,7 +9,7 @@ import 'package:mes/Others/Network/FlutterCache.dart';
 
 void main() {
   runApp(MESApp());
-  print("MeInfo: ${MeInfo().username}, ${MeInfo().password}");
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {});
 
@@ -17,6 +17,7 @@ void main() {
 }
 
 void _initSomeThings() {
+  print("MeInfo: ${MeInfo().username}, ${MeInfo().password}");
   FlutterCache();
   NativeCommunicationTool();
 }
