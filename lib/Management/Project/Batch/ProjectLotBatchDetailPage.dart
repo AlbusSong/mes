@@ -3,6 +3,7 @@ import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
@@ -45,6 +46,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
   List arrOfGradeItem;
   ProjectGradeItemModel selectedGradeItem;
 
+  String batchNum;
   String lotNo;
 
   @override
@@ -118,7 +120,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
             color: hexColor(MAIN_COLOR),
             child: Text("确认"),
             onPressed: () {
-              // _btnConfirmClicked();
+               _btnConfirmClicked();
             },
           ),
         ),
@@ -163,10 +165,15 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
       _popSheetAlert();
     };
     wgt.keyboardReturnBlock = (String content) {
-      _checkBatchLotNoFromServer(content);
+      if (index == 1) {
+        _checkBatchLotNoFromServer(content);
+      }
     };
     wgt.contentChangeBlock = (String newContent) {
       print("contentChangeBlock: $newContent");
+      if (index == 0) {
+        this.batchNum = newContent;
+      }
     };
 
     return wgt;
@@ -256,6 +263,52 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
         ],
       ),
     );
+  }
+
+  Future _btnConfirmClicked() async {
+    if (isAvailable(this.lotNo) == false) {
+      HudTool.showInfoWithStatus("请输入/扫码获取有效的Lot NO");
+      return;
+    }
+
+    if (isAvailable(this.batchNum) == false) {
+      HudTool.showInfoWithStatus("请输入分批数量");
+      return;
+    }
+
+    if (this.selectedGradeItem == null) {
+      HudTool.showInfoWithStatus("请选择档位");
+      return;
+    }
+
+    bool isOkay =
+    await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定锁定?");
+
+    if (isOkay) {
+      _confirmAction();
+    }
+  }
+
+  void _confirmAction() {
+    // LotSubmit/LotSpilt
+    Map mDict = Map();
+    mDict["oldlot"] = this.data.LotNo;
+    mDict["lotno"] = this.lotNo;
+    mDict["sqty"] = this.batchNum;
+    mDict["grade"] = this.selectedGradeItem.Level;
+
+    HudTool.show();
+    HttpDigger().postWithUri("LotSubmit/LotSpilt", parameters: mDict,
+        success: (int code, String message, dynamic responseJson) {
+          print("LotSubmit/LotSpilt: $responseJson");
+          if (code == 0) {
+            HudTool.showInfoWithStatus(message);
+            return;
+          }
+
+          HudTool.showInfoWithStatus("操作成功");
+          Navigator.pop(context);
+        });
   }
 
   void _showPickerWithData(List<String> listData, int index) {
