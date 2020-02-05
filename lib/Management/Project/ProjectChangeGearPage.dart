@@ -67,7 +67,7 @@ class _ProjectChangeGearPageState extends State<ProjectChangeGearPage> {
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLotSearch: $responseJson");
       HudTool.dismiss();
-      List arr = jsonDecode(responseJson['Extend']) as List;
+      List arr = responseJson['Extend'] as List;
       if (listLength(arr) == 0) {
         return;
       }
@@ -88,7 +88,7 @@ class _ProjectChangeGearPageState extends State<ProjectChangeGearPage> {
         parameters: {"proclass": prodClass}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetGrade: $responseJson");
-      this.arrOfGradeItem = (jsonDecode(responseJson['Extend']) as List)
+      this.arrOfGradeItem = (responseJson['Extend2'] as List)
           .map((item) => ProjectGradeItemModel.fromJson(item))
           .toList();
     });
@@ -273,8 +273,8 @@ class _ProjectChangeGearPageState extends State<ProjectChangeGearPage> {
   void _confirmAction() {
     HudTool.show();
     HttpDigger().postWithUri("LotSubmit/LotGradeChange", parameters: {
-      "lotno": this.lotNo,
-      "grade": this.selectedGradeItem.ProdClassCode
+      "lotno": this.lotDetailData.LotNo,
+      "grade": this.selectedGradeItem.Level,
     }, success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/LotLock: $responseJson");
       if (code == 0) {
