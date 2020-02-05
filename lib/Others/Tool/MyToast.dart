@@ -23,6 +23,7 @@ class MyToast {
   void _initSomeThings() {}
 
   int milliSecondsBeforeDissmissed = 1500;
+  static BuildContext APP_CONTEXT;
 
   ToastController _toastControl = ToastController(1500);
 
@@ -32,7 +33,7 @@ class MyToast {
 
   static showMessageWithLivingPeriod(
       String status, int milliSecondsBeforeDissmissed) {
-    var overlayState = Overlay.of(HomePage.appContext);
+    var overlayState = Overlay.of(APP_CONTEXT);
     OverlayEntry overlayEntry;
     overlayEntry = new OverlayEntry(builder: (ctx) {
       return buildMessageToastLayout(status);
@@ -47,7 +48,7 @@ class MyToast {
   }
 
   static show() {
-    var overlayState = Overlay.of(HomePage.appContext);
+    var overlayState = Overlay.of(APP_CONTEXT);
     OverlayEntry overlayEntry;
     overlayEntry = new OverlayEntry(builder: (ctx) {
       return buildProgressHUDLayout();
