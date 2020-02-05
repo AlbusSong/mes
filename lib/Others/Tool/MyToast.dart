@@ -48,7 +48,7 @@ class MyToast {
 
   static show() {
     var overlayState = Overlay.of(APP_CONTEXT);
-    print("overlayState: $overlayState");
+//    print("overlayState: $overlayState");
     OverlayEntry overlayEntry;
     overlayEntry = new OverlayEntry(builder: (ctx) {
       return buildProgressHUDLayout();

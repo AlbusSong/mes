@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import '../../../Others/Network/HttpDigger.dart';
-import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
@@ -17,8 +16,6 @@ import '../Model/ProjectMaterialItemModel.dart';
 import '../Model/ProjectTagInfoModel.dart';
 
 import 'ProjectAddMaterialTagPage.dart';
-
-import 'dart:convert';
 
 class ProjectOrderMaterialPage extends StatefulWidget {
   @override
@@ -173,11 +170,10 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
         success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/LoadTag: $responseJson");
       HudTool.dismiss();
-      List arr = jsonDecode(responseJson["Extend"]);
-      this.arrOfMaterialTag = (arr as List)
+      this.arrOfMaterialTag = (responseJson["Extend"] as List)
           .map((item) => ProjectTagInfoModel.fromJson(item))
           .toList();
-      setState(() {});
+     setState(() {});
     });
   }
 
@@ -525,8 +521,8 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     mDict["item"] = this.materialInfo.ItemCode;
     mDict["tag"] = this.selectedMaterialTag.TagID;
     mDict["id"] = this.selectedTodayWork.ID;
-    print('$uri: $mDict');
-
+    print("$uri: $mDict");
+    
     HudTool.show();
     HttpDigger().postWithUri(uri, parameters: mDict,
         success: (int code, String message, dynamic responseJson) {

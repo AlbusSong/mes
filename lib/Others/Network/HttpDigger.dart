@@ -64,7 +64,7 @@ class HttpDigger {
     if (shouldCache == true) {
       Future<dynamic> cachedDataFuture = FlutterCache().getCachedData(cacheKey);
       cachedDataFuture.then((responseJsonString) {
-        if (success != null) {
+        if (success != null && responseJsonString != null) {
           dynamic responseJson = jsonDecode(responseJsonString);
           if (responseJson == null) {
             success(0, "data is null", null);
