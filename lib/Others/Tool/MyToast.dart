@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:mes/Home/HomePage.dart';
 
 class MyToast {
   // 单例公开访问点
@@ -49,6 +48,7 @@ class MyToast {
 
   static show() {
     var overlayState = Overlay.of(APP_CONTEXT);
+    print("overlayState: $overlayState");
     OverlayEntry overlayEntry;
     overlayEntry = new OverlayEntry(builder: (ctx) {
       return buildProgressHUDLayout();
@@ -137,12 +137,13 @@ class ToastController {
   int milliSecondsBeforeDissmissed;
   OverlayEntry overlayEntry;
   OverlayState overlayState;
-  bool dismissed = false;
+  bool isDismissed = false;
 
   showAndDismissSoon() async {
     await Future.delayed(Duration(microseconds: 100));
     // overlayEntry?.remove();
     overlayState.insert(overlayEntry);
+    this.isDismissed = false;
     await Future.delayed(Duration(milliseconds: milliSecondsBeforeDissmissed));
     this.dismiss();
   }
@@ -151,16 +152,18 @@ class ToastController {
     await Future.delayed(Duration(microseconds: 100));
     // overlayEntry?.remove();
     overlayState.insert(overlayEntry);
-//    this.dismissed = false;
+    this.isDismissed = false;
   }
 
   dismiss() async {
-//    if (dismissed) {
-//      return;
-//    }
-//    this.dismissed = true;
+    if (this.isDismissed == true) {
+      return;
+    }
+
     if (overlayEntry != null) {
       overlayEntry.remove();
     }
+
+    this.isDismissed = true;
   }
 }
