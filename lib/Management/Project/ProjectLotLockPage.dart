@@ -59,14 +59,13 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   }
 
   void _getDataFromServer() {
-    // CAB1912173050FFF
     HudTool.show();
     HttpDigger().postWithUri("LotSubmit/GetLotSearch",
         parameters: {"lotno": this.lotNo}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLotSearch: $responseJson");
       HudTool.dismiss();
-      List extend = jsonDecode(responseJson["Extend"]);
+      List extend = responseJson["Extend"];
       if (listLength(extend) == 0) {
         return;
       }

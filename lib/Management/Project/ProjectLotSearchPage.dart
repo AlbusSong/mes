@@ -142,13 +142,13 @@ class _ProjectLotSearchPageState extends State<ProjectLotSearchPage> {
           ),
           Container(
             child: Text(
-              "  Lot大小：${this.detailData.LOTSize}",
+              "  Lot大小：${this.detailData.LOTSize ?? ""}",
               style: TextStyle(color: hexColor("333333"), fontSize: 15),
             ),
           ),
           Container(
             child: Text(
-              "       数量：${this.detailData.Qty}",
+              "       数量：${this.detailData.Qty ?? ""}",
               style: TextStyle(color: hexColor("333333"), fontSize: 15),
             ),
           ),
