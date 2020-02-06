@@ -10,6 +10,7 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'ProjectRepairmentDetailPage.dart';
 
 import '../Model/ProjectProcessItemModel.dart';
+import '../Model/ProjectRepairListItemModel.dart';
 
 class ProjectRepairmentListPage extends StatefulWidget {
   @override
@@ -26,6 +27,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
   String lotNo;
   List arrOfProcess;
   ProjectProcessItemModel selectedProcess;
+  List arrOfData;
 
   @override
   void initState() {
@@ -50,14 +52,27 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
 
   void _getDataFromServer() {
     HudTool.show();
-    HttpDigger()
-        .postWithUri("Repair/GetRepairList", parameters: {"workcenter":this.selectedProcess.WorkCenter, "lotno":"", "rpwo":""}, shouldCache: true,
+
+    Map mDict = Map();
+    mDict["workcenter"] = this.selectedProcess.WorkCenter;
+    mDict["lotno"] = "";
+    mDict["rpwo"] = "";
+    print("Repair/GetRepairList: $mDict");
+    HttpDigger().postWithUri("Repair/GetRepairList", parameters: mDict, shouldCache: true,
             success: (int code, String message, dynamic responseJson) {
       print("Repair/GetRepairList: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
       HudTool.dismiss();
-      // this.arrOfProcess = (responseJson['Extend'] as List)
-      //     .map((item) => ProjectProcessItemModel.fromJson(item))
-      //     .toList();
+
+      this.arrOfData = (responseJson['Extend'] as List)
+           .map((item) => ProjectRepairListItemModel.fromJson(item))
+           .toList();
+
+      setState(() { });
     });
   }
 
@@ -68,9 +83,16 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
             success: (int code, String message, dynamic responseJson) {
       print("Repair/GetAllProcess: $responseJson");
       HudTool.dismiss();
-      this.arrOfProcess = (responseJson['Extend'] as List)
+      this.arrOfProcess = (responseJson["Extend"] as List)
           .map((item) => ProjectProcessItemModel.fromJson(item))
           .toList();
+
+      if (listLength(this.arrOfProcess) > 0) {
+        this.selectedProcess = this.arrOfProcess.first;
+        _sBar.setContent("${this.selectedProcess.ProcessCode}|${this.selectedProcess.ProcessName}");
+
+         _getDataFromServer();
+      }
     });
   }
 
@@ -103,8 +125,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
 
   Widget _buildListView() {
     return ListView.builder(
-        // itemCount: listLength(this.arrOfData),
-        itemCount: 10,
+        itemCount: listLength(this.arrOfData),
         itemBuilder: (context, index) {
           // In our case, a DogCard for each doggo.
           return GestureDetector(
@@ -115,6 +136,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
   }
 
   Widget _buildListItem(int index) {
+    ProjectRepairListItemModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       child: Row(
@@ -131,7 +153,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                      "返修工单：D20180404000006",
+                      "返修工单：${itemData.RPWO}",
                       maxLines: 2,
                       style: TextStyle(
                           color: hexColor(MAIN_COLOR_BLACK),
@@ -146,7 +168,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("LotNo：13251001",
+                        Text("LotNo：${itemData.LotNo}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
@@ -159,7 +181,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("生产工单：20180404",
+                        Text("生产工单：${itemData.Wono}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -172,7 +194,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("机型：20180404",
+                        Text("机型：${itemData.ItemCode}|${itemData.ItemName}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -185,7 +207,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("创建时间：20180404",
+                        Text("创建时间：${itemData.OTime}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -198,10 +220,10 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("数量：82",
+                        Text("数量：${itemData.Qty}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        Text("返修代码：20",
+                        Text("返修代码：${itemData.RepairCode}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                         SizedBox(
