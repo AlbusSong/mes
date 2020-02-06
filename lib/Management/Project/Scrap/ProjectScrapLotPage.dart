@@ -74,7 +74,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
       print("Repair/SGetLotInfo: $responseJson");
       HudTool.dismiss();
 
-      List arr = jsonDecode(responseJson["Extend"]);
+      List arr = responseJson["Extend"];
       if (listLength(arr) > 0) {
         this.lotInfoData = ProjectLotInfoModel.fromJson(arr.first);
 
@@ -94,7 +94,6 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
       this.arrOfScrapCode = (responseJson["Extend"] as List)
           .map((item) => ProjectScrapItemModel.fromJson(item))
           .toList();
-      // print("arrOfScrapCode: $arrOfScrapCode");
     });
   }
 
