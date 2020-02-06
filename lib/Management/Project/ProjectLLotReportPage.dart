@@ -347,8 +347,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
       return;
     }
 
-    bool isOkay =
-        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定提交?");
+    bool isOkay = await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定提交?");
 
     if (isOkay) {
       _confirmAction();
