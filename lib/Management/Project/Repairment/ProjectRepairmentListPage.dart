@@ -257,7 +257,7 @@ class _ProjectRepairmentListPageState extends State<ProjectRepairmentListPage> {
 
   void _hasSelectedIndex(int index) {
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-        builder: (BuildContext context) => ProjectRepairmentDetailPage()));
+        builder: (BuildContext context) => ProjectRepairmentDetailPage(this.arrOfData[index])));
   }
 
   void _showPickerWithData(List<String> listData, int index) {
