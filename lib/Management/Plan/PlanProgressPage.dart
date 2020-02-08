@@ -6,6 +6,8 @@ import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 import 'package:mes/Others/View/SimpleSelectionItemWidget.dart';
 
+import 'package:flutter_picker/flutter_picker.dart';
+
 class PlanProgressPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -125,7 +127,10 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                 Expanded(
                   child: _simpleSelectionWgt0,
                 ),
-                Text(" ~ ", style: TextStyle(fontSize: 13, color: hexColor("999999")),),
+                Text(
+                  " ~ ",
+                  style: TextStyle(fontSize: 13, color: hexColor("999999")),
+                ),
                 Expanded(
                   child: _simpleSelectionWgt1,
                 ),
@@ -149,13 +154,43 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
       _hasSelectedSimpleSelectionItem(index);
     };
 
-    SimpleSelectionItemWidget wgt = SimpleSelectionItemWidget(height: 45, content: c, selectionBlock: selectionBlock,);
+    SimpleSelectionItemWidget wgt = SimpleSelectionItemWidget(
+      height: 45,
+      content: c,
+      selectionBlock: selectionBlock,
+    );
 
     return wgt;
   }
 
   void _hasSelectedSimpleSelectionItem(int index) {
     print("_hasSelectedSimpleSelectionItem: $index");
+
+    _showDatePicker(index);
+  }
+
+  void _showDatePicker(int index) {
+    Picker(
+        hideHeader: true,
+        adapter: DateTimePickerAdapter(),
+        title: Text("选择日期"),
+        selectedTextStyle: TextStyle(color: Colors.blue),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems);
+          this._handleDatePickerConfirmation(indexOfSelectedItems, index);
+        }).showDialog(context);
+  }
+
+  void _handleDatePickerConfirmation(List indexOfSelectedItems, int index) {
+    int month = indexOfSelectedItems[0] + 1;
+    int day = indexOfSelectedItems[1] + 1;
+    int year = indexOfSelectedItems[2] + 1900;
+    String year_month_day = "$year-$month-$day";
+    if (index == 0) {
+      _simpleSelectionWgt0.setContent(year_month_day);
+    } else {
+      _simpleSelectionWgt1.setContent(year_month_day);
+    }
   }
 
   Widget _buildTopBar() {
@@ -272,15 +307,17 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                         ),
                         GestureDetector(
                           child: Icon(
-                            this.expansionList[index] == false ? Icons.more_horiz : Icons.expand_less,
+                            this.expansionList[index] == false
+                                ? Icons.more_horiz
+                                : Icons.expand_less,
                             color: hexColor(MAIN_COLOR),
                             size: 20,
                           ),
                           onTap: () {
-                            print("more_horiz");                            
+                            print("more_horiz");
                             setState(() {
-
-                              this.expansionList[index] = !this.expansionList[index];
+                              this.expansionList[index] =
+                                  !this.expansionList[index];
                             });
                           },
                         ),

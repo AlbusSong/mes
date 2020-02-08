@@ -297,8 +297,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     picker.show(_scaffoldKey.currentState);
   }
 
-  void _handlePickerConfirmation(
-      int indexOfSelectedItem, String title, int index) {
+  void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
     if (index == 0) {
       this.selectedWork = this.arrOfWork[indexOfSelectedItem];
       print("this.selectedWork.LineCode: ${this.selectedWork.LineCode}");
