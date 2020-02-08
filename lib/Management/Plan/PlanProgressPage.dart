@@ -5,7 +5,6 @@ import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
-import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 import 'package:mes/Others/View/SimpleSelectionItemWidget.dart';
 
@@ -31,7 +30,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
 
   String content;
   final List<String> functionTitleList = [
-    "锁定",
+    "暂停",
     "重启",
     "终止",
   ];
@@ -41,11 +40,13 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   ProjectLineModel selectedLineItem;
   List<bool> expansionList = List();
   List arrOfData;
-  List arrOfSelectedIndex = List();
+  int selectedIndex;
 
   @override
   void initState() {
     super.initState();
+
+    this.selectedIndex = -1;
 
     for (int i = 0; i < functionTitleList.length; i++) {
       String functionTitle = functionTitleList[i];
@@ -60,7 +61,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
             child: Text(functionTitle),
             onPressed: () {
               print(functionTitle);
-              // _functionItemClickedAtIndex(i);
+              _functionItemClickedAtIndex(i);
             },
           ),
         ),
@@ -123,6 +124,52 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
       }
 
       setState(() {});
+    });
+  }
+
+  Future _functionItemClickedAtIndex(int index) async {
+    if (this.selectedIndex < 0) {
+      HudTool.showInfoWithStatus("请选择一项");
+      return;
+    }
+
+    String hintText = "";
+    if (index == 0) {
+      hintText = "确定暂停？";
+    } else if (index == 1) {
+      hintText = "确定重启？";
+    } else if (index == 2) {
+      hintText = "确定终止？";
+    }
+
+    bool isOkay = await AlertTool.showStandardAlert(_scaffoldKey.currentContext, hintText);
+
+    if (isOkay) {
+      _realConfirmationAction(index);
+    }
+  }
+
+  void _realConfirmationAction(int index) {
+    String uri = "";
+    if (index == 0) {
+      uri = "LoadPlanProcess/PauseWo";
+    } else if (index == 1) {
+      uri = "LoadPlanProcess/RestartWo";
+    } else if (index == 2) {
+      uri = "LoadPlanProcess/StopWo";
+    }
+
+    PlanProcessItemModel selectedItem = this.arrOfData[index];
+    HudTool.show();
+    HttpDigger().postWithUri(uri, parameters: {"Wono": selectedItem.Wono}, success: (int code, String message, dynamic responseJson) {
+      print("$uri: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.of(context).pop();
     });
   }
 
@@ -431,15 +478,15 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   }
 
   bool _checkIfSelected(int index) {
-    return this.arrOfSelectedIndex.contains(index);
+    return this.selectedIndex == index;
   }
 
   void _hasSelectedIndex(int index) {
-    if (this.arrOfSelectedIndex.contains(index) == true) {
-      this.arrOfSelectedIndex.remove(index);
-    } else {
-      this.arrOfSelectedIndex.add(index);
+    if (this.selectedIndex == index) {
+      return;
     }
+
+    this.selectedIndex = index;
 
     setState(() {});
   }
