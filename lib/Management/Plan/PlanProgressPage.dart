@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
@@ -7,6 +10,9 @@ import '../../Others/View/MESSelectionItemWidget.dart';
 import 'package:mes/Others/View/SimpleSelectionItemWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
+
+import 'package:mes/Management/Project/Model/ProjectLineModel.dart';
+import 'package:mes/Management/Plan/Model/PlanProcessItemModel.dart';
 
 class PlanProgressPage extends StatefulWidget {
   @override
@@ -16,12 +22,13 @@ class PlanProgressPage extends StatefulWidget {
 }
 
 class _PlanProgressPageState extends State<PlanProgressPage> {
-  final SearchBarWithFunction _sBar = SearchBarWithFunction(
-    hintText: "模具编码",
-  );
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   SimpleSelectionItemWidget _simpleSelectionWgt0;
   SimpleSelectionItemWidget _simpleSelectionWgt1;
+
+  MESSelectionItemWidget _selectionWgt0;
 
   String content;
   final List<String> functionTitleList = [
@@ -31,15 +38,14 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   ];
   List<Widget> bottomFunctionWidgetList = List();
 
-  final List<bool> expansionList = [false, false, false];
+  List arrOfLineItem;
+  ProjectLineModel selectedLineItem;
+  List<bool> expansionList = List();
+  List arrOfData;
 
   @override
   void initState() {
     super.initState();
-
-    _sBar.functionBlock = () {
-      print("functionBlock");
-    };
 
     for (int i = 0; i < functionTitleList.length; i++) {
       String functionTitle = functionTitleList[i];
@@ -68,11 +74,58 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
 
     _simpleSelectionWgt0 = _buildSimpleSelectionItem(0);
     _simpleSelectionWgt1 = _buildSimpleSelectionItem(1);
+    _selectionWgt0 = _buildSelectionInputItem(0);
+
+    _getLineDataFromServer();
+  }
+
+  void _getLineDataFromServer() {
+    // 获取所有有效的产线
+    HttpDigger().postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/AllLine: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      this.arrOfLineItem = (responseJson['Extend'] as List)
+          .map((item) => ProjectLineModel.fromJson(item))
+          .toList();
+    });
+  }
+
+  void _getProgressListFromServer() {
+    // LoadPlanProcess/LoadPlanProcess
+    Map mDict = Map();
+    if (this.selectedLineItem != null) {
+      mDict["LineCode"] = this.selectedLineItem.LineCode;
+    }
+
+    HudTool.show();
+    HttpDigger().postWithUri("LoadPlanProcess/LoadPlanProcess", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("LoadPlanProcess/LoadPlanProcess: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss(); 
+      this.arrOfData = (responseJson['Extend'] as List).map((item) => PlanProcessItemModel.fromJson(item)).toList();
+      this.expansionList.clear();
+      for (int i = 0; i < listLength(this.arrOfData); i++) {
+        this.expansionList.add(false);
+      }
+
+      setState(() {        
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("工单进度"),
@@ -201,7 +254,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Expanded(
-            child: MESSelectionItemWidget(enabled: true, title: "产线"),
+            child: _selectionWgt0,
           ),
           GestureDetector(
             child: Center(
@@ -224,26 +277,113 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     );
   }
 
+  Widget _buildSelectionInputItem(int index) {
+    String title = "";
+    bool enabled = true;
+    if (index == 0) {
+      title = "产线";
+    }
+    void Function() selectionBlock = () {
+      _hasSelectedItem(index);
+    };
+
+    MESSelectionItemWidget wgt = MESSelectionItemWidget(
+      title: title,
+      enabled: enabled,
+    );
+    wgt.selectionBlock = selectionBlock;
+    return wgt;
+  }
+
+  void _hasSelectedItem(int index) {
+    print("_hasSelectedItem: $index");
+
+    List<String> arrOfSelectionTitle = [];
+    for (ProjectLineModel m in this.arrOfLineItem) {
+        arrOfSelectionTitle.add('${m.LineCode}|${m.LineName}');
+      }
+
+    if (arrOfSelectionTitle.length == 0) {
+      return;
+    }
+
+    _showPickerWithData(arrOfSelectionTitle, index);
+
+    hideKeyboard(context);
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    if (index == 0) {
+      this.selectedLineItem = this.arrOfLineItem[index];
+
+      _selectionWgt0.setContent(title);      
+    }
+  }
+
   void _tryToSearch() {
     print("_tryToSearch");
+
+    _getProgressListFromServer();
   }
+
+  // Widget _buildListView() {
+  //   return ListView(
+  //     physics: const AlwaysScrollableScrollPhysics(),
+  //     children: <Widget>[
+  //       _buildHeader(),
+  //       _buildSummaryCellItem(0),
+  //       _buildDetailCellItem(shouldExpand: expansionList[0]),
+  //       _buildSummaryCellItem(1),
+  //       _buildDetailCellItem(shouldExpand: expansionList[1]),
+  //       _buildSummaryCellItem(2),
+  //       _buildDetailCellItem(shouldExpand: expansionList[2]),
+  //     ],
+  //   );
+  // }
 
   Widget _buildListView() {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: <Widget>[
-        _buildHeader(),
-        _buildSummaryCellItem(0),
-        _buildDetailCellItem(shouldExpand: expansionList[0]),
-        _buildSummaryCellItem(1),
-        _buildDetailCellItem(shouldExpand: expansionList[1]),
-        _buildSummaryCellItem(2),
-        _buildDetailCellItem(shouldExpand: expansionList[2]),
-      ],
-    );
+    return ListView.builder(
+        itemCount: listLength(this.arrOfData) * 2,
+        itemBuilder: (context, index) {          
+          if (index == 0) {
+            return _buildHeader();
+          } else {
+            int realIndex = ((index - 1)/2.0).floor();
+            if ((index - 1) % 2 == 0) {
+            return _buildListItem(realIndex);
+          } else {
+            return _buildDetailCellItem(realIndex);
+          }
+          }          
+          // return GestureDetector(
+          //   onTap: () => _hasSelectedIndex(index),
+          //   child: _buildListItem(index),
+          // );
+        });
   }
 
-  Widget _buildDetailCellItem({bool shouldExpand = false}) {
+  // Widget _buildListItem(int index) {
+
+  // }
+
+  Widget _buildDetailCellItem(int index) {
+    bool shouldExpand = this.expansionList[index];
     if (shouldExpand) {
       return Container(
         height: 300,
@@ -256,9 +396,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     }
   }
 
-  Widget _buildSummaryCellItem(int index) {
-    double progress = randomIntUntil(100) / 100.0;
-
+  Widget _buildListItem(int index) {
+    PlanProcessItemModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       height: 70,
@@ -278,11 +417,11 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                     height: 20,
                     // color: randomColor(),
                     child: Text(
-                      "工单号：W0201912170019|1",
+                      "${itemData.Wono}|${itemData.ProcessName}|${itemData.Shift}|${itemData.StateDesc}",
                       style: TextStyle(
                           color: hexColor("333333"),
                           fontSize: 13,
-                          fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.normal),
                     ),
                   ),
                   Container(
@@ -292,14 +431,21 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                          "物料：12233002",
+                          "物料：${itemData.ItemCode}",
                           style: TextStyle(
                             fontSize: 13,
                             color: hexColor("666666"),
                           ),
                         ),
                         Text(
-                          "良品：返工：报废：",
+                          "计划量：${itemData.WoPlanQty.round()}",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: hexColor("666666"),
+                          ),
+                        ),
+                        Text(
+                          "实绩：${itemData.WoGoodQty.round()}",
                           style: TextStyle(
                             fontSize: 13,
                             color: hexColor("666666"),
@@ -334,14 +480,14 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                             backgroundColor: hexColor("eeeeee"),
                             valueColor:
                                 AlwaysStoppedAnimation(hexColor(MAIN_COLOR)),
-                            value: progress,
+                            value: (itemData.CompRate/100.0),
                           ),
                         ),
                         Positioned(
                           top: 2,
                           right: 0,
                           child: Text(
-                            "${progress * 100}%",
+                            "${itemData.CompRate}%",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 11),
                           ),
