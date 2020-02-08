@@ -4,6 +4,7 @@ import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
+import 'package:mes/Others/View/SimpleSelectionItemWidget.dart';
 
 class PlanProgressPage extends StatefulWidget {
   @override
@@ -16,11 +17,14 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   final SearchBarWithFunction _sBar = SearchBarWithFunction(
     hintText: "模具编码",
   );
+
+  SimpleSelectionItemWidget _simpleSelectionWgt0;
+  SimpleSelectionItemWidget _simpleSelectionWgt1;
+
   String content;
   final List<String> functionTitleList = [
     "锁定",
-    "解锁",
-    "暂停",
+    "重启",
     "终止",
   ];
   List<Widget> bottomFunctionWidgetList = List();
@@ -59,6 +63,9 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
         bottomFunctionWidgetList.add(SizedBox(width: 1));
       }
     }
+
+    _simpleSelectionWgt0 = _buildSimpleSelectionItem(0);
+    _simpleSelectionWgt1 = _buildSimpleSelectionItem(1);
   }
 
   @override
@@ -76,6 +83,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   Widget _buildBody() {
     return Column(
       children: <Widget>[
+        WidgetTool.createListViewLine(5, hexColor("f2f2f7")),
+        _buildDateFilterTopBar(),
         WidgetTool.createListViewLine(5, hexColor("f2f2f7")),
         _buildTopBar(),
         Expanded(
@@ -95,6 +104,58 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
         ),
       ],
     );
+  }
+
+  Widget _buildDateFilterTopBar() {
+    return Container(
+      color: Colors.white,
+      height: 50,
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            "生产日期：",
+            style: TextStyle(fontSize: 15, color: hexColor("333333")),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  child: _simpleSelectionWgt0,
+                ),
+                Text(" ~ ", style: TextStyle(fontSize: 13, color: hexColor("999999")),),
+                Expanded(
+                  child: _simpleSelectionWgt1,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleSelectionItem(int index) {
+    String c = "";
+    if (index == 0) {
+      c = "起止日期";
+    } else if (index == 1) {
+      c = "终止日期";
+    }
+
+    void Function() selectionBlock = () {
+      _hasSelectedSimpleSelectionItem(index);
+    };
+
+    SimpleSelectionItemWidget wgt = SimpleSelectionItemWidget(height: 45, content: c, selectionBlock: selectionBlock,);
+
+    return wgt;
+  }
+
+  void _hasSelectedSimpleSelectionItem(int index) {
+    print("_hasSelectedSimpleSelectionItem: $index");
   }
 
   Widget _buildTopBar() {

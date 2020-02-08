@@ -9,6 +9,7 @@ class PlanPage extends StatelessWidget {
 
   final List<Map> functionItemDataArray = [
     {"title": "计划进度", "icon": "", "badgeValue": 0},
+    {"title": "物料接收", "icon": "", "badgeValue": 0},
   ];
 
   final List<MESSquareItemWidget> functionItemArray = [];
@@ -50,8 +51,10 @@ class PlanPage extends StatelessWidget {
     if (index == 0) {
       w = PlanProgressPage();
     }
-    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-              builder: (BuildContext context) => w));
+    
+    if (w != null) {
+      Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
+    }
   }
   
   Widget _buildGridView() {
