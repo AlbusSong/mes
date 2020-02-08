@@ -22,7 +22,6 @@ class PlanProgressPage extends StatefulWidget {
 }
 
 class _PlanProgressPageState extends State<PlanProgressPage> {
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   SimpleSelectionItemWidget _simpleSelectionWgt0;
@@ -42,6 +41,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   ProjectLineModel selectedLineItem;
   List<bool> expansionList = List();
   List arrOfData;
+  List arrOfSelectedIndex = List();
 
   @override
   void initState() {
@@ -81,7 +81,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
 
   void _getLineDataFromServer() {
     // 获取所有有效的产线
-    HttpDigger().postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true,
+    HttpDigger()
+        .postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true,
             success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/AllLine: $responseJson");
       if (code == 0) {
@@ -103,22 +104,25 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     }
 
     HudTool.show();
-    HttpDigger().postWithUri("LoadPlanProcess/LoadPlanProcess", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LoadPlanProcess/LoadPlanProcess",
+        parameters: mDict, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("LoadPlanProcess/LoadPlanProcess: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
         return;
       }
 
-      HudTool.dismiss(); 
-      this.arrOfData = (responseJson['Extend'] as List).map((item) => PlanProcessItemModel.fromJson(item)).toList();
+      HudTool.dismiss();
+      this.arrOfData = (responseJson['Extend'] as List)
+          .map((item) => PlanProcessItemModel.fromJson(item))
+          .toList();
       this.expansionList.clear();
       for (int i = 0; i < listLength(this.arrOfData); i++) {
         this.expansionList.add(false);
       }
 
-      setState(() {        
-      });
+      setState(() {});
     });
   }
 
@@ -300,8 +304,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
 
     List<String> arrOfSelectionTitle = [];
     for (ProjectLineModel m in this.arrOfLineItem) {
-        arrOfSelectionTitle.add('${m.LineCode}|${m.LineName}');
-      }
+      arrOfSelectionTitle.add('${m.LineCode}|${m.LineName}');
+    }
 
     if (arrOfSelectionTitle.length == 0) {
       return;
@@ -332,7 +336,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     if (index == 0) {
       this.selectedLineItem = this.arrOfLineItem[index];
 
-      _selectionWgt0.setContent(title);      
+      _selectionWgt0.setContent(title);
     }
   }
 
@@ -342,58 +346,102 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     _getProgressListFromServer();
   }
 
-  // Widget _buildListView() {
-  //   return ListView(
-  //     physics: const AlwaysScrollableScrollPhysics(),
-  //     children: <Widget>[
-  //       _buildHeader(),
-  //       _buildSummaryCellItem(0),
-  //       _buildDetailCellItem(shouldExpand: expansionList[0]),
-  //       _buildSummaryCellItem(1),
-  //       _buildDetailCellItem(shouldExpand: expansionList[1]),
-  //       _buildSummaryCellItem(2),
-  //       _buildDetailCellItem(shouldExpand: expansionList[2]),
-  //     ],
-  //   );
-  // }
-
   Widget _buildListView() {
     return ListView.builder(
-        itemCount: listLength(this.arrOfData) * 2,
-        itemBuilder: (context, index) {          
+        itemCount: listLength(this.arrOfData) * 2 + 1,
+        itemBuilder: (context, index) {
           if (index == 0) {
             return _buildHeader();
           } else {
-            int realIndex = ((index - 1)/2.0).floor();
+            int realIndex = ((index - 1) / 2.0).floor();
             if ((index - 1) % 2 == 0) {
-            return _buildListItem(realIndex);
-          } else {
-            return _buildDetailCellItem(realIndex);
+              return GestureDetector(
+                child: _buildListItem(realIndex),
+                onTap: () => _hasSelectedIndex(realIndex),
+              );
+            } else {
+              return _buildDetailCellItem(realIndex);
+            }
           }
-          }          
-          // return GestureDetector(
-          //   onTap: () => _hasSelectedIndex(index),
-          //   child: _buildListItem(index),
-          // );
         });
   }
 
-  // Widget _buildListItem(int index) {
-
-  // }
-
   Widget _buildDetailCellItem(int index) {
+    PlanProcessItemModel itemData = this.arrOfData[index];
     bool shouldExpand = this.expansionList[index];
     if (shouldExpand) {
       return Container(
-        height: 300,
-        color: randomColor(),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        color: hexColor("f5f8f7"),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _generateDetailWidgetList(itemData),
+        ),
       );
     } else {
       return Container(
         height: 1,
       );
     }
+  }
+
+  List<Widget> _generateDetailWidgetList(PlanProcessItemModel itemData) {
+    const detailTitleList = const ["订单号", "纳期", "开始时间", "结束时间", "部品名", "型号规格", "版本", "发行日期", "计划量"];
+
+    List<Widget> result = List();
+    for (int i = 0; i < detailTitleList.length; i++) {
+      String title = "";
+      if (i == 0) {
+        // 订单号
+        title = "${detailTitleList[i]}：${avoidNull(itemData.Pdno)}";
+      } else if (i == 1) {
+        // 纳期
+        title = "${detailTitleList[i]}：${avoidNull(itemData.PdFTime)}";
+      } else if (i == 2) {
+        // 开始时间
+        title = "${detailTitleList[i]}：${avoidNull(itemData.WoStartDate)}";
+      } else if (i == 3) {
+        // 结束时间
+        title = "${detailTitleList[i]}：${avoidNull(itemData.Pdno)}";
+      } else if (i == 4) {
+        // 部品名
+        title = "${detailTitleList[i]}：${avoidNull(itemData.ItemName)}";
+      } else if (i == 5) {
+        // 型号规格
+        title = "${detailTitleList[i]}：${avoidNull(itemData.ItemName)}";
+      } else if (i == 6) {
+        // 版本
+        title = "${detailTitleList[i]}：${avoidNull(itemData.BopVersion)}";
+      } else if (i == 7) {
+        // 发行日期
+        title = "${detailTitleList[i]}：${avoidNull(itemData.Pdno)}";
+      } else if (i == 8) {
+        // 计划量
+        title = "计划量：${itemData.WoPlanQty.round()}    实绩：${itemData.WoOutPutQty.round()}    良品：${itemData.WoGoodQty.round()}    返工：${itemData.WoReturnQty.round()}    报废：${itemData.WoScrapQty.round()} ";
+      }
+      Text txt = Text(
+              title,
+              style: TextStyle(fontSize: 12, color: hexColor("999999")),
+            );
+      result.add(txt);
+    }
+
+    return result;
+  }
+
+  bool _checkIfSelected(int index) {
+    return this.arrOfSelectedIndex.contains(index);
+  }
+
+  void _hasSelectedIndex(int index) {
+    if (this.arrOfSelectedIndex.contains(index) == true) {
+      this.arrOfSelectedIndex.remove(index);
+    } else {
+      this.arrOfSelectedIndex.add(index);
+    }
+
+    setState(() {});
   }
 
   Widget _buildListItem(int index) {
@@ -413,16 +461,33 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Container(
-                    height: 20,
-                    // color: randomColor(),
-                    child: Text(
-                      "${itemData.Wono}|${itemData.ProcessName}|${itemData.Shift}|${itemData.StateDesc}",
-                      style: TextStyle(
-                          color: hexColor("333333"),
-                          fontSize: 13,
-                          fontWeight: FontWeight.normal),
-                    ),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(right: 8),
+                        color: Colors.white,
+                        child: Icon(
+                          _checkIfSelected(index) == true
+                              ? Icons.check_box
+                              : Icons.check_box_outline_blank,
+                          color: _checkIfSelected(index) == true
+                              ? hexColor(MAIN_COLOR)
+                              : hexColor("dddddd"),
+                          size: 20,
+                        ),
+                      ),
+                      Container(
+                        height: 20,
+                        // color: randomColor(),
+                        child: Text(
+                          "${itemData.Wono}|${itemData.ProcessName}|${itemData.Shift}|${itemData.StateDesc}",
+                          style: TextStyle(
+                              color: hexColor("333333"),
+                              fontSize: 13,
+                              fontWeight: FontWeight.normal),
+                        ),
+                      ),
+                    ],
                   ),
                   Container(
                     // color: randomColor(),
@@ -480,7 +545,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                             backgroundColor: hexColor("eeeeee"),
                             valueColor:
                                 AlwaysStoppedAnimation(hexColor(MAIN_COLOR)),
-                            value: (itemData.CompRate/100.0),
+                            value: (itemData.CompRate / 100.0),
                           ),
                         ),
                         Positioned(
