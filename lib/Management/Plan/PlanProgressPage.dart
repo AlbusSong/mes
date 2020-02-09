@@ -3,9 +3,9 @@ import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
-import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Const/Const.dart';
-import '../../Others/View/MESSelectionItemWidget.dart';
+import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Const/Const.dart';
+import 'package:mes/Others/View/MESSelectionItemWidget.dart';
 import 'package:mes/Others/View/SimpleSelectionItemWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
@@ -142,7 +142,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
       hintText = "确定终止？";
     }
 
-    bool isOkay = await AlertTool.showStandardAlert(_scaffoldKey.currentContext, hintText);
+    bool isOkay = await AlertTool.showStandardAlert(
+        _scaffoldKey.currentContext, hintText);
 
     if (isOkay) {
       _realConfirmationAction(index);
@@ -161,7 +162,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
 
     PlanProcessItemModel selectedItem = this.arrOfData[index];
     HudTool.show();
-    HttpDigger().postWithUri(uri, parameters: {"Wono": selectedItem.Wono}, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri(uri, parameters: {"Wono": selectedItem.Wono},
+        success: (int code, String message, dynamic responseJson) {
       print("$uri: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -434,7 +436,17 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   }
 
   List<Widget> _generateDetailWidgetList(PlanProcessItemModel itemData) {
-    const detailTitleList = const ["订单号", "纳期", "开始时间", "结束时间", "部品名", "型号规格", "版本", "发行日期", "计划量"];
+    const detailTitleList = const [
+      "订单号",
+      "纳期",
+      "开始时间",
+      "结束时间",
+      "部品名",
+      "型号规格",
+      "版本",
+      "发行日期",
+      "计划量"
+    ];
 
     List<Widget> result = List();
     for (int i = 0; i < detailTitleList.length; i++) {
@@ -465,12 +477,13 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
         title = "${detailTitleList[i]}：${avoidNull(itemData.Pdno)}";
       } else if (i == 8) {
         // 计划量
-        title = "计划量：${itemData.WoPlanQty.round()}    实绩：${itemData.WoOutPutQty.round()}    良品：${itemData.WoGoodQty.round()}    返工：${itemData.WoReturnQty.round()}    报废：${itemData.WoScrapQty.round()} ";
+        title =
+            "计划量：${itemData.WoPlanQty.round()}    实绩：${itemData.WoOutPutQty.round()}    良品：${itemData.WoGoodQty.round()}    返工：${itemData.WoReturnQty.round()}    报废：${itemData.WoScrapQty.round()} ";
       }
       Text txt = Text(
-              title,
-              style: TextStyle(fontSize: 12, color: hexColor("999999")),
-            );
+        title,
+        style: TextStyle(fontSize: 12, color: hexColor("999999")),
+      );
       result.add(txt);
     }
 
@@ -537,7 +550,6 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                     ],
                   ),
                   Container(
-                    // color: randomColor(),
                     height: 20,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

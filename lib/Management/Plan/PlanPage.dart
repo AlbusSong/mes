@@ -3,6 +3,7 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
 import 'PlanProgressPage.dart';
+import 'PlanMaterialAcceptionPage.dart';
 
 class PlanPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -50,6 +51,8 @@ class PlanPage extends StatelessWidget {
     Widget w;
     if (index == 0) {
       w = PlanProgressPage();
+    } else if (index == 1) {
+      w = PlanMaterialAcceptionPage();
     }
     
     if (w != null) {
