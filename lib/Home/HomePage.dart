@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_general_toast/flutter_general_toast.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Tool/MyToast.dart';
 import 'HomeMenu.dart';
@@ -27,8 +28,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // MyToast().context = context;
-    MyToast.APP_CONTEXT = context;
+    // MyToast.APP_CONTEXT = context;
+    FlutterGeneralToast.APP_CONTEXT = context;
     Scaffold scf = Scaffold(
       key: _scaffoldKey,
       backgroundColor: hexColor("f0eff5"),
