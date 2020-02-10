@@ -63,7 +63,7 @@ class _ProjectRepairmentDetailPageState
     // Repair/GetRepairItem
     HudTool.show();
     HttpDigger().postWithUri("Repair/GetRepairItem",
-        parameters: {"item": this.lotNo}, shouldCache: true,
+        parameters: {"item": this.data.ItemCode}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("Repair/GetRepairItem: $responseJson");
       if (code == 0) {
@@ -333,6 +333,7 @@ class _ProjectRepairmentDetailPageState
     mDict["item1"] = this.selectedMaterialItem0.BomID;
     mDict["item2"] = this.selectedMaterialItem1.BomID;
     mDict["item3"] = this.selectedMaterialItem2.BomID;
+    print("Repair/RepairOK mDict: $mDict");
 
     HudTool.show();
     HttpDigger().postWithUri("Repair/RepairOK", parameters: mDict,
