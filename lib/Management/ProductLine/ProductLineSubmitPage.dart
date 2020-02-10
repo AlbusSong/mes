@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Tool/WidgetTool.dart';
 import '../../Others/Const/Const.dart';
@@ -99,9 +100,10 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
   void _getExceptionTypeListFromServer() {
     // ExceptionType/LoadList
     HudTool.show();
-    HttpDigger()
-        .postWithUri("ExceptionType/LoadList", parameters: {"linecode": this.selectedProductLine.LineCode}, shouldCache: true,
-            success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("ExceptionType/LoadList",
+        parameters: {"linecode": this.selectedProductLine.LineCode},
+        shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("ExceptionType/LoadList: $responseJson");
       // if (code == 0) {
       //   HudTool.showInfoWithStatus(message);
@@ -118,9 +120,10 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
   void _getExceptionProcessListFromServer() {
     // ExceptionStep/LoadList
     HudTool.show();
-    HttpDigger()
-        .postWithUri("ExceptionStep/LoadList", parameters: {"linecode": this.selectedProductLine.LineCode}, shouldCache: true,
-            success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("ExceptionStep/LoadList",
+        parameters: {"linecode": this.selectedProductLine.LineCode},
+        shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("ExceptionStep/LoadList: $responseJson");
       // if (code == 0) {
       //   HudTool.showInfoWithStatus(message);
@@ -137,7 +140,9 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
   void _getMachineListFromServer() {
     // ProductCode/LoadList
     HudTool.show();
-    HttpDigger().postWithUri("ProductCode/LoadList", parameters: {"code": ""}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("ProductCode/LoadList",
+        parameters: {"code": ""}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("ProductCode/LoadList: $responseJson");
       // if (code == 0) {
       //   HudTool.showInfoWithStatus(message);
@@ -154,7 +159,9 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
   void _getFirstCheckListFromServer() {
     // FirstQC/LoadList
     HudTool.show();
-    HttpDigger().postWithUri("FirstQC/LoadList", parameters: {"code": ""}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("FirstQC/LoadList",
+        parameters: {"code": ""}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("ProductCode/LoadList: $responseJson");
       // if (code == 0) {
       //   HudTool.showInfoWithStatus(message);
@@ -246,25 +253,29 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
     } else if (index == 4) {
       title = "异常类型";
       shouldShow = false;
-      if (this.selectedProductLineStatus != null && this.selectedProductLineStatus["value"] == "QCCHANGE") {
+      if (this.selectedProductLineStatus != null &&
+          this.selectedProductLineStatus["value"] == "QCCHANGE") {
         shouldShow = true;
       }
     } else if (index == 5) {
-      title = "异常工序";      
+      title = "异常工序";
       shouldShow = false;
-      if (this.selectedProductLineStatus != null && this.selectedProductLineStatus["value"] == "QCCHANGE") {
+      if (this.selectedProductLineStatus != null &&
+          this.selectedProductLineStatus["value"] == "QCCHANGE") {
         shouldShow = true;
       }
     } else if (index == 6) {
       title = "调整机型";
       shouldShow = false;
-      if (this.selectedProductLineStatus != null && this.selectedProductLineStatus["value"] == "MODELCHANGE") {
+      if (this.selectedProductLineStatus != null &&
+          this.selectedProductLineStatus["value"] == "MODELCHANGE") {
         shouldShow = true;
       }
     } else if (index == 7) {
       title = "首检类型";
       shouldShow = false;
-      if (this.selectedProductLineStatus != null && this.selectedProductLineStatus["value"] == "FISTTEST") {
+      if (this.selectedProductLineStatus != null &&
+          this.selectedProductLineStatus["value"] == "FISTTEST") {
         shouldShow = true;
       }
     }
@@ -376,19 +387,23 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
       }
     } else if (index == 4) {
       if (this.selectedExceptionTypeItem != null) {
-        result = "${this.selectedExceptionTypeItem.Code}|${this.selectedExceptionTypeItem.Remark}";
+        result =
+            "${this.selectedExceptionTypeItem.Code}|${this.selectedExceptionTypeItem.Remark}";
       }
     } else if (index == 5) {
       if (this.selectedExceptionProcessItem != null) {
-        result = "${this.selectedExceptionProcessItem.StepCode}|${this.selectedExceptionProcessItem.StepName}";
+        result =
+            "${this.selectedExceptionProcessItem.StepCode}|${this.selectedExceptionProcessItem.StepName}";
       }
     } else if (index == 6) {
       if (this.selectedMachine != null) {
-        result = "${this.selectedMachine.ProductCode}|${this.selectedMachine.ProductName}";
+        result =
+            "${this.selectedMachine.ProductCode}|${this.selectedMachine.ProductName}";
       }
     } else if (index == 7) {
       if (this.selectedFirstCheckItem != null) {
-        result = "${this.selectedFirstCheckItem.Code}|${this.selectedFirstCheckItem.Remark}";
+        result =
+            "${this.selectedFirstCheckItem.Code}|${this.selectedFirstCheckItem.Remark}";
       }
     }
 
@@ -450,7 +465,76 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
     );
   }
 
-  void _btnConfirmClicked() {}
+  Future _btnConfirmClicked() async {
+    if (this.selectedProductLineStatus == null) {
+      HudTool.showInfoWithStatus("请选择变更后的状态");
+      return;
+    }
+
+    if (this.selectedProductLineStatus["value"] == "QCCHANGE") {
+      if (this.selectedExceptionTypeItem == null) {
+        HudTool.showInfoWithStatus("请选择异常类型");
+        return;
+      }
+      if (this.selectedExceptionProcessItem == null) {
+        HudTool.showInfoWithStatus("请选择异常工序");
+        return;
+      }
+    } else if (this.selectedProductLineStatus["value"] == "MODELCHANGE") {
+      if (this.selectedMachine == null) {
+        HudTool.showInfoWithStatus("请选择调整机型类型");
+        return;
+      }
+    } else if (this.selectedProductLineStatus["value"] == "FISTTEST") {
+      if (this.selectedFirstCheckItem == null) {
+        HudTool.showInfoWithStatus("请选择首检类型");
+        return;
+      }
+    }
+
+    if (isAvailable(this.remarkContent) == false) {
+      HudTool.showInfoWithStatus("请输入备注");
+      return;
+    }
+
+    bool isOkay =
+        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定提交?");
+
+    if (isOkay) {
+      _confirmAction();
+    }
+  }
+
+  void _confirmAction() {
+    Map mDict = Map();
+    mDict["itemLine"] = this.selectedProductLine.LineCode;
+    mDict["itemChangeState"] = this.selectedProductLineStatus["value"];
+    if (this.selectedExceptionTypeItem != null) {
+      mDict["itemExceptionType"] = this.selectedExceptionTypeItem.Code;
+    }    
+    if (this.selectedExceptionProcessItem != null) {
+      mDict["itemStep"] = this.selectedExceptionProcessItem.StepCode;
+    }
+    if (this.selectedMachine != null) {
+      mDict["itemToProduct"] = this.selectedMachine.ProductCode;
+    }    
+    if (this.selectedFirstCheckItem != null) {
+      mDict["itemFirstQC"] = this.selectedFirstCheckItem.Code;
+    }
+    mDict["txtRemark"] = this.remarkContent;
+
+    HudTool.show();
+    HttpDigger().postWithUri("LineState/ChangeComit", parameters: mDict,
+        success: (int code, String message, dynamic responseJson) {
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.of(context).pop();
+    });
+  }
 
   void _hasSelectedChoiseItem(int index) {
     List<String> arrOfSelectionTitle = [];
@@ -467,7 +551,8 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
         arrOfSelectionTitle.add("${m.Code}|${m.Remark}");
       }
     } else if (index == 5) {
-      for (ProductLineExceptionProcessItemModel m in this.arrOfExceptionProcess) {
+      for (ProductLineExceptionProcessItemModel m
+          in this.arrOfExceptionProcess) {
         arrOfSelectionTitle.add("${m.StepCode}|${m.StepName}");
       }
     } else if (index == 6) {
@@ -479,7 +564,6 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
         arrOfSelectionTitle.add("${m.Code}|${m.Remark}");
       }
     }
-
 
     if (arrOfSelectionTitle.length == 0) {
       return;
@@ -513,7 +597,8 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
     } else if (index == 1) {
     } else if (index == 2) {
     } else if (index == 3) {
-      this.selectedProductLineStatus = this.productLineStatusList[indexOfSelectedItem];
+      this.selectedProductLineStatus =
+          this.productLineStatusList[indexOfSelectedItem];
       if (this.selectedProductLineStatus["value"] == "QCCHANGE") {
         _getExceptionTypeListFromServer();
         _getExceptionProcessListFromServer();
@@ -523,9 +608,11 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
         _getFirstCheckListFromServer();
       }
     } else if (index == 4) {
-      this.selectedExceptionTypeItem = this.arrOfExceptionType[indexOfSelectedItem];
+      this.selectedExceptionTypeItem =
+          this.arrOfExceptionType[indexOfSelectedItem];
     } else if (index == 5) {
-      this.selectedExceptionProcessItem = this.arrOfExceptionProcess[indexOfSelectedItem];
+      this.selectedExceptionProcessItem =
+          this.arrOfExceptionProcess[indexOfSelectedItem];
     } else if (index == 6) {
       this.selectedMachine = this.arrOfMachine[indexOfSelectedItem];
     } else if (index == 7) {
