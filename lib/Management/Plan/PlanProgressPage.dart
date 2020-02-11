@@ -29,6 +29,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   MESSelectionItemWidget _selectionWgt0;
 
   String content;
+  String startDateString;
+  String endDateString;
   final List<String> functionTitleList = [
     "暂停",
     "重启",
@@ -102,6 +104,12 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     Map mDict = Map();
     if (this.selectedLineItem != null) {
       mDict["LineCode"] = this.selectedLineItem.LineCode;
+    }
+    if (isAvailable(this.startDateString)) {
+      mDict["WoStartDate"] = this.startDateString;
+    }
+    if (isAvailable(this.endDateString)) {
+      mDict["WoEndDate"] = this.endDateString;
     }
 
     HudTool.show();
@@ -294,8 +302,10 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     String year_month_day = "$year-$month-$day";
     if (index == 0) {
       _simpleSelectionWgt0.setContent(year_month_day);
+      this.startDateString = year_month_day;
     } else {
       _simpleSelectionWgt1.setContent(year_month_day);
+      this.endDateString = year_month_day;
     }
   }
 

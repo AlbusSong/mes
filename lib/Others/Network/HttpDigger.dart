@@ -134,6 +134,10 @@ class HttpDigger {
     });
   }
 
+  void _handleInvalidLoginError() {
+
+  }
+
   static void login(String username, String password,
       {HttpSuccess success, HttpFailure failure}) {
     Dio(BaseOptions(
