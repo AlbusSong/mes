@@ -70,8 +70,101 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
 
   Widget _buildListItem(int index) {
     return Container(
-      color: randomColor(),
-      height: 100,
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                    height: 25,
+                    color: Colors.white,
+                    child: Text(
+                      "CPX|完成线",
+                      maxLines: 2,
+                      style: TextStyle(
+                          color: hexColor(MAIN_COLOR_BLACK),
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("工序：绝缘耐压抵抗检测",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("工单号：MECWO20191211012",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("下发时间：15:20",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("类型：定期自检",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: hexColor("dddddd"),
+                    height: 1,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 5),
+          Container(
+            margin: EdgeInsets.only(right: 8),
+            color: Colors.white,
+            child: Icon(
+              Icons.arrow_forward_ios,
+              color: hexColor("dddddd"),
+              size: 20,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
