@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
-// import 'PlanProgressPage.dart';
+import 'QualitySelfTestWorkOrderPage.dart';
+import 'QualityPatrolTestWorkOrderPage.dart';
 
 class QualityPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -49,10 +50,14 @@ class QualityPage extends StatelessWidget {
   void _functionItemClickedAtIndex(int index) {
     Widget w;
     if (index == 0) {
-      // w = PlanProgressPage();
+      w = QualitySelfTestWorkOrderPage();
+    } else if (index == 1) {
+      w = QualityPatrolTestWorkOrderPage();
     }
-    // Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-    //           builder: (BuildContext context) => w));
+    if (w != null) {
+      Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
+              builder: (BuildContext context) => w));
+    }
   }
   
   Widget _buildGridView() {
