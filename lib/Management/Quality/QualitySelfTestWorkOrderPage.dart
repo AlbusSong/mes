@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
-import 'package:mes/Others/View/SearchBar.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
+
+import 'Model/QualitySelfTestWorkOrderItemModel.dart';
 
 class QualitySelfTestWorkOrderPage extends StatefulWidget {
   @override
@@ -12,9 +15,35 @@ class QualitySelfTestWorkOrderPage extends StatefulWidget {
 
 class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final SearchBar _sBar = SearchBar(
-    hintText: "产线代码",
-  );
+
+  List arrOfData;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer() {
+    // MEC/LoadWorkOrder
+    HudTool.show();
+    HttpDigger().postWithUri("MEC/LoadWorkOrder", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("MEC/LoadWorkOrder: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfData = (responseJson['Extend'] as List)
+          .map((item) => QualitySelfTestWorkOrderItemModel.fromJson(item))
+          .toList();
+      
+      setState(() {        
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,24 +61,10 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
   Widget _buildBody() {
     return Column(
       children: <Widget>[
-        _sBar,
         Expanded(
           child: Container(
             color: hexColor("f2f2f7"),
             child: _buildListView(),
-          ),
-        ),
-        Container(
-          height: 50,
-          width: double.infinity,
-          // color: randomColor(),
-          child: FlatButton(
-            textColor: Colors.white,
-            color: hexColor(MAIN_COLOR),
-            child: Text("确认"),
-            onPressed: () {
-              _btnConfirmClicked();
-            },
           ),
         ),
       ],
@@ -58,8 +73,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
 
   Widget _buildListView() {
     return ListView.builder(
-        // itemCount: listLength(this.arrOfData),
-        itemCount: 10,
+        itemCount: listLength(this.arrOfData),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () => _hasSelectedIndex(index),
@@ -69,6 +83,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
   }  
 
   Widget _buildListItem(int index) {
+    QualitySelfTestWorkOrderItemModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       child: Row(
@@ -85,7 +100,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                      "CPX|完成线",
+                      "${itemData.LineCode}|${itemData.LineName}",
                       maxLines: 2,
                       style: TextStyle(
                           color: hexColor(MAIN_COLOR_BLACK),
@@ -100,7 +115,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("工序：绝缘耐压抵抗检测",
+                        Text("工序：${itemData.Step}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
@@ -113,7 +128,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("工单号：MECWO20191211012",
+                        Text("工单号：${itemData.MECWorkOrderNo}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -126,7 +141,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("下发时间：15:20",
+                        Text("下发时间：${itemData.AppTime}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -139,7 +154,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("类型：定期自检",
+                        Text("类型：${itemData.AppWoType}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],

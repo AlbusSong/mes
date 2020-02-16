@@ -4,6 +4,7 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'dart:convert';
 import 'FlutterCache.dart';
+import '../../Home/HomePage.dart';
 
 typedef HttpSuccess = void Function(
     int code, String message, dynamic responseJson);
@@ -125,17 +126,31 @@ class HttpDigger {
         FlutterCache().cacheData(jsonEncode(responseJson), cacheKey);
       }
     }).catchError((error) {
-      if (failure != null) {
+      if (_checkIfNeedReLoginFromError(error) == true) {
+        HomePage.eventBus.fire(null);        
+      } else {
+        if (failure != null) {
         failure(error);
       } else {
         print("$uri error: $error");
         HudTool.showInfoWithStatus("网络或服务器错误");
       }
+      }      
     });
   }
 
-  void _handleInvalidLoginError() {
+  bool _checkIfNeedReLoginFromError(dynamic error) {
+    bool result = false;
+    if (error is DioError) {
+      DioError dError = error as DioError;
+      if (dError.response.statusCode == 302) {
+        // 302 means wrong data type（html）
+        // 302 means needing relogin
+        result = true;
+      }
+    }
 
+    return result;
   }
 
   static void login(String username, String password,

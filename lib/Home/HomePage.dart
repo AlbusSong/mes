@@ -7,10 +7,14 @@ import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Login/LoginPage.dart';
 
+import 'package:event_bus/event_bus.dart';
+
 class HomePage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   // HomePage({Key key, this.title}) : super(key: key);
   bool _isLoginInfoRefreshed = false;
+
+  static final EventBus eventBus = EventBus();
 
   void _getDataFromServer() {
     if (_isLoginInfoRefreshed == true) {
@@ -29,6 +33,12 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // MyToast.APP_CONTEXT = context;
     FlutterGeneralToast.APP_CONTEXT = context;
+
+    eventBus.on().listen((event) {
+      print("event.runtimeType: ${event.runtimeType}");
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+    });
+
     Scaffold scf = Scaffold(
       key: _scaffoldKey,
       backgroundColor: hexColor("f0eff5"),

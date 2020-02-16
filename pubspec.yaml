@@ -28,6 +28,7 @@ dependencies:
   dio: ^3.0.8
   json_annotation: ^3.0.0
   flutter_general_toast: ^0.0.1
+  event_bus: ^1.1.1
   # barcode_scan: ^1.0.0
   # qrscan: ^0.2.17
 
