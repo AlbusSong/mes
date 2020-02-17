@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
-import 'QualitySelfTestWorkOrderPage.dart';
+import 'SelfTest/QualitySelfTestWorkOrderPage.dart';
 import 'QualityPatrolTestWorkOrderPage.dart';
 
 class QualityPage extends StatelessWidget {

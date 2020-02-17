@@ -4,7 +4,9 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 
-import 'Model/QualitySelfTestWorkOrderItemModel.dart';
+import '../Model/QualitySelfTestWorkOrderItemModel.dart';
+
+import 'QualitySelfTestWorkOrderReportPage.dart';
 
 class QualitySelfTestWorkOrderPage extends StatefulWidget {
   @override
@@ -184,10 +186,8 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
   }
 
   void _hasSelectedIndex(int index) {
+    print("_hasSelectedIndex: $index");
 
-  }
-
-  void _btnConfirmClicked() {
-    
+    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => QualitySelfTestWorkOrderReportPage(this.arrOfData[index])));
   }
 }
