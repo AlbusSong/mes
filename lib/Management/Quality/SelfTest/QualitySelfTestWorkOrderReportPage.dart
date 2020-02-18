@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/View/MESContentInputWidget.dart';
 
 import '../Model/QualitySelfTestWorkOrderItemModel.dart';
+import '../Model/QualityMachineTypeItemModel.dart';
+import '../Model/QualityMachineDetailInfoModel.dart';
+
+import 'package:flutter_picker/flutter_picker.dart';
 
 class QualitySelfTestWorkOrderReportPage extends StatefulWidget {
   QualitySelfTestWorkOrderReportPage(this.detailData);
@@ -26,6 +33,66 @@ class _QualitySelfTestWorkOrderReportPageState
   final QualitySelfTestWorkOrderItemModel detailData;
 
   String remarkContent;
+  List arrOfData;
+  QualityMachineTypeItemModel selectedMachineType;
+  QualityMachineDetailInfoModel machineDetailInfo;
+  String nonManualJudgeValue;
+  String selectedManualJudgeResult;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer() {
+    // MEC/LoadProduct
+    HudTool.show();
+    HttpDigger().postWithUri("MEC/LoadProduct",
+        parameters: {"workOrderNo": this.detailData.MECWorkOrderNo},
+        shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("MEC/LoadProduct: $responseJson");
+      // if (code == 0) {
+      //   HudTool.showInfoWithStatus(message);
+      //   return;
+      // }
+
+      HudTool.dismiss();
+      this.arrOfData = (responseJson['Extend'] as List)
+          .map((item) => QualityMachineTypeItemModel.fromJson(item))
+          .toList();
+      if (listLength(this.arrOfData) > 0) {
+        this.selectedMachineType = this.arrOfData.first;
+        _getMachineDetailInfoFromServer();
+      }
+      setState(() {});
+    });
+  }
+
+  _getMachineDetailInfoFromServer() {
+    // MEC/LoadItem
+    Map mDict = Map();
+    mDict["mecPlanNo"] = this.detailData.MECPlanNo;
+    mDict["itemCode"] = this.selectedMachineType.ItemCode;
+
+    HudTool.show();
+    HttpDigger()
+        .postWithUri("MEC/LoadItem", parameters: mDict, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
+      print("MEC/LoadItem: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.machineDetailInfo =
+          QualityMachineDetailInfoModel.fromJson(responseJson["Extend"]);
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,11 +145,28 @@ class _QualitySelfTestWorkOrderReportPageState
         _buildSelectionItemCell(title: "机    型：", index: 0),
         _buildMachineBaseJudgementInfoCell(),
         _buildMachineStandardInfoCell(),
-        _buildConsequeceNumberInputCell(),
+        Offstage(
+          offstage: _isManualJudget() == true,
+          child: _buildConsequeceNumberInputCell(),
+        ),
+        Offstage(
+          offstage: _isManualJudget() == false,
+          child: _buildSelectionItemCell(title: "结    果：", index: 1),
+        ),
         _buildContentInputCell(),
         WidgetTool.createListViewLine(20, hexColor("f2f2f7")),
       ],
     );
+  }
+
+  bool _isManualJudget() {
+    if (this.machineDetailInfo != null) {
+      if (this.machineDetailInfo.JudgeStandard == "人为判断") {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   Widget _buildWorkOrderHeaderCell() {
@@ -239,7 +323,7 @@ class _QualitySelfTestWorkOrderReportPageState
         color: Colors.white,
         height: 60,
         child: Container(
-          margin: EdgeInsets.fromLTRB(10, 10, 5, 10),
+          margin: EdgeInsets.fromLTRB(5, 10, 5, 10),
           decoration: BoxDecoration(
             color: canInteract ? Colors.white : hexColor("f5f5f5"),
             border: new Border.all(width: 1, color: hexColor("999999")),
@@ -249,7 +333,7 @@ class _QualitySelfTestWorkOrderReportPageState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
+                padding: EdgeInsets.symmetric(horizontal: 5),
                 child: Text(
                   _getChoiseItemContent(index),
                   style: TextStyle(
@@ -285,7 +369,9 @@ class _QualitySelfTestWorkOrderReportPageState
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(
-            "判断基准：",
+            this.machineDetailInfo == null
+                ? "判断基准："
+                : "判断基准：${this.machineDetailInfo.JudgeStandard}",
             style: TextStyle(color: hexColor("666666"), fontSize: 15),
           ),
         ],
@@ -303,7 +389,9 @@ class _QualitySelfTestWorkOrderReportPageState
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(
-            "标    准：",
+            this.machineDetailInfo == null
+                ? "标    准："
+                : "标    准：${this.machineDetailInfo.Standard}",
             style: TextStyle(color: hexColor("666666"), fontSize: 15),
           ),
         ],
@@ -335,7 +423,8 @@ class _QualitySelfTestWorkOrderReportPageState
                     borderRadius: new BorderRadius.all(Radius.circular(4))),
                 child: TextField(
                     enabled: true,
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    keyboardType:
+                        TextInputType.numberWithOptions(decimal: true),
                     style: TextStyle(
                         fontSize: 15, color: hexColor(MAIN_COLOR_BLACK)),
                     maxLines: 1,
@@ -343,6 +432,7 @@ class _QualitySelfTestWorkOrderReportPageState
                         hintText: "请输入数值(只能输入数值)", border: InputBorder.none),
                     onChanged: (text) {
                       print("contentChanged: $text");
+                      this.nonManualJudgeValue = text;
                     }),
               ),
             ),
@@ -364,11 +454,127 @@ class _QualitySelfTestWorkOrderReportPageState
     return wgt;
   }
 
-  void _hasSelectedChoiseItem(int index) {}
+  void _hasSelectedChoiseItem(int index) {
+    List<String> arrOfSelectionTitle = [];
+    if (index == 0) {
+      for (QualityMachineTypeItemModel m in this.arrOfData) {
+        arrOfSelectionTitle.add('${m.ItemCode}|${m.ItemName}|${m.AppState}');
+      }
+    } else if (index == 1) {
+      arrOfSelectionTitle.add("OK");
+      arrOfSelectionTitle.add("NG");
+    }
+
+    if (arrOfSelectionTitle.length == 0) {
+      return;
+    }
+
+    _showPickerWithData(arrOfSelectionTitle, index);
+
+    hideKeyboard(context);
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    if (index == 0) {
+      this.selectedMachineType = this.arrOfData[indexOfSelectedItem];
+      _getMachineDetailInfoFromServer();      
+    } else if (index == 1) {
+      this.selectedManualJudgeResult = title;
+    }
+
+    setState(() {});
+  }
 
   String _getChoiseItemContent(int index) {
+    if (index == 0) {
+      if (this.selectedMachineType != null) {
+        return "${this.selectedMachineType.ItemCode}|${this.selectedMachineType.ItemName}|${this.selectedMachineType.AppState}";
+      }
+    } else if (index == 1) {
+      if (this.selectedManualJudgeResult != null) {
+        return this.selectedManualJudgeResult;
+      }
+    }
     return "-";
   }
 
-  void _btnConfirmClicked() {}
+  Future _btnConfirmClicked() async {
+    if (this.detailData == null) {
+      HudTool.showInfoWithStatus("无效工单信息");
+      return;
+    }
+
+    if (this.selectedMachineType == null) {
+      HudTool.showInfoWithStatus("请选择机型");
+      return;      
+    }
+
+    if (this.machineDetailInfo == null) {
+      HudTool.showInfoWithStatus("请先获取判断基准相关信息");
+      return;
+    }
+
+    if (_isManualJudget() == true && isAvailable(this.selectedManualJudgeResult) == false) {
+      HudTool.showInfoWithStatus("请选择人为判断结果");
+      return;
+    }
+
+    if (_isManualJudget() == false && this.nonManualJudgeValue == null) {
+      HudTool.showInfoWithStatus("请填写结果数值");
+      return;
+    }
+
+    if (isAvailable(this.remarkContent) == false) {
+      HudTool.showInfoWithStatus("请填写备注");
+      return;
+    }
+
+    bool isOkay = await AlertTool.showStandardAlert(context, "确定报工?");
+
+    if (isOkay) {
+      _realConfirmationAction();
+    }
+  }
+
+  void _realConfirmationAction() {
+    Map mDict = Map();
+    mDict["mecWorkOrderNo"] = this.detailData.MECWorkOrderNo;
+    mDict["product"] = this.selectedMachineType.ItemCode;
+    mDict["standard"] = this.machineDetailInfo.Standard;
+    mDict["judge"] = this.machineDetailInfo.JudgeStandard;
+    if (_isManualJudget() == true) {
+      mDict["commitManResult"] = this.selectedManualJudgeResult;
+    } else {
+      mDict["commitNumResult"] = this.nonManualJudgeValue;
+    }
+    mDict["bookComment"] = this.remarkContent;
+
+    HudTool.show();
+    HttpDigger().postWithUri("MEC/WorkOrderBook", parameters: mDict, success: (int code, String message, dynamic responseJson) {
+      print("MEC/WorkOrderBook: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.of(context).pop();
+    });
+  }
 }

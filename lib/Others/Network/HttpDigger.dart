@@ -94,7 +94,8 @@ class HttpDigger {
     responseFuture.then((responseObject) {
       dynamic responseObjectData = responseObject.data;
       Map responseJson;
-      if ((responseObjectData is Map) == false) {
+      if ((responseObjectData is Map) == false || 
+          ((responseObjectData is Map) == true && responseObjectData["Success"] == null)) {
         responseJson = {
           "Success":true,
           "Message":"",

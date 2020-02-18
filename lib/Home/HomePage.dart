@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_general_toast/flutter_general_toast.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import 'HomeMenu.dart';
 
 import 'package:mes/Others/Model/MeInfo.dart';
@@ -36,6 +37,7 @@ class HomePage extends StatelessWidget {
 
     eventBus.on().listen((event) {
       print("event.runtimeType: ${event.runtimeType}");
+      HudTool.dismiss();
       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
     });
 
