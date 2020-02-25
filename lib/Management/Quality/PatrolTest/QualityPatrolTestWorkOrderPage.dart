@@ -3,6 +3,8 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/View/SearchBar.dart';
 
+import 'QualityPatrolTestSubWorkOrderListPage.dart';
+
 class QualityPatrolTestWorkOrderPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -12,9 +14,9 @@ class QualityPatrolTestWorkOrderPage extends StatefulWidget {
 
 class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOrderPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final SearchBar _sBar = SearchBar(
-    hintText: "产线代码",
-  );
+  // final SearchBar _sBar = SearchBar(
+  //   hintText: "产线代码",
+  // );
 
   @override
   Widget build(BuildContext context) {
@@ -32,26 +34,13 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
   Widget _buildBody() {
     return Column(
       children: <Widget>[
-        _sBar,
+        // _sBar,
         Expanded(
           child: Container(
             color: hexColor("f2f2f7"),
             child: _buildListView(),
           ),
-        ),
-        Container(
-          height: 50,
-          width: double.infinity,
-          // color: randomColor(),
-          child: FlatButton(
-            textColor: Colors.white,
-            color: hexColor(MAIN_COLOR),
-            child: Text("确认"),
-            onPressed: () {
-              _btnConfirmClicked();
-            },
-          ),
-        ),
+        ),        
       ],
     );
   }
@@ -169,7 +158,9 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
   }
 
   void _hasSelectedIndex(int index) {
-
+    QualityPatrolTestSubWorkOrderListPage w = QualityPatrolTestSubWorkOrderListPage();
+    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
+              builder: (BuildContext context) => w));
   }
 
   void _btnConfirmClicked() {

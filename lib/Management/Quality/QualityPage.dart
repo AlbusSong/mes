@@ -3,7 +3,7 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
 import 'SelfTest/QualitySelfTestWorkOrderPage.dart';
-import 'QualityPatrolTestWorkOrderPage.dart';
+import 'PatrolTest/QualityPatrolTestWorkOrderPage.dart';
 
 class QualityPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
