@@ -1,18 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 
 import 'QualityPatrolTestWorkOrderReportPage.dart';
 
+import '../Model/QualityPatrolTestWorkOrderItemModel.dart';
+import '../Model/QualityPatrolTestSubWorkOrderItemModel.dart';
+
 class QualityPatrolTestSubWorkOrderListPage extends StatefulWidget {
+  QualityPatrolTestSubWorkOrderListPage(this.itemData);
+  final QualityPatrolTestWorkOrderItemModel itemData;
   @override
   State<StatefulWidget> createState() {
-    return _QualityPatrolTestSubWorkOrderListPageState();
+    return _QualityPatrolTestSubWorkOrderListPageState(this.itemData);
   }  
 }
 
 class _QualityPatrolTestSubWorkOrderListPageState extends State<QualityPatrolTestSubWorkOrderListPage> {
+  _QualityPatrolTestSubWorkOrderListPageState(
+    this.itemData,
+  );
+  final QualityPatrolTestWorkOrderItemModel itemData;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  List arrOfData;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer() {
+    // CHK/LoadWorkOrderItem
+    Map mDict = Map();
+    mDict["ipqcPlanNo"] = this.itemData.IPQCPlanNo;
+    mDict["ipqcType"] = this.itemData.IPQCType;
+    mDict["ipqcWoNo"] = this.itemData.IPQCWoNo;
+
+    HudTool.show();
+    HttpDigger().postWithUri("CHK/LoadWorkOrderItem", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("CHK/LoadWorkOrderItem: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfData = (responseJson['Extend'] as List)
+          .map((item) => QualityPatrolTestSubWorkOrderItemModel.fromJson(item))
+          .toList();
+      
+      setState(() {        
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {   
@@ -36,27 +81,13 @@ class _QualityPatrolTestSubWorkOrderListPageState extends State<QualityPatrolTes
             child: _buildListView(),
           ),
         ),
-        Container(
-          height: 50,
-          width: double.infinity,
-          // color: randomColor(),
-          child: FlatButton(
-            textColor: Colors.white,
-            color: hexColor(MAIN_COLOR),
-            child: Text("确认"),
-            onPressed: () {
-              _btnConfirmClicked();
-            },
-          ),
-        ),
       ],
     );
   }
 
   Widget _buildListView() {
     return ListView.builder(
-        // itemCount: listLength(this.arrOfData),
-        itemCount: 10,
+        itemCount: listLength(this.arrOfData),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () => _hasSelectedIndex(index),
@@ -66,6 +97,7 @@ class _QualityPatrolTestSubWorkOrderListPageState extends State<QualityPatrolTes
   }
 
   Widget _buildListItem(int index) {
+    QualityPatrolTestSubWorkOrderItemModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       child: Row(
@@ -82,7 +114,7 @@ class _QualityPatrolTestSubWorkOrderListPageState extends State<QualityPatrolTes
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                      "CPX|完成线",
+                      "项目|${avoidNull(itemData.Item)}",
                       maxLines: 2,
                       style: TextStyle(
                           color: hexColor(MAIN_COLOR_BLACK),
@@ -97,7 +129,7 @@ class _QualityPatrolTestSubWorkOrderListPageState extends State<QualityPatrolTes
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("类型：定期自检",
+                        Text("工序：${avoidNull(itemData.Step)}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -130,8 +162,5 @@ class _QualityPatrolTestSubWorkOrderListPageState extends State<QualityPatrolTes
     QualityPatrolTestWorkOrderReportPage w = QualityPatrolTestWorkOrderReportPage(null);
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
               builder: (BuildContext context) => w));
-  }
-
-  void _btnConfirmClicked() {
   }
 }

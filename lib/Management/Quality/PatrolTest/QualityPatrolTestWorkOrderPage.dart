@@ -32,7 +32,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
   }
 
   void _getDataFromServer() {
-    // CHK/LoadWorkOrder
+    // CHK/LoadWorkOrder    
     HudTool.show();
     HttpDigger().postWithUri("CHK/LoadWorkOrder", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
       print("CHK/LoadWorkOrder: $responseJson");
@@ -191,7 +191,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
   }
 
   void _hasSelectedIndex(int index) {
-    QualityPatrolTestSubWorkOrderListPage w = QualityPatrolTestSubWorkOrderListPage();
+    QualityPatrolTestSubWorkOrderListPage w = QualityPatrolTestSubWorkOrderListPage(this.arrOfData[index]);
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
               builder: (BuildContext context) => w));
   }
