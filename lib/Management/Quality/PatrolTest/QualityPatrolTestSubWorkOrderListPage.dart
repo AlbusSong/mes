@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 
+import 'QualityPatrolTestWorkOrderReportPage.dart';
+
 class QualityPatrolTestSubWorkOrderListPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -125,7 +127,9 @@ class _QualityPatrolTestSubWorkOrderListPageState extends State<QualityPatrolTes
   }
 
   void _hasSelectedIndex(int index) {
-
+    QualityPatrolTestWorkOrderReportPage w = QualityPatrolTestWorkOrderReportPage(null);
+    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
+              builder: (BuildContext context) => w));
   }
 
   void _btnConfirmClicked() {

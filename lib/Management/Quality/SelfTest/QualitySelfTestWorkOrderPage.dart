@@ -3,6 +3,7 @@ import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/View/SearchBar.dart';
 
 import '../Model/QualitySelfTestWorkOrderItemModel.dart';
 
@@ -17,6 +18,9 @@ class QualitySelfTestWorkOrderPage extends StatefulWidget {
 
 class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final SearchBar _sBar = SearchBar(
+    hintText: "产线代码",
+  );
 
   List arrOfData;
 
@@ -63,6 +67,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
   Widget _buildBody() {
     return Column(
       children: <Widget>[
+        _sBar,
         Expanded(
           child: Container(
             color: hexColor("f2f2f7"),

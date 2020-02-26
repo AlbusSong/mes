@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/View/SearchBar.dart';
 
 import 'QualityPatrolTestSubWorkOrderListPage.dart';
+
+import '../Model/QualityPatrolTestWorkOrderItemModel.dart';
 
 class QualityPatrolTestWorkOrderPage extends StatefulWidget {
   @override
@@ -14,9 +18,38 @@ class QualityPatrolTestWorkOrderPage extends StatefulWidget {
 
 class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOrderPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  // final SearchBar _sBar = SearchBar(
-  //   hintText: "产线代码",
-  // );
+  final SearchBar _sBar = SearchBar(
+    hintText: "产线代码",
+  );
+
+  List arrOfData;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer() {
+    // CHK/LoadWorkOrder
+    HudTool.show();
+    HttpDigger().postWithUri("CHK/LoadWorkOrder", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("CHK/LoadWorkOrder: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfData = (responseJson['Extend'] as List)
+          .map((item) => QualityPatrolTestWorkOrderItemModel.fromJson(item))
+          .toList();
+      
+      setState(() {        
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +67,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
   Widget _buildBody() {
     return Column(
       children: <Widget>[
-        // _sBar,
+        _sBar,
         Expanded(
           child: Container(
             color: hexColor("f2f2f7"),
@@ -47,8 +80,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
 
   Widget _buildListView() {
     return ListView.builder(
-        // itemCount: listLength(this.arrOfData),
-        itemCount: 10,
+        itemCount: listLength(this.arrOfData),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () => _hasSelectedIndex(index),
@@ -58,6 +90,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
   }  
 
   Widget _buildListItem(int index) {
+    QualityPatrolTestWorkOrderItemModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       child: Row(
@@ -74,7 +107,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                      "CPX|完成线",
+                      "${avoidNull(itemData.LineCode)}|${avoidNull(itemData.LineName)}",
                       maxLines: 2,
                       style: TextStyle(
                           color: hexColor(MAIN_COLOR_BLACK),
@@ -89,7 +122,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("工序：绝缘耐压抵抗检测",
+                        Text("工作中心：${avoidNull(itemData.WCName)}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
@@ -102,7 +135,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("工单号：MECWO20191211012",
+                        Text("下发时间：${avoidNull(itemData.AppTime)}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -115,7 +148,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("下发时间：15:20",
+                        Text("类型：${avoidNull(itemData.AppIPQCType)}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -128,7 +161,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("类型：定期自检",
+                        Text("类型：${avoidNull(itemData.LineCode)}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
