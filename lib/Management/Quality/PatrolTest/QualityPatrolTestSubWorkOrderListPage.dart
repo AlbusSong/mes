@@ -159,7 +159,7 @@ class _QualityPatrolTestSubWorkOrderListPageState extends State<QualityPatrolTes
   }
 
   void _hasSelectedIndex(int index) {
-    QualityPatrolTestWorkOrderReportPage w = QualityPatrolTestWorkOrderReportPage(null);
+    QualityPatrolTestWorkOrderReportPage w = QualityPatrolTestWorkOrderReportPage(this.arrOfData[index], this.itemData);
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
               builder: (BuildContext context) => w));
   }

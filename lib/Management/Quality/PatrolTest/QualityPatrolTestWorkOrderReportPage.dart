@@ -7,19 +7,21 @@ import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/View/MESContentInputWidget.dart';
 
-import '../Model/QualitySelfTestWorkOrderItemModel.dart';
+import '../Model/QualityPatrolTestWorkOrderItemModel.dart';
 import '../Model/QualityMachineTypeItemModel.dart';
 import '../Model/QualityMachineDetailInfoModel.dart';
+import '../Model/QualityPatrolTestSubWorkOrderItemModel.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 
 class QualityPatrolTestWorkOrderReportPage extends StatefulWidget {
-  QualityPatrolTestWorkOrderReportPage(this.detailData);
-  final QualitySelfTestWorkOrderItemModel detailData;
+  QualityPatrolTestWorkOrderReportPage(this.detailData, this.itemData);
+  final QualityPatrolTestSubWorkOrderItemModel detailData;
+  final QualityPatrolTestWorkOrderItemModel itemData;
 
   @override
   State<StatefulWidget> createState() {
-    return _QualityPatrolTestWorkOrderReportPageState(detailData);
+    return _QualityPatrolTestWorkOrderReportPageState(detailData, itemData);
   }
 }
 
@@ -27,10 +29,12 @@ class _QualityPatrolTestWorkOrderReportPageState
     extends State<QualityPatrolTestWorkOrderReportPage> {
   _QualityPatrolTestWorkOrderReportPageState(
     this.detailData,
+    this.itemData,
   );
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final QualitySelfTestWorkOrderItemModel detailData;
+  final QualityPatrolTestSubWorkOrderItemModel detailData;
+  final QualityPatrolTestWorkOrderItemModel itemData;
 
   String remarkContent;
   List arrOfData;
@@ -43,55 +47,55 @@ class _QualityPatrolTestWorkOrderReportPageState
   void initState() {
     super.initState();
 
-    _getDataFromServer();
+    // _getDataFromServer();
   }
 
   void _getDataFromServer() {
     // MEC/LoadProduct
-    HudTool.show();
-    HttpDigger().postWithUri("MEC/LoadProduct",
-        parameters: {"workOrderNo": this.detailData.MECWorkOrderNo},
-        shouldCache: true,
-        success: (int code, String message, dynamic responseJson) {
-      print("MEC/LoadProduct: $responseJson");
-      // if (code == 0) {
-      //   HudTool.showInfoWithStatus(message);
-      //   return;
-      // }
+    // HudTool.show();
+    // HttpDigger().postWithUri("MEC/LoadProduct",
+    //     parameters: {"workOrderNo": this.detailData.MECWorkOrderNo},
+    //     shouldCache: true,
+    //     success: (int code, String message, dynamic responseJson) {
+    //   print("MEC/LoadProduct: $responseJson");
+    //   // if (code == 0) {
+    //   //   HudTool.showInfoWithStatus(message);
+    //   //   return;
+    //   // }
 
-      HudTool.dismiss();
-      this.arrOfData = (responseJson['Extend'] as List)
-          .map((item) => QualityMachineTypeItemModel.fromJson(item))
-          .toList();
-      if (listLength(this.arrOfData) > 0) {
-        this.selectedMachineType = this.arrOfData.first;
-        _getMachineDetailInfoFromServer();
-      }
-      setState(() {});
-    });
+    //   HudTool.dismiss();
+    //   this.arrOfData = (responseJson['Extend'] as List)
+    //       .map((item) => QualityMachineTypeItemModel.fromJson(item))
+    //       .toList();
+    //   if (listLength(this.arrOfData) > 0) {
+    //     this.selectedMachineType = this.arrOfData.first;
+    //     _getMachineDetailInfoFromServer();
+    //   }
+    //   setState(() {});
+    // });
   }
 
   _getMachineDetailInfoFromServer() {
     // MEC/LoadItem
-    Map mDict = Map();
-    mDict["mecPlanNo"] = this.detailData.MECPlanNo;
-    mDict["itemCode"] = this.selectedMachineType.ItemCode;
+    // Map mDict = Map();
+    // mDict["mecPlanNo"] = this.detailData.MECPlanNo;
+    // mDict["itemCode"] = this.selectedMachineType.ItemCode;
 
-    HudTool.show();
-    HttpDigger()
-        .postWithUri("MEC/LoadItem", parameters: mDict, shouldCache: true,
-            success: (int code, String message, dynamic responseJson) {
-      print("MEC/LoadItem: $responseJson");
-      if (code == 0) {
-        HudTool.showInfoWithStatus(message);
-        return;
-      }
+    // HudTool.show();
+    // HttpDigger()
+    //     .postWithUri("MEC/LoadItem", parameters: mDict, shouldCache: true,
+    //         success: (int code, String message, dynamic responseJson) {
+    //   print("MEC/LoadItem: $responseJson");
+    //   if (code == 0) {
+    //     HudTool.showInfoWithStatus(message);
+    //     return;
+    //   }
 
-      HudTool.dismiss();
-      this.machineDetailInfo =
-          QualityMachineDetailInfoModel.fromJson(responseJson["Extend"]);
-      setState(() {});
-    });
+    //   HudTool.dismiss();
+    //   this.machineDetailInfo =
+    //       QualityMachineDetailInfoModel.fromJson(responseJson["Extend"]);
+    //   setState(() {});
+    // });
   }
 
   @override
@@ -179,7 +183,7 @@ class _QualityPatrolTestWorkOrderReportPageState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            "${this.detailData.LineName}|${this.detailData.Item}",
+            "${this.itemData.LineName}|${this.detailData.Item}",
             style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
@@ -206,11 +210,30 @@ class _QualityPatrolTestWorkOrderReportPageState
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
+                  "作业中心：${this.itemData.WCName}",
+                  style: TextStyle(color: hexColor("666666"), fontSize: 15),
+                ),
+                Text(
                   "工序：${this.detailData.Step}",
                   style: TextStyle(color: hexColor("666666"), fontSize: 15),
                 ),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            height: 30,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
                 Text(
-                  "项目：${this.detailData.Item}",
+                  "巡检类型：${this.itemData.AppIPQCType}",
+                  style: TextStyle(color: hexColor("666666"), fontSize: 15),
+                ),
+                Text(
+                  "抽检数量：${this.detailData.QTY}",
                   style: TextStyle(color: hexColor("666666"), fontSize: 15),
                 ),
               ],
@@ -225,7 +248,7 @@ class _QualityPatrolTestWorkOrderReportPageState
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "工具：${this.detailData.MethodTool}",
+                  "工单号：${this.itemData.IPQCWoNo}",
                   style: TextStyle(color: hexColor("666666"), fontSize: 15),
                 ),
               ],
@@ -240,7 +263,7 @@ class _QualityPatrolTestWorkOrderReportPageState
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "工单号：${this.detailData.MECWorkOrderNo}",
+                  "工单下发时间：${this.itemData.AppTime}",
                   style: TextStyle(color: hexColor("666666"), fontSize: 15),
                 ),
               ],
@@ -255,7 +278,7 @@ class _QualityPatrolTestWorkOrderReportPageState
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "工单类型：${this.detailData.AppWoType}",
+                  "检测工具：${this.detailData.Tool}",
                   style: TextStyle(color: hexColor("666666"), fontSize: 15),
                 ),
               ],
@@ -270,8 +293,32 @@ class _QualityPatrolTestWorkOrderReportPageState
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "工单下发时间：${this.detailData.AppTime}",
+                  "检测方法：${this.detailData.Method}",
                   style: TextStyle(color: hexColor("666666"), fontSize: 15),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            height: 30,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "附        件：",
+                  style: TextStyle(color: hexColor("666666"), fontSize: 15),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    print("click to see image");
+                  },
+                  child: Text(
+                  "无图片",
+                  style: TextStyle(color: hexColor(MAIN_COLOR), fontSize: 15),
+                ),
                 ),
               ],
             ),
@@ -554,7 +601,7 @@ class _QualityPatrolTestWorkOrderReportPageState
 
   void _realConfirmationAction() {
     Map mDict = Map();
-    mDict["mecWorkOrderNo"] = this.detailData.MECWorkOrderNo;
+    // mDict["mecWorkOrderNo"] = this.detailData.MECWorkOrderNo;
     mDict["product"] = this.selectedMachineType.ItemCode;
     mDict["standard"] = this.machineDetailInfo.Standard;
     mDict["judge"] = this.machineDetailInfo.JudgeStandard;
