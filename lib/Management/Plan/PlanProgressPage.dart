@@ -393,7 +393,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   void _handlePickerConfirmation(
       int indexOfSelectedItem, String title, int index) {
     if (index == 0) {
-      this.selectedLineItem = this.arrOfLineItem[index];
+      this.selectedLineItem = this.arrOfLineItem[indexOfSelectedItem];
 
       _selectionWgt0.setContent(title);
     }

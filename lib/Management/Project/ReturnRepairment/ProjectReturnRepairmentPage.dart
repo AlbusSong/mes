@@ -40,7 +40,7 @@ class _ProjectReturnRepairmentPageState
       controller: new PageController(),
       physics: const NeverScrollableScrollPhysics() ,
       children: <Widget>[
-        ProjectReturnRepairmentNonLotPage(),
+        ProjectReturnRepairmentNonLotPage(_scaffoldKey),
         ProjectReturnRepairmentLotPage(_scaffoldKey),
       ],
       onPageChanged: (currentIndex) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/Tool/HudTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
@@ -6,18 +7,141 @@ import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../../../Others/View/MESContentInputWidget.dart';
 import '../Widget/ProjectTextInputWidget.dart';
 
+import '../Model/ProjectReturnRepairmentWorkOrderItemModel.dart';
+import '../Model/ProjectReturnRepairmentProjectItemModel.dart';
+import '../Model/ProjectReturnRepairmentRepairCodeItemModel.dart';
+import '../Model/ProjectReturnRepairmentReasonProcessItemModel.dart';
+
+import 'package:flutter_picker/flutter_picker.dart';
+
 class ProjectReturnRepairmentNonLotPage extends StatefulWidget {
+  ProjectReturnRepairmentNonLotPage(
+    this.parentScaffoldKey,
+  );
+  final GlobalKey<ScaffoldState> parentScaffoldKey;
+
   @override
   State<StatefulWidget> createState() {   
-    return _ProjectReturnRepairmentNonLotPageState();
+    return _ProjectReturnRepairmentNonLotPageState(this.parentScaffoldKey);
   }  
 }
 
 class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairmentNonLotPage> with AutomaticKeepAliveClientMixin {
-  String content;
+  _ProjectReturnRepairmentNonLotPageState(
+    this.parentScaffoldKey,
+  );
+  final GlobalKey<ScaffoldState> parentScaffoldKey;
+
+  MESSelectionItemWidget _selectionWgt0;
+  MESSelectionItemWidget _selectionWgt1;
+  MESSelectionItemWidget _selectionWgt2;
+  MESSelectionItemWidget _selectionWgt3;
+  MESSelectionItemWidget _selectionWgt4;
+
+  String remarkContent;
+  String returnRepairmentNum;
+
+  List arrOfWorkOrder;
+  ProjectReturnRepairmentWorkOrderItemModel selectedWorkOrder;
+  List arrOfProject;
+  ProjectReturnRepairmentProjectItemModel selectedProject;
+  List arrOfReasonProcess;
+  ProjectReturnRepairmentReasonProcessItemModel selectedReasonProcess;
+  List arrOfRepairCode;
+  ProjectReturnRepairmentRepairCodeItemModel selectedRepairCode;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectionWgt0 = _buildSelectionInputItem(0);
+    _selectionWgt1 = _buildSelectionInputItem(1);
+    _selectionWgt2 = _buildSelectionInputItem(2);
+    _selectionWgt3 = _buildSelectionInputItem(3);
+    _selectionWgt4 = _buildSelectionInputItem(4);
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer() {
+    // Loadmaterial/GetAllWorkCenter
+    HudTool.show();
+    HttpDigger().postWithUri("Loadmaterial/GetAllWorkCenter", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("Loadmaterial/GetAllWorkCenter: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfWorkOrder = (responseJson["Extend"] as List).map((item) => ProjectReturnRepairmentWorkOrderItemModel.fromJson(item))
+          .toList();
+    });
+  }
+
+  void _getProjectsListFromServer() {
+    // Repair/GetProcessByLineCode
+    Map mDict = Map();
+    mDict["line"] = this.selectedWorkOrder.WorkCenterCode;
+
+    HudTool.show();
+    HttpDigger().postWithUri("Repair/GetProcessByLineCode", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("Repair/GetProcessByLineCode: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfProject = (responseJson["Extend"] as List).map((item) => ProjectReturnRepairmentProjectItemModel.fromJson(item))
+          .toList();
+    });
+  }
+
+  void _getCurrentDayProjectFromServer() {
+
+  }
+
+  void _getReasonProcessListFromServer() {
+    // Repair/GetStep
+    Map mDict = Map();
+    mDict["line"] = this.selectedWorkOrder.LineCode;
+
+    HudTool.show();
+    HttpDigger().postWithUri("Repair/GetStep", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("Repair/GetStep: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfReasonProcess = (responseJson["Extend"] as List).map((item) => ProjectReturnRepairmentReasonProcessItemModel.fromJson(item))
+          .toList();
+    });
+  }
+
+  void _getRepairCodeListFromServer() {
+    // Repair/GetRepairCode
+    Map mDict = Map();
+    mDict["line"] = this.selectedWorkOrder.LineCode;
+
+    HudTool.show();
+    HttpDigger().postWithUri("Repair/GetRepairCode", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("Repair/GetRepairCode: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfRepairCode = (responseJson["Extend"] as List).map((item) => ProjectReturnRepairmentRepairCodeItemModel.fromJson(item))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,12 +176,12 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
   Widget _buildListView() {
     return ListView(
       children: <Widget>[
-        _buildSelectionInputItem(0),
-        _buildSelectionInputItem(1),
-        _buildSelectionInputItem(2),
-        _buildSelectionInputItem(3),
+        _selectionWgt0,
+        _selectionWgt1,
+        _selectionWgt2,
+        _selectionWgt3,
         _buildTextInputWidgetItem(0),
-        _buildSelectionInputItem(4),
+        _selectionWgt4,
         _buildContentInputItem(),
         _buildFooter(),
       ],
@@ -68,15 +192,24 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
     String title = "";
     String placeholder = "";
     bool canScan = false;
+    TextInputType keyboardInputType = TextInputType.text;
     if (index == 0) {
       title = "返修数量";
       placeholder = "请输入数字(只能输入数字)";
+      keyboardInputType = TextInputType.number;
     }
+
     ProjectTextInputWidget wgt = ProjectTextInputWidget(
       title: title,
       placeholder: placeholder,
       canScan: canScan,
+      keyboardType: keyboardInputType,
     );
+    wgt.contentChangeBlock = (String newContent) {
+      if (index == 0) {
+        this.returnRepairmentNum = newContent;
+      }
+    };
 
     return wgt;
   }
@@ -110,12 +243,83 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
 
   void _hasSelectedItem(int index) {
     print("_hasSelectedItem: $index");
+
+    List<String> arrOfSelectionTitle = [];
+    if (index == 0) {
+      for (ProjectReturnRepairmentWorkOrderItemModel m in this.arrOfWorkOrder) {
+      arrOfSelectionTitle.add('${m.WorkCenterCode}|${m.WorkCenterName}');
+    }
+    } else if (index == 1) {
+      for (ProjectReturnRepairmentProjectItemModel m in this.arrOfProject) {
+        arrOfSelectionTitle.add('${m.ProcessCode}|${m.ProcessName}');
+      }
+    } else if (index == 2) {
+
+    } else if (index == 3) {
+      for (ProjectReturnRepairmentReasonProcessItemModel m in this.arrOfReasonProcess) {
+        arrOfSelectionTitle.add('${m.StepCode}|${m.StepName}');
+      }
+    } else if (index == 4) {
+      for (ProjectReturnRepairmentRepairCodeItemModel m in this.arrOfRepairCode) {
+        arrOfSelectionTitle.add('${m.LOTRepairCode}|${m.Description}');
+      }
+    }
+
+    if (arrOfSelectionTitle.length == 0) {
+      return;
+    }
+
+    _showPickerWithData(arrOfSelectionTitle, index);
+
+    hideKeyboard(context);
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    picker.show(this.parentScaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    if (index == 0) {
+      this.selectedWorkOrder = this.arrOfWorkOrder[indexOfSelectedItem];
+
+      _selectionWgt0.setContent(title);
+
+      _getProjectsListFromServer();
+      _getReasonProcessListFromServer();
+      _getRepairCodeListFromServer();
+    } else if (index == 1) {
+      this.selectedProject = this.arrOfProject[indexOfSelectedItem];
+
+      _selectionWgt1.setContent(title);
+    } else if (index == 2) {
+
+    } else if (index == 3) {
+      this.selectedReasonProcess = this.arrOfReasonProcess[indexOfSelectedItem];
+
+      _selectionWgt3.setContent(title);
+    } else if (index == 4) {
+      this.selectedRepairCode = this.arrOfRepairCode[indexOfSelectedItem];
+
+      _selectionWgt4.setContent(title);
+    }
   }
 
   Widget _buildContentInputItem() {
     void Function(String) contentChangedBlock = (String newContent) {
       // print("contentChangedBlock: $newContent");
-      this.content = newContent;
+      this.remarkContent = newContent;
     };
     return MESContentInputWidget(
       placeholder: "备注",
