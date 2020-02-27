@@ -1,8 +1,21 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+
+
+//  Image Base64字符串 转为 image
+Image convertToImageByBase64String(base64String) {
+  Uint8List bytes = Base64Decoder().convert(base64String);
+  if (bytes != null) {
+    return Image.memory(bytes);
+  } else {
+    return null;
+  }
+}
 
 // md5 加密
 String generateMd5(String data) {

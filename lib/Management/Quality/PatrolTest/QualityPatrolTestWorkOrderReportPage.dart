@@ -36,12 +36,15 @@ class _QualityPatrolTestWorkOrderReportPageState
   final QualityPatrolTestSubWorkOrderItemModel detailData;
   final QualityPatrolTestWorkOrderItemModel itemData;
 
+  String imageBase64String;
   String remarkContent;
   List arrOfData;
   QualityMachineTypeItemModel selectedMachineType;
   QualityMachineDetailInfoModel machineDetailInfo;
   String nonManualJudgeValue;
   String selectedManualJudgeResult;
+
+
 
   @override
   void initState() {
@@ -75,7 +78,24 @@ class _QualityPatrolTestWorkOrderReportPageState
     // });
   }
 
-  _getMachineDetailInfoFromServer() {
+  void _getAttachmentImageDataFromServer() {
+    // CHK/Browse
+    Map mDict = Map();
+    mDict["ipqcType"] = this.detailData.IPQCItemNo;
+    mDict["ipqcType"] = this.itemData.IPQCType;
+
+    HttpDigger().postWithUri("CHK/Browse", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("CHK/Browse: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      this.imageBase64String = responseJson["data"];
+    });
+  }
+
+  void _getMachineDetailInfoFromServer() {
     // MEC/LoadItem
     // Map mDict = Map();
     // mDict["mecPlanNo"] = this.detailData.MECPlanNo;
@@ -313,10 +333,13 @@ class _QualityPatrolTestWorkOrderReportPageState
                 ),
                 GestureDetector(
                   onTap: () {
+                    if (isAvailable(this.imageBase64String) == false) {
+                      return;
+                    }
                     print("click to see image");
                   },
                   child: Text(
-                  "无图片",
+                  isAvailable(this.imageBase64String) ? "点击查看图片" : "无图片",
                   style: TextStyle(color: hexColor(MAIN_COLOR), fontSize: 15),
                 ),
                 ),
