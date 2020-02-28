@@ -3,6 +3,7 @@ import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/Tool/HudTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../../../Others/View/MESContentInputWidget.dart';
 import '../Widget/ProjectTextInputWidget.dart';
@@ -39,6 +40,8 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
   MESSelectionItemWidget _selectionWgt3;
   MESSelectionItemWidget _selectionWgt4;
 
+  ProjectTextInputWidget _txtInputWgt0;
+
   String remarkContent;
   String returnRepairmentNum;
 
@@ -64,6 +67,8 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
     _selectionWgt2 = _buildSelectionInputItem(2);
     _selectionWgt3 = _buildSelectionInputItem(3);
     _selectionWgt4 = _buildSelectionInputItem(4);
+
+    _txtInputWgt0 = _buildTextInputWidgetItem(0);
 
     _getDataFromServer();
   }
@@ -181,7 +186,7 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
               color: hexColor(MAIN_COLOR),
               child: Text("确认"),
               onPressed: () {
-                // _btnConfirmClicked();
+                _btnConfirmClicked();
               },
             ),
           ),
@@ -197,7 +202,7 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
         _selectionWgt1,
         _selectionWgt2,
         _selectionWgt3,
-        _buildTextInputWidgetItem(0),
+        _txtInputWgt0,
         _selectionWgt4,
         _buildContentInputItem(),
         _buildFooter(),
@@ -381,5 +386,65 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
         ],
       ),
     );
+  }
+
+  Future _btnConfirmClicked() async {
+    if (this.selectedWorkOrder == null) {
+      HudTool.showInfoWithStatus("请选择作业中心");
+      return;
+    }
+
+    if (this.selectedProject == null) {
+      HudTool.showInfoWithStatus("请选择工程");
+      return;
+    }
+
+    if (this.selectedReasonProcess == null) {
+      HudTool.showInfoWithStatus("请选择原因工序");
+      return;
+    }
+
+    if (isAvailable(this.returnRepairmentNum) == false) {
+      HudTool.showInfoWithStatus("请输入返修数量");
+      return;
+    }
+
+    if (this.selectedRepairCode == null) {
+      HudTool.showInfoWithStatus("请选择返修代码");
+      return;
+    }
+
+    if (isAvailable(this.remarkContent) == false) {
+      HudTool.showInfoWithStatus("请输入备注");
+      return;
+    }
+
+    bool isOkay = await AlertTool.showStandardAlert(context, "确定提交?");
+
+    if (isOkay) {
+      _realConfirmationAction();
+    }
+  }
+
+  void _realConfirmationAction() {
+    // Repair/RepairNotLot
+    Map mDict = Map();
+    mDict["Wono"] = this.currentDayProject.Wono;
+    mDict["LotNo"] = "";
+    mDict["StepCode"] = this.selectedReasonProcess.StepCode;
+    mDict["Comment"] = this.remarkContent;
+    mDict["Qty"] = this.returnRepairmentNum;
+    mDict["RepairCode"] = this.selectedRepairCode.LOTRepairCode;
+
+    HudTool.show();
+    HttpDigger().postWithUri("Repair/RepairNotLot", parameters: mDict, success: (int code, String message, dynamic responseJson) {
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.of(context).pop();
+    });
   }
 }
