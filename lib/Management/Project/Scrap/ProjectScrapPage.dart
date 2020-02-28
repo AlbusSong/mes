@@ -40,7 +40,7 @@ class _ProjectScrapPageState
       controller: new PageController(),
       physics: const NeverScrollableScrollPhysics() ,
       children: <Widget>[
-        ProjectScrapNonLotPage(),
+        ProjectScrapNonLotPage(_scaffoldKey),
         ProjectScrapLotPage(_scaffoldKey),
       ],
       onPageChanged: (currentIndex) {

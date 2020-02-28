@@ -438,6 +438,7 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
 
     HudTool.show();
     HttpDigger().postWithUri("Repair/RepairNotLot", parameters: mDict, success: (int code, String message, dynamic responseJson) {
+      print("Repair/RepairNotLot: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
         return;

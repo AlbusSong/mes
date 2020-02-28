@@ -38,6 +38,7 @@ class HomePage extends StatelessWidget {
     eventBus.on().listen((event) {
       print("event.runtimeType: ${event.runtimeType}");
       HudTool.dismiss();
+      Navigator.of(context).popUntil((r) => r.isFirst);
       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
     });
 
