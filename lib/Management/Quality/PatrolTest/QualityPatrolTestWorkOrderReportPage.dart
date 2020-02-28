@@ -124,7 +124,7 @@ class _QualityPatrolTestWorkOrderReportPageState
       key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("自检工单报工"),
+        title: Text("巡检工单报工"),
         centerTitle: true,
       ),
       body: _buildBody(),

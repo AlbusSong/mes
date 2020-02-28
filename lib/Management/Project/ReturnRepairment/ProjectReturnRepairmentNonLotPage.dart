@@ -9,6 +9,7 @@ import '../Widget/ProjectTextInputWidget.dart';
 
 import '../Model/ProjectReturnRepairmentWorkOrderItemModel.dart';
 import '../Model/ProjectReturnRepairmentProjectItemModel.dart';
+import '../Model/ProjectReturnRepairmentCurrentDayProjectModel.dart';
 import '../Model/ProjectReturnRepairmentRepairCodeItemModel.dart';
 import '../Model/ProjectReturnRepairmentReasonProcessItemModel.dart';
 
@@ -45,6 +46,7 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
   ProjectReturnRepairmentWorkOrderItemModel selectedWorkOrder;
   List arrOfProject;
   ProjectReturnRepairmentProjectItemModel selectedProject;
+  ProjectReturnRepairmentCurrentDayProjectModel currentDayProject;
   List arrOfReasonProcess;
   ProjectReturnRepairmentReasonProcessItemModel selectedReasonProcess;
   List arrOfRepairCode;
@@ -102,7 +104,22 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
   }
 
   void _getCurrentDayProjectFromServer() {
+    // Repair/GetOnLineWo
+    Map mDict = Map();
+    mDict["line"] = this.selectedProject.ProcessCode;
 
+    HudTool.show();
+    HttpDigger().postWithUri("Repair/GetOnLineWo", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("Repair/GetOnLineWo: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.currentDayProject = ProjectReturnRepairmentCurrentDayProjectModel.fromJson(responseJson["Extend"]);
+      _selectionWgt2.setContent(this.currentDayProject.Wono);
+    });
   }
 
   void _getReasonProcessListFromServer() {
@@ -303,6 +320,8 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
       this.selectedProject = this.arrOfProject[indexOfSelectedItem];
 
       _selectionWgt1.setContent(title);
+
+      _getCurrentDayProjectFromServer();
     } else if (index == 2) {
 
     } else if (index == 3) {
