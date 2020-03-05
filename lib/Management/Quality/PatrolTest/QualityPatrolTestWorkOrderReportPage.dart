@@ -37,12 +37,16 @@ class _QualityPatrolTestWorkOrderReportPageState
   final QualityPatrolTestWorkOrderItemModel itemData;
 
   String imageBase64String;
-  String remarkContent;
+  List remarkContentList = [];
   List arrOfData;
+  int selectedIndex = -1;
   QualityMachineTypeItemModel selectedMachineType;
-  QualityMachineDetailInfoModel machineDetailInfo;
-  String nonManualJudgeValue;
-  String selectedManualJudgeResult;
+  // QualityMachineDetailInfoModel machineDetailInfo;
+  Map currentStandardDetail;
+  // String nonManualJudgeValue;
+  // String selectedManualJudgeResult;
+  List actualList = [];
+  // List standardList = [];
 
 
 
@@ -50,32 +54,43 @@ class _QualityPatrolTestWorkOrderReportPageState
   void initState() {
     super.initState();
 
-    // _getDataFromServer();
+    _getDataFromServer();
   }
 
-  void _getDataFromServer() {
-    // MEC/LoadProduct
-    // HudTool.show();
-    // HttpDigger().postWithUri("MEC/LoadProduct",
-    //     parameters: {"workOrderNo": this.detailData.MECWorkOrderNo},
-    //     shouldCache: true,
-    //     success: (int code, String message, dynamic responseJson) {
-    //   print("MEC/LoadProduct: $responseJson");
-    //   // if (code == 0) {
-    //   //   HudTool.showInfoWithStatus(message);
-    //   //   return;
-    //   // }
+  void _getDataFromServer() {    
+    // CHK/LoadItem
+    Map mDict = Map();
+    mDict["ipqcItemNo"] = this.detailData.IPQCItemNo;
+    mDict["ipqcType"] = "${this.itemData.IPQCType},${this.itemData.IPQCWoNo}";
 
-    //   HudTool.dismiss();
-    //   this.arrOfData = (responseJson['Extend'] as List)
-    //       .map((item) => QualityMachineTypeItemModel.fromJson(item))
-    //       .toList();
-    //   if (listLength(this.arrOfData) > 0) {
-    //     this.selectedMachineType = this.arrOfData.first;
-    //     _getMachineDetailInfoFromServer();
-    //   }
-    //   setState(() {});
-    // });
+    HudTool.show();
+    HttpDigger().postWithUri("CHK/LoadItem",
+        parameters: mDict,
+        shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("CHK/LoadItem: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfData = (responseJson['Extend'] as List)
+          .map((item) => QualityMachineTypeItemModel.fromJson(item))
+          .toList();
+      this.remarkContentList.clear();
+      this.actualList.clear();
+      for (int i = 0; i < listLength(this.arrOfData); i++) {
+        this.remarkContentList.add("");
+        this.actualList.add("");
+      }
+      if (listLength(this.arrOfData) > 0) {
+        this.selectedIndex = 0;
+        this.selectedMachineType = this.arrOfData.first;
+        _getMachineDetailInfoFromServer();
+      }
+      setState(() {});
+    });
   }
 
   void _getAttachmentImageDataFromServer() {
@@ -96,26 +111,27 @@ class _QualityPatrolTestWorkOrderReportPageState
   }
 
   void _getMachineDetailInfoFromServer() {
-    // MEC/LoadItem
-    // Map mDict = Map();
-    // mDict["mecPlanNo"] = this.detailData.MECPlanNo;
-    // mDict["itemCode"] = this.selectedMachineType.ItemCode;
+    // CHK/LoadProduct
+    Map mDict = Map();
+    mDict["ipqcType"] = this.itemData.IPQCType;
+    mDict["ipqcPlanNo"] = this.detailData.IPQCPlanNo;
+    mDict["ipqcItemNo"] = this.detailData.IPQCItemNo;
 
-    // HudTool.show();
-    // HttpDigger()
-    //     .postWithUri("MEC/LoadItem", parameters: mDict, shouldCache: true,
-    //         success: (int code, String message, dynamic responseJson) {
-    //   print("MEC/LoadItem: $responseJson");
-    //   if (code == 0) {
-    //     HudTool.showInfoWithStatus(message);
-    //     return;
-    //   }
+    HudTool.show();
+    HttpDigger()
+        .postWithUri("CHK/LoadProduct", parameters: mDict, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
+      print("CHK/LoadProduct: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
 
-    //   HudTool.dismiss();
-    //   this.machineDetailInfo =
-    //       QualityMachineDetailInfoModel.fromJson(responseJson["Extend"]);
-    //   setState(() {});
-    // });
+      HudTool.dismiss();
+      // this.machineDetailInfo = QualityMachineDetailInfoModel.fromJson(responseJson["Extend"]);
+      this.currentStandardDetail = responseJson["Extend"];
+      setState(() {});
+    });
   }
 
   @override
@@ -184,8 +200,8 @@ class _QualityPatrolTestWorkOrderReportPageState
   }
 
   bool _isManualJudget() {
-    if (this.machineDetailInfo != null) {
-      if (this.machineDetailInfo.JudgeStandard == "人为判断") {
+    if (this.currentStandardDetail != null) {
+      if (this.currentStandardDetail["StandardType"] == "人为判断") {
         return true;
       }
     }
@@ -439,9 +455,9 @@ class _QualityPatrolTestWorkOrderReportPageState
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(
-            this.machineDetailInfo == null
+            this.currentStandardDetail == null
                 ? "判断基准："
-                : "判断基准：${this.machineDetailInfo.JudgeStandard}",
+                : "判断基准：${this.currentStandardDetail['StandardType']}",
             style: TextStyle(color: hexColor("666666"), fontSize: 15),
           ),
         ],
@@ -459,9 +475,9 @@ class _QualityPatrolTestWorkOrderReportPageState
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(
-            this.machineDetailInfo == null
-                ? "标    准："
-                : "标    准：${this.machineDetailInfo.Standard}",
+            this.currentStandardDetail == null
+                ? "标        准："
+                : "标        准：${this.currentStandardDetail['Standard']}",
             style: TextStyle(color: hexColor("666666"), fontSize: 15),
           ),
         ],
@@ -502,7 +518,8 @@ class _QualityPatrolTestWorkOrderReportPageState
                         hintText: "请输入数值(只能输入数值)", border: InputBorder.none),
                     onChanged: (text) {
                       print("contentChanged: $text");
-                      this.nonManualJudgeValue = text;
+                      // this.nonManualJudgeValue = text;
+                      this.actualList[this.selectedIndex] = text;
                     }),
               ),
             ),
@@ -515,7 +532,7 @@ class _QualityPatrolTestWorkOrderReportPageState
   Widget _buildContentInputCell() {
     void Function(String newContent) contentChangedBlock = (String newContent) {
       print("_buildContentInputCell: $newContent");
-      this.remarkContent = newContent;
+      this.remarkContentList[this.selectedIndex] = newContent;
     };
     MESContentInputWidget wgt = MESContentInputWidget(
       placeholder: "备注",
@@ -565,7 +582,8 @@ class _QualityPatrolTestWorkOrderReportPageState
       this.selectedMachineType = this.arrOfData[indexOfSelectedItem];
       _getMachineDetailInfoFromServer();      
     } else if (index == 1) {
-      this.selectedManualJudgeResult = title;
+      // this.selectedManualJudgeResult = title;
+      this.actualList[this.selectedIndex] = title;
     }
 
     setState(() {});
@@ -577,8 +595,12 @@ class _QualityPatrolTestWorkOrderReportPageState
         return "${this.selectedMachineType.ItemCode}|${this.selectedMachineType.ItemName}|${this.selectedMachineType.AppState}";
       }
     } else if (index == 1) {
-      if (this.selectedManualJudgeResult != null) {
-        return this.selectedManualJudgeResult;
+      // if (this.selectedManualJudgeResult != null) {
+      //   return this.selectedManualJudgeResult;
+      // }
+      String actual = this.actualList[this.selectedIndex];
+      if (isAvailable(actual) == true) {
+        return actual;
       }
     }
     return "-";
@@ -595,24 +617,30 @@ class _QualityPatrolTestWorkOrderReportPageState
       return;      
     }
 
-    if (this.machineDetailInfo == null) {
+    if (this.currentStandardDetail == null) {
       HudTool.showInfoWithStatus("请先获取判断基准相关信息");
       return;
     }
 
-    if (_isManualJudget() == true && isAvailable(this.selectedManualJudgeResult) == false) {
+    if (_isManualJudget() == true && isAvailable(this.actualList[this.selectedIndex]) == false) {
       HudTool.showInfoWithStatus("请选择人为判断结果");
       return;
     }
 
-    if (_isManualJudget() == false && this.nonManualJudgeValue == null) {
+    if (_isManualJudget() == false && isAvailable(this.actualList[this.selectedIndex]) == false) {
       HudTool.showInfoWithStatus("请填写结果数值");
       return;
     }
 
-    if (isAvailable(this.remarkContent) == false) {
-      HudTool.showInfoWithStatus("请填写备注");
-      return;
+    // if (isAvailable(this.remarkContent) == false) {
+    //   HudTool.showInfoWithStatus("请填写备注");
+    //   return;
+    // }
+    for (String remarkContent in this.remarkContentList) {
+      if (isAvailable(remarkContent) == false) {
+        HudTool.showInfoWithStatus("请填写备注");
+        return;
+      }
     }
 
     bool isOkay = await AlertTool.showStandardAlert(context, "确定报工?");
@@ -623,21 +651,41 @@ class _QualityPatrolTestWorkOrderReportPageState
   }
 
   void _realConfirmationAction() {
+    // CHK/WorkOrderBook
     Map mDict = Map();
-    // mDict["mecWorkOrderNo"] = this.detailData.MECWorkOrderNo;
-    mDict["product"] = this.selectedMachineType.ItemCode;
-    mDict["standard"] = this.machineDetailInfo.Standard;
-    mDict["judge"] = this.machineDetailInfo.JudgeStandard;
-    if (_isManualJudget() == true) {
-      mDict["commitManResult"] = this.selectedManualJudgeResult;
-    } else {
-      mDict["commitNumResult"] = this.nonManualJudgeValue;
+    mDict["ipqcItemNo"] = this.detailData.IPQCItemNo;
+    mDict["ipqcWoNo"] = this.itemData.IPQCWoNo;
+    mDict["ipqcType"] = this.itemData.IPQCType;
+    mDict["judgeType"] = this.currentStandardDetail["StandardType"];
+    mDict["standard"] = this.currentStandardDetail["Standard"];
+    mDict["item"] = this.detailData.Item;
+    mDict["productCode"] = this.selectedMachineType.ItemCode;
+    mDict["product"] = this.selectedMachineType.ItemName;
+    mDict["lineCode"] = this.itemData.LineCode;
+    mDict["lineName"] = this.itemData.LineName;
+    mDict["wcCode"] = this.itemData.WCCode;
+    mDict["wcName"] = this.itemData.WCName;
+    mDict["stepCode"] = this.detailData.StepCode;
+    mDict["step"] = this.detailData.Step;
+    mDict["solveList"] = "";    
+    mDict["picList"] = [];
+
+    // solveList
+    List solveList = [];
+    for (int i = 0; i < listLength(this.arrOfData); i++) {
+      // QualityMachineTypeItemModel machineData = this.arrOfData[i];
+      Map solveDict = Map();
+      solveDict["Actual"] = this.actualList[i];
+      solveDict["BookComment"] = this.remarkContentList[i];
+      solveDict["Index"] = i;
+      solveDict["StandardType"] = this.currentStandardDetail["StandardType"];
+      solveList.add(solveDict);
     }
-    mDict["bookComment"] = this.remarkContent;
+    mDict["solveList"] = solveList;
 
     HudTool.show();
-    HttpDigger().postWithUri("MEC/WorkOrderBook", parameters: mDict, success: (int code, String message, dynamic responseJson) {
-      print("MEC/WorkOrderBook: $responseJson");
+    HttpDigger().postWithUri("CHK/WorkOrderBook", parameters: mDict, success: (int code, String message, dynamic responseJson) {
+      print("CHK/WorkOrderBook: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
         return;
