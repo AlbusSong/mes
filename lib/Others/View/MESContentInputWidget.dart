@@ -12,9 +12,18 @@ class MESContentInputWidget extends StatefulWidget {
   final String placeholder;
   void Function (String newContent) contentChangedBlock;
 
+  _MESContentInputWidgetState _state;
+
+  void setContent(String c) {
+    _state.setContent(c);
+  }
+
   @override
   State<StatefulWidget> createState() {
-    return _MESContentInputWidgetState(placeholder: this.placeholder, contentChangedBlock:this.contentChangedBlock);
+    if (_state == null) {
+      _state = _MESContentInputWidgetState(placeholder: this.placeholder, contentChangedBlock:this.contentChangedBlock);
+    }    
+    return _state;
   }  
 }
 
@@ -22,10 +31,15 @@ class _MESContentInputWidgetState extends State<MESContentInputWidget> {
   _MESContentInputWidgetState({
     this.placeholder,
     this.contentChangedBlock,
-  });
+  });  
 
   final String placeholder;
   void Function (String newContent) contentChangedBlock;
+  final TextEditingController _txtController = TextEditingController();
+
+  void setContent(String c) {
+    _txtController.text = c;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +56,7 @@ class _MESContentInputWidgetState extends State<MESContentInputWidget> {
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
           child: TextField(
+            controller: _txtController,
             enabled: true,
             style: TextStyle(fontSize: 17, color: hexColor(MAIN_COLOR_BLACK)),
             maxLines: 5,

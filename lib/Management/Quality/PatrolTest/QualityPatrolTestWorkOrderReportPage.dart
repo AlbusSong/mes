@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
@@ -12,7 +14,10 @@ import '../Model/QualityMachineTypeItemModel.dart';
 import '../Model/QualityMachineDetailInfoModel.dart';
 import '../Model/QualityPatrolTestSubWorkOrderItemModel.dart';
 
+import 'QualityPatrolTestImageBrowserPage.dart';
+
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 class QualityPatrolTestWorkOrderReportPage extends StatefulWidget {
   QualityPatrolTestWorkOrderReportPage(this.detailData, this.itemData);
@@ -35,6 +40,8 @@ class _QualityPatrolTestWorkOrderReportPageState
 
   final QualityPatrolTestSubWorkOrderItemModel detailData;
   final QualityPatrolTestWorkOrderItemModel itemData;
+  
+  MESContentInputWidget _contentInputWgt;
 
   String imageBase64String;
   List remarkContentList = [];
@@ -47,6 +54,7 @@ class _QualityPatrolTestWorkOrderReportPageState
   // String selectedManualJudgeResult;
   List actualList = [];
   // List standardList = [];
+  List pictureList = [];
 
 
 
@@ -54,7 +62,10 @@ class _QualityPatrolTestWorkOrderReportPageState
   void initState() {
     super.initState();
 
+    _contentInputWgt = _buildContentInputCell();
+
     _getDataFromServer();
+    _getAttachmentImageDataFromServer();
   }
 
   void _getDataFromServer() {    
@@ -74,15 +85,22 @@ class _QualityPatrolTestWorkOrderReportPageState
         return;
       }
 
+      if (responseJson["Extend"] == null) {
+        HudTool.showInfoWithStatus("暂无机型数据");
+        return;
+      }
+
       HudTool.dismiss();
       this.arrOfData = (responseJson['Extend'] as List)
           .map((item) => QualityMachineTypeItemModel.fromJson(item))
           .toList();
       this.remarkContentList.clear();
       this.actualList.clear();
+      this.pictureList.clear();
       for (int i = 0; i < listLength(this.arrOfData); i++) {
         this.remarkContentList.add("");
         this.actualList.add("");
+        this.pictureList.add(null);        
       }
       if (listLength(this.arrOfData) > 0) {
         this.selectedIndex = 0;
@@ -193,8 +211,9 @@ class _QualityPatrolTestWorkOrderReportPageState
           offstage: _isManualJudget() == false,
           child: _buildSelectionItemCell(title: "结    果：", index: 1),
         ),
-        _buildContentInputCell(),
-        WidgetTool.createListViewLine(20, hexColor("f2f2f7")),
+        _contentInputWgt,
+        _buildImageInputCell(),
+        WidgetTool.createListViewLine(20, hexColor("f2f2f7")),        
       ],
     );
   }
@@ -350,9 +369,10 @@ class _QualityPatrolTestWorkOrderReportPageState
                 GestureDetector(
                   onTap: () {
                     if (isAvailable(this.imageBase64String) == false) {
+                      print("无图片");
                       return;
-                    }
-                    print("click to see image");
+                    }                    
+                    _tryToSeeImage();
                   },
                   child: Text(
                   isAvailable(this.imageBase64String) ? "点击查看图片" : "无图片",
@@ -365,6 +385,14 @@ class _QualityPatrolTestWorkOrderReportPageState
         ],
       ),
     );
+  }
+
+  void _tryToSeeImage() {
+    print("_tryToSeeImage");
+
+    QualityPatrolTestImageBrowserPage imageBrowser = QualityPatrolTestImageBrowserPage(this.imageBase64String);
+    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
+              builder: (BuildContext context) => imageBrowser));
   }
 
   Widget _buildSelectionItemCell(
@@ -537,8 +565,67 @@ class _QualityPatrolTestWorkOrderReportPageState
     MESContentInputWidget wgt = MESContentInputWidget(
       placeholder: "备注",
       contentChangedBlock: contentChangedBlock,
-    );
+    );    
     return wgt;
+  }
+
+  Widget _buildImageInputCell() {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            height: 40,
+            child: FlatButton(
+            textColor: hexColor("333333"),
+            color: hexColor("dddddd"),
+            child: Text("选择文件"),
+            onPressed: () {
+              _tryToChooseImage();
+            },
+          ),
+          ),
+
+          _buildImageContentArea(),          
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageContentArea() {
+    File picture;
+    if (this.selectedIndex >= 0) {
+      picture = this.pictureList[this.selectedIndex];
+    }
+
+    if (picture == null) {
+      return Container(
+        height: 1,
+      );
+    } else {
+      return Container(
+        margin: EdgeInsets.all(10),
+        height: 200,
+        color: randomColor(),
+        child: Image.file(picture),
+      );
+    }
+  }
+
+  Future _tryToChooseImage() async {
+    print("_tryToChooseImage");
+    var picture = await ImagePicker.pickImage(source: ImageSource.gallery);
+    print("picture: $picture");
+    if (picture == null) {
+      return;
+    }
+    this.pictureList[this.selectedIndex] = picture;
+
+    setState(() {      
+    });
   }
 
   void _hasSelectedChoiseItem(int index) {
@@ -579,8 +666,11 @@ class _QualityPatrolTestWorkOrderReportPageState
   void _handlePickerConfirmation(
       int indexOfSelectedItem, String title, int index) {
     if (index == 0) {
+      this.selectedIndex = indexOfSelectedItem;
       this.selectedMachineType = this.arrOfData[indexOfSelectedItem];
-      _getMachineDetailInfoFromServer();      
+      _getMachineDetailInfoFromServer();
+
+      _contentInputWgt.setContent(this.remarkContentList[this.selectedIndex]);
     } else if (index == 1) {
       // this.selectedManualJudgeResult = title;
       this.actualList[this.selectedIndex] = title;
@@ -598,10 +688,12 @@ class _QualityPatrolTestWorkOrderReportPageState
       // if (this.selectedManualJudgeResult != null) {
       //   return this.selectedManualJudgeResult;
       // }
-      String actual = this.actualList[this.selectedIndex];
+      if (this.selectedIndex >= 0) {
+        String actual = this.actualList[this.selectedIndex];
       if (isAvailable(actual) == true) {
         return actual;
       }
+      }      
     }
     return "-";
   }
@@ -667,12 +759,11 @@ class _QualityPatrolTestWorkOrderReportPageState
     mDict["wcName"] = this.itemData.WCName;
     mDict["stepCode"] = this.detailData.StepCode;
     mDict["step"] = this.detailData.Step;
-    mDict["solveList"] = "";    
-    mDict["picList"] = [];
+    mDict["solveList"] = "";
 
     // solveList
     List solveList = [];
-    for (int i = 0; i < listLength(this.arrOfData); i++) {
+    for (int i = 0; i < listLength(this.actualList); i++) {
       // QualityMachineTypeItemModel machineData = this.arrOfData[i];
       Map solveDict = Map();
       solveDict["Actual"] = this.actualList[i];
@@ -682,6 +773,19 @@ class _QualityPatrolTestWorkOrderReportPageState
       solveList.add(solveDict);
     }
     mDict["solveList"] = solveList;
+
+    // picList
+    List picList = [];
+    for (int i = 0; i < listLength(this.pictureList); i++) {
+      File picture = this.pictureList[i];
+      Map picDict = Map();
+      picDict["No"] = i;
+      picDict["Pic"] = base64Encode(picture.readAsBytesSync());
+      picList.add(picDict);
+    }
+    mDict["picList"] = picList;
+
+    print("mDict: $mDict");
 
     HudTool.show();
     HttpDigger().postWithUri("CHK/WorkOrderBook", parameters: mDict, success: (int code, String message, dynamic responseJson) {

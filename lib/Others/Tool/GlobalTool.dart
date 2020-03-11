@@ -13,7 +13,7 @@ Image convertToImageByBase64String(base64String) {
   if (bytes != null) {
     return Image.memory(bytes);
   } else {
-    return null;
+    return Image();
   }
 }
 
