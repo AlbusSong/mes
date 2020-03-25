@@ -3,6 +3,7 @@ import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'LoginInputItem.dart';
 
@@ -118,7 +119,22 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future _testDialog() async {
+    // bool isOkay = await AlertTool.showStandardAlert(context, "确定提交?");
+
+    // if (isOkay) {
+    //   print("hahahahh");
+    // }
+    Map resultDict = await AlertTool.showInputFeildAlert(_scaffoldKey.currentContext, "确定提交?", placeholder: "请输入备注信息");
+
+    if (resultDict["confirmation"] == true) {
+      print("hsdfjalsjfldf");
+    }
+  }
+
   void _tryToLogin() {
+    _testDialog();
+    return;
     
      if (isAvailable(this.username) == false) {
        HudTool.showInfoWithStatus("请输入用户名");
