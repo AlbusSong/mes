@@ -36,6 +36,7 @@ class HomePage extends StatelessWidget {
     FlutterGeneralToast.APP_CONTEXT = context;
 
     eventBus.on().listen((event) {
+      return;
       print("event.runtimeType: ${event.runtimeType}");
       HudTool.dismiss();
       Navigator.of(context).popUntil((r) => r.isFirst);
@@ -75,6 +76,8 @@ class HomePage extends StatelessWidget {
     //   _getDataFromServer();
     //   return;
     // }
+
+    return;
 
     Future.delayed(Duration(seconds: 2), () {
       if (MeInfo().isLogined == false) {

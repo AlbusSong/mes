@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
       MeInfo().password = this.password;
       MeInfo().nickname = responseJson["Category"];
       MeInfo().storeLoginInfo();      
-    }, failure: (Error e) {
+    }, failure: (dynamic e) {
       HudTool.showInfoWithStatus("${e.toString()}");
     });
   }

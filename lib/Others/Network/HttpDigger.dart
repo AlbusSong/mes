@@ -8,7 +8,7 @@ import '../../Home/HomePage.dart';
 
 typedef HttpSuccess = void Function(
     int code, String message, dynamic responseJson);
-typedef HttpFailure = void Function(Error error);
+typedef HttpFailure = void Function(dynamic error);
 
 class HttpDigger {
   factory HttpDigger() => _getInstance();
@@ -152,6 +152,58 @@ class HttpDigger {
     }
 
     return result;
+  }
+
+  static void xunfeiOCR(String imageBase64String, {HttpSuccess success, HttpFailure failure}) {
+    String xunfeiAppId = "5e73354e";
+    String xunfeiAppKey = "323f4a078dc0102067b66b2088e7c73e";
+    String currentUnixTimeString = "${(DateTime.now().millisecondsSinceEpoch/1000).round()}";
+    Map xParam = {"language":"en", "location":"false"};
+    String xParamBase64String = base64.encode(utf8.encode(jsonEncode(xParam)));
+    String checkSumMaterial = "$xunfeiAppKey$currentUnixTimeString$xParamBase64String";
+    String checkSum = generateMd5(checkSumMaterial);
+    Dio(BaseOptions(
+      baseUrl: "https://webapi.xfyun.cn/",
+      connectTimeout: 300000,
+      receiveTimeout: 300000,
+      // 5s
+      headers: {
+        "user-agent": "EES-Android",
+        "X-Appid":xunfeiAppId,
+        "X-CurTime":currentUnixTimeString,
+        "X-Param":xParamBase64String,
+        "X-CheckSum":checkSum,
+        // "api": "1.0.0",
+        // "Cookie": MeInfo().cookie,
+      },
+      // contentType: "application/json",
+      contentType: "application/x-www-form-urlencoded",
+      responseType: ResponseType.json,
+    ))
+      ..post("v1/service/v1/ocr/general",
+              data: {"image":imageBase64String})
+          .then((responseObject) {
+            // print("responseObject: $responseObject");
+            // print("responseObject Data: ${responseObject.data is String}");
+            Map responseJson;
+          if (responseObject.data is String) {
+            responseJson = jsonDecode(responseObject.data);
+          } else {
+            responseJson = responseObject.data;
+          }
+        if (success != null) {                    
+          // print("responseJson: $responseJson");
+          // MeInfo().cookie = responseObject.headers.value("set-cookie");
+          // Map responseJson = responseObject.data;
+          // bool s = responseJson["Success"];
+          // String message = responseJson["Message"];
+          success(int.parse(responseJson["code"]), responseJson["desc"], responseJson);
+        }
+      }).catchError((error) {
+        if (failure != null) {
+          failure(error);
+        }
+      });
   }
 
   static void login(String username, String password,

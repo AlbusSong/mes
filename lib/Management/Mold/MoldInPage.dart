@@ -10,6 +10,9 @@ import '../../Others/View/MESSelectionItemWidget.dart';
 
 import 'Model/MoldInModel.dart';
 
+import 'package:mes/Others/Page/CropImagePage.dart';
+import 'package:image_picker/image_picker.dart';
+
 class MoldInPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -18,7 +21,7 @@ class MoldInPage extends StatefulWidget {
 }
 
 class _MoldInPageState extends State<MoldInPage> {
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(
     hintText: "模具编码",
   );
@@ -61,7 +64,11 @@ class _MoldInPageState extends State<MoldInPage> {
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToscan();
+                if (index == 0) {
+                  _tryToscan();
+                } else if (index == 1) {
+                  _tryToUseOCR();
+                }                
               }),
         )),
         height: 120,
@@ -213,6 +220,23 @@ class _MoldInPageState extends State<MoldInPage> {
       HudTool.showInfoWithStatus(message);
       Navigator.pop(context);
     });
+  }
+
+  Future _tryToUseOCR() async {
+    print("_tryToUseOCR");
+
+    var picture = await ImagePicker.pickImage(source: ImageSource.gallery);
+    if (picture == null) {
+      return;
+    }    
+    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => CropImagePage(picture)));
+    print("cccccc: $c");
+    if (c == null) {
+      return;
+    }
+    this.moldCode = c;
+    _sBar.setContent(this.moldCode);
+    _getDataFromServer();
   }
 
   Future _tryToscan() async {
