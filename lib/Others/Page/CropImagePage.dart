@@ -81,10 +81,14 @@ class _CropImagePageState extends State<CropImagePage> {
           }
           for (Map contentSubDict in wordList) {
             String c = contentSubDict["content"] as String;
-            if (c.startsWith("C") && c.endsWith("F")) {
+            if (isAvailable(c)) {
               code = c;
               break;
             }
+            // if (c.startsWith("C") && c.endsWith("F")) {
+            //   code = c;
+            //   break;
+            // }
           }
         }
 

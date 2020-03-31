@@ -225,7 +225,7 @@ class _MoldInPageState extends State<MoldInPage> {
   Future _tryToUseOCR() async {
     print("_tryToUseOCR");
 
-    var picture = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var picture = await ImagePicker.pickImage(source: ImageSource.camera);
     if (picture == null) {
       return;
     }    
