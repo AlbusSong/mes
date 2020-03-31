@@ -134,7 +134,7 @@ class HttpDigger {
         failure(error);
       } else {
         print("$uri error: $error");
-        HudTool.showInfoWithStatus("网络或服务器错误");
+        HudTool.showInfoWithStatus("网络或服务器错误: $uri");
       }
       }      
     });
