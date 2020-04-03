@@ -1,377 +1,292 @@
 package com.zivos.mes;
 
-import android.app.Activity;
-import android.os.Bundle;
-
-//import cn.bingoogolapple.photopicker.activity.BGAPhotoPickerActivity;
-import cn.bingoogolapple.qrcode.core.BarcodeType;
-import cn.bingoogolapple.qrcode.core.QRCodeView;
-import cn.bingoogolapple.qrcode.zbar.BarcodeFormat;
-import cn.bingoogolapple.qrcode.zbar.ZBarView;
-
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Vibrator;
-import android.text.InputFilter;
-import android.text.TextUtils;
-import android.util.AttributeSet;
+import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Vibrator;
-import android.util.Log;
-import android.view.View;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import cn.bingoogolapple.qrcode.core.BarcodeType;
-import cn.bingoogolapple.qrcode.core.QRCodeView;
-import cn.bingoogolapple.qrcode.zbar.BarcodeFormat;
-import cn.bingoogolapple.qrcode.zbar.ZBarView;
-
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class BarcodeScanActivity extends Activity implements QRCodeView.Delegate {
-    private ZBarView mZBarView;
-    private EditText editInfo;
-    private EditText passWord;
+import me.devilsen.czxing.code.BarcodeFormat;
+import me.devilsen.czxing.code.BarcodeReader;
+import me.devilsen.czxing.code.CodeResult;
+import me.devilsen.czxing.compat.ActivityCompat;
+import me.devilsen.czxing.compat.ContextCompat;
+import me.devilsen.czxing.util.BarCodeUtil;
+import me.devilsen.czxing.util.BitmapUtil;
+import me.devilsen.czxing.util.ScreenUtil;
+import me.devilsen.czxing.util.SoundPoolUtil;
+import me.devilsen.czxing.view.ScanBoxView;
+import me.devilsen.czxing.view.ScanListener;
+import me.devilsen.czxing.view.ScanView;
 
-    public void onCreate(Bundle savedInstanceState) {
+/**
+ * desc : 自定义扫码界面
+ * date : 2019-11-18
+ *
+ * @author : dongSen
+ */
+public class BarcodeScanActivity extends AppCompatActivity implements View.OnClickListener,
+        ScanListener, ScanListener.AnalysisBrightnessListener {
+
+    private static final int PERMISSIONS_REQUEST_CAMERA = 1;
+    private static final int PERMISSIONS_REQUEST_STORAGE = 2;
+    private static final int CODE_SELECT_IMAGE = 100;
+
+    private ScanView mScanView;
+    private SoundPoolUtil mSoundPoolUtil;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_test_scan);
-////        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-//
-//        mZBarView = findViewById(R.id.zbarview);
-//        mZBarView.setDelegate(this);
+        setContentView(R.layout.activity_customize_scan);
 
-//        initView();
-        initView2();
-    }
-
-
-    private void initView2() {
-
-//        ScrollView main = new ScrollView(this);
-//        main.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-//        main.setBackgroundColor(Color.RED);
-//
-//        //根布局参数
-        LinearLayout.LayoutParams layoutParamsRoot = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        layoutParamsRoot.gravity = Gravity.CENTER;
-        //根布局
-        LinearLayout layoutRoot = new LinearLayout(this);
-        layoutRoot.setLayoutParams(layoutParamsRoot);
-        layoutRoot.setOrientation(LinearLayout.VERTICAL);
-//
-//
-//        //上边距（dp值）
-//        int topMargin = dip2px(this, 5);
-//        //imageMain宽度（dp值）
-//        int widthMain = dip2px(this, 240);
-//        //imageMain高度（dp值）
-//        int heightMain = dip2px(this, 420);
-//
-//        LinearLayout.LayoutParams layoutParamsImageMain = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, heightMain);
-//        layoutParamsImageMain.topMargin = topMargin;
-//        layoutParamsImageMain.bottomMargin = topMargin;
-//        layoutParamsImageMain.leftMargin = topMargin;
-//        layoutParamsImageMain.rightMargin = topMargin;
-//        layoutParamsImageMain.gravity = Gravity.CENTER_HORIZONTAL;
-//
-//        //初始化ImageView
-//        ImageView imageMain = new ImageView(this);
-//        imageMain.setBackgroundColor(Color.BLUE);
-//        imageMain.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//        imageMain.setAdjustViewBounds(true);
-//        imageMain.setImageResource(R.mipmap.login_background);
-//        layoutRoot.addView(imageMain, layoutParamsImageMain);
-
-        LinearLayout lineLayout = (LinearLayout)getLayoutInflater().inflate(R.layout.activity_test_scan, layoutRoot);
-        Log.i("SSS", "hahahh" + lineLayout.toString());
-        setContentView(lineLayout);
-        mZBarView = findViewById(R.id.zbarview);
-        mZBarView.setDelegate(this);
-        if (mZBarView != null) {
-            Log.i("SSS", "LLLLLLL" + mZBarView.toString());
-        } else {
-            Log.i("SSS", "JLJJJJJJJJJJJJJ");
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.hide();
         }
-//        layoutRoot.addView(mZBarView);
+        ScreenUtil.setFullScreen(this);
 
-//        main.addView(layoutRoot);
+        LinearLayout titleLayout = findViewById(R.id.layout_customize_scan_title);
+        ImageView backImg = findViewById(R.id.image_customize_scan_back);
+        TextView albumTxt = findViewById(R.id.text_view_customize_scan_album);
+        mScanView = findViewById(R.id.surface_customize_view_scan);
+        TextView myCodeTxt = findViewById(R.id.text_view_customize_my_qr_code);
+        TextView option1Txt = findViewById(R.id.text_view_customize_option_1);
+        TextView option2Txt = findViewById(R.id.text_view_customize_option_2);
+        TextView option3Txt = findViewById(R.id.text_view_customize_option_3);
 
-//        setContentView(main);
+        // 设置扫描模式
+//        mScanView.setScanMode(ScanView.SCAN_MODE_MIX);
+        // 设置扫描格式 BarcodeFormat
+//        mScanView.setBarcodeFormat();
+
+        ScanBoxView scanBox = mScanView.getScanBox();
+        // 设置扫码框上下偏移量，可以为负数
+        scanBox.setBoxTopOffset(-BarCodeUtil.dp2px(this, 100));
+        // 设置边框大小
+        scanBox.setBorderSize(BarCodeUtil.dp2px(this, 200), BarCodeUtil.dp2px(this, 100));
+        // 设置扫码框四周的颜色
+        scanBox.setMaskColor(Color.parseColor("#9C272626"));
+        // 设定四个角的颜色
+//        scanBox.setCornerColor();
+        // 设定扫描框的边框颜色
+//        scanBox.setBorderColor();
+        // 设置边框长度(扫码框大小)
+//        scanBox.setBorderSize();
+        // 设定扫描线的颜色
+//        scanBox.setScanLineColor();
+        // 设置扫码线移动方向为水平（从左往右）
+//        scanBox.setHorizontalScanLine();
+        // 设置手电筒打开时的图标
+//        scanBox.setFlashLightOnDrawable();
+        // 设置手电筒关闭时的图标
+//        scanBox.setFlashLightOffDrawable();
+        // 设置闪光灯打开时的提示文字
+//        scanBox.setFlashLightOnText();
+        // 设置闪光灯关闭时的提示文字
+//        scanBox.setFlashLightOffText();
+        // 不使用手电筒图标及提示
+//        scanBox.invisibleFlashLightIcon();
+        // 设置扫码框下方的提示文字
+//        scanBox.setScanNoticeText();
+
+        backImg.setOnClickListener(this);
+        albumTxt.setOnClickListener(this);
+        // 获取扫码回调
+        mScanView.setScanListener(this);
+        // 获取亮度测量结果
+        mScanView.setAnalysisBrightnessListener(this);
+        myCodeTxt.setOnClickListener(this);
+        option1Txt.setOnClickListener(this);
+        option2Txt.setOnClickListener(this);
+        option3Txt.setOnClickListener(this);
+
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) titleLayout.getLayoutParams();
+        layoutParams.topMargin = ScreenUtil.getStatusBarHeight(this);
+
+        mSoundPoolUtil = new SoundPoolUtil();
+        mSoundPoolUtil.loadDefault(this);
+
+        requestCameraPermission();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mZBarView.startCamera(); // 打开后置摄像头开始预览，但是并未开始识别
-//        mZBarView.startCamera(Camera.CameraInfo.CAMERA_FACING_FRONT); // 打开前置摄像头开始预览，但是并未开始识别
-
-        mZBarView.startSpotAndShowRect(); // 显示扫描框，并开始识别
+    protected void onResume() {
+        super.onResume();
+        mScanView.openCamera(); // 打开后置摄像头开始预览，但是并未开始识别
+        mScanView.startScan();  // 显示扫描框，并开始识别
     }
 
     @Override
-    protected void onStop() {
-        mZBarView.stopCamera(); // 关闭摄像头预览，并且隐藏扫描框
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
+        mScanView.stopScan();
+        mScanView.closeCamera(); // 关闭摄像头预览，并且隐藏扫描框
     }
 
     @Override
     protected void onDestroy() {
-        mZBarView.onDestroy(); // 销毁二维码扫描控件
+        mScanView.onDestroy(); // 销毁二维码扫描控件
+        mSoundPoolUtil.release();
         super.onDestroy();
     }
 
-    private void vibrate() {
-        Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        v.vibrate(200);
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.image_customize_scan_back:
+                finish();
+                break;
+            case R.id.text_view_customize_scan_album:
+                requestStoragePermission();
+                break;
+            case R.id.text_view_customize_my_qr_code:
+//                startActivity(new Intent(this, MyCardActivity.class));
+                break;
+            case R.id.text_view_customize_option_1:
+                Toast.makeText(this, "option 1", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.text_view_customize_option_2:
+                Toast.makeText(this, "option 2", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.text_view_customize_option_3:
+                Toast.makeText(this, "option 3", Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 
     @Override
-    public void onScanQRCodeSuccess(String result) {
-        Log.i("RST", "result:" + result);
-//        setTitle("扫描结果：" + result);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == CODE_SELECT_IMAGE) {
+            decodeImage(data);
+            finish();
+        }
+    }
 
+    @Override
+    public void onScanSuccess(String result, BarcodeFormat format) {
+        mSoundPoolUtil.play();
+
+//        showResult(result);
         Intent in = new Intent();
         in.putExtra("barcodeResult", result);
-
         setResult(100001, in);
 
-        vibrate();
-
-//        mZBarView.startSpot(); // 开始识别
-        this.onStop();
-        this.onDestroy();
         finish();
     }
 
+    /**
+     * 可以通过此回调来控制自定义的手电筒显隐藏
+     *
+     * @param isDark 是否处于黑暗的环境
+     */
     @Override
-    public void onCameraAmbientBrightnessChanged(boolean isDark) {
-        Log.i("RST", "亮度变了");
+    public void onAnalysisBrightness(boolean isDark) {
+        if (isDark) {
+            Log.d("analysisBrightness", "您处于黑暗的环境，建议打开手电筒");
+        } else {
+            Log.d("analysisBrightness", "正常环境，如果您打开了手电筒，可以关闭");
+        }
     }
 
     @Override
-    public  void onScanQRCodeOpenCameraError() {
-        Log.i("RST", "打开相机出问题了");
+    public void onOpenCameraError() {
+        Log.e("onOpenCameraError", "onOpenCameraError");
     }
 
-    private void initView() {
-        ScrollView main = new ScrollView(this);
-        main.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        main.setBackgroundColor(Color.WHITE);
+    public void showResult(String result) {
+//        Intent intent = new Intent(this, DelegateActivity.class);
+//        intent.putExtra("result", result);
+//        startActivity(intent);
+    }
 
-        //根布局参数
-        LinearLayout.LayoutParams layoutParamsRoot = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        layoutParamsRoot.gravity = Gravity.CENTER;
-        //根布局
-        LinearLayout layoutRoot = new LinearLayout(this);
-        layoutRoot.setLayoutParams(layoutParamsRoot);
-        layoutRoot.setOrientation(LinearLayout.VERTICAL);
+    private void decodeImage(Intent intent) {
+        Uri selectImageUri = intent.getData();
+        if (selectImageUri == null) {
+            return;
+        }
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(selectImageUri, filePathColumn, null, null, null);
+        if (cursor == null) {
+            return;
+        }
+        cursor.moveToFirst();
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        String picturePath = cursor.getString(columnIndex);
+        cursor.close();
 
-        //上边距（dp值）
-        int topMargin = dip2px(this, 30);
-        //imageMain宽度（dp值）
-        int widthMain = dip2px(this, 240);
-        //imageMain高度（dp值）
-        int heightMain = dip2px(this, 120);
+        Bitmap bitmap = BitmapUtil.getDecodeAbleBitmap(picturePath);
+        if (bitmap == null) {
+            return;
+        }
 
-        //imageMain布局参数
-        LinearLayout.LayoutParams layoutParamsImageMain = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, heightMain);
-        layoutParamsImageMain.topMargin = topMargin;
-        layoutParamsImageMain.bottomMargin = topMargin;
-        layoutParamsImageMain.leftMargin = topMargin;
-        layoutParamsImageMain.rightMargin = topMargin;
-        layoutParamsImageMain.gravity = Gravity.CENTER_HORIZONTAL;
-        //初始化ImageView
-        ImageView imageMain = new ImageView(this);
-        imageMain.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        imageMain.setAdjustViewBounds(true);
-//        imageMain.setImageResource(R.mipmap.laoying);
-        layoutRoot.addView(imageMain, layoutParamsImageMain);
-
-        //按钮布局
-        LinearLayout layoutUser = new LinearLayout(this);
-        layoutUser.setLayoutParams(layoutParamsImageMain);
-        layoutUser.setOrientation(LinearLayout.HORIZONTAL);
-        //editInfo布局参数
-        LinearLayout.LayoutParams layoutParamsEditInfo = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParamsEditInfo.gravity = Gravity.LEFT;
-        layoutParamsEditInfo.leftMargin = dip2px(this, 10);
-        layoutParamsEditInfo.rightMargin = dip2px(this, 5);
-        layoutParamsEditInfo.weight = 1;
-
-        //初始化textInfo
-        TextView textInfo = new TextView(this);
-        textInfo.setLayoutParams(layoutParamsEditInfo);
-        textInfo.setGravity(Gravity.LEFT);
-        textInfo.setTextSize(18);
-        textInfo.setText("账号:");
-        layoutUser.addView(textInfo);
-
-        //
-        LinearLayout.LayoutParams layoutParamsET = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParamsET.gravity = Gravity.RIGHT;
-        layoutParamsET.leftMargin = dip2px(this, 10);
-        layoutParamsET.rightMargin = dip2px(this, 5);
-        layoutParamsET.weight = 1;
-        //初始化editInfo
-        editInfo = new EditText(this);
-        editInfo.setLayoutParams(layoutParamsET);
-        editInfo.setGravity(Gravity.LEFT);
-        editInfo.setHint("请输入账号");
-        editInfo.setLines(1);
-        editInfo.setEllipsize(TextUtils.TruncateAt.END);
-        //设置可输入的最大长度
-        InputFilter[] filters = {new InputFilter.LengthFilter(20)};
-        editInfo.setFilters(filters);
-        editInfo.setTextSize(18);
-        layoutUser.addView(editInfo);
-
-        layoutRoot.addView(layoutUser, layoutParamsEditInfo);
-        //密码输入
-        passWord(layoutRoot, layoutParamsImageMain);
-        //上边距（dp值）
-        int minHeight = dip2px(this, 54);
-        //上padding（dp值）
-        int topPadding = dip2px(this, 4);
-        //左padding（dp值）
-        int leftPadding = dip2px(this, 2);
-        //按钮布局
-        LinearLayout layoutButton = new LinearLayout(this);
-        layoutButton.setLayoutParams(layoutParamsEditInfo);
-        layoutButton.setOrientation(LinearLayout.HORIZONTAL);
-        layoutButton.setMinimumHeight(minHeight);
-        layoutButton.setPadding(leftPadding, topPadding, leftPadding, topPadding);
-        layoutButton.setId(100000001);
-
-        //buttonOK布局参数
-        LinearLayout.LayoutParams layoutParamsButtonOK = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParamsButtonOK.gravity = Gravity.LEFT;
-        layoutParamsButtonOK.leftMargin = dip2px(this, 10);
-        layoutParamsButtonOK.rightMargin = dip2px(this, 5);
-        layoutParamsButtonOK.weight = 1;
-        //Button确定
-        Button buttonOK = new Button(this);
-        buttonOK.setLayoutParams(layoutParamsButtonOK);
-        buttonOK.setMaxLines(2);
-        buttonOK.setTextSize(18);
-        buttonOK.setText("登录");
-        layoutButton.addView(buttonOK);
-
-        //buttonCancel布局参数
-        LinearLayout.LayoutParams layoutParamsButtonCancel = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParamsButtonCancel.gravity = Gravity.RIGHT;
-        layoutParamsButtonCancel.leftMargin = dip2px(this, 5);
-        layoutParamsButtonCancel.rightMargin = dip2px(this, 10);
-        layoutParamsButtonCancel.weight = 1;
-        //Button取消
-        Button buttonCancel = new Button(this);
-        buttonCancel.setLayoutParams(layoutParamsButtonCancel);
-        buttonCancel.setMaxLines(2);
-        buttonCancel.setTextSize(18);
-        buttonCancel.setText("取消");
-
-        layoutButton.addView(buttonCancel);
-
-        layoutRoot.addView(layoutButton, layoutParamsEditInfo);
-
-        buttonOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Toast.makeText(PureCodeActivity.this, "账号:" + editInfo.getText().toString() + " 密码：" + passWord.getText().toString(), Toast.LENGTH_SHORT).show();
-//                System.out.print("ahahsdhfsad");
-                Log.i("BARCODESCAN", "alljsflasdjflasjf");
-            }
-        });
-        buttonCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        //RelativeLayout布局参数
-        LinearLayout.LayoutParams layoutParamsBottom = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        RelativeLayout layoutBottom = new RelativeLayout(this);
-        layoutBottom.setLayoutParams(layoutParamsBottom);
-
-        main.addView(layoutRoot);
-        setContentView(main);
+        CodeResult result = BarcodeReader.getInstance().read(bitmap);
+        if (result == null) {
+            Log.e("Scan >>> ", "no code");
+            return;
+        } else {
+            Log.e("Scan >>> ", result.getText());
+        }
+        showResult(result.getText());
     }
 
     /**
-     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+     * 获取摄像头权限（实际测试中，使用第三方获取权限工具，可能造成摄像头打开失败）
      */
-    public static int dip2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
+    private void requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+        }
     }
 
-    /**
-     * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
-     */
-    public static int px2dip(Context context, float pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
+    private void requestStoragePermission() {
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_STORAGE);
+        } else {
+            Intent albumIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(albumIntent, CODE_SELECT_IMAGE);
+        }
     }
 
-    private void passWord(LinearLayout layoutRoot, LinearLayout.LayoutParams layoutParamsImageMain) {
-        //按钮布局
-        LinearLayout layoutUser = new LinearLayout(this);
-        layoutUser.setLayoutParams(layoutParamsImageMain);
-        layoutUser.setOrientation(LinearLayout.HORIZONTAL);
-        //editInfo布局参数
-        LinearLayout.LayoutParams layoutParamsEditInfo = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParamsEditInfo.gravity = Gravity.LEFT;
-        layoutParamsEditInfo.leftMargin = dip2px(this, 10);
-        layoutParamsEditInfo.rightMargin = dip2px(this, 5);
-        layoutParamsEditInfo.weight = 1;
-
-        //初始化textInfo
-        TextView textInfo = new TextView(this);
-        textInfo.setLayoutParams(layoutParamsEditInfo);
-        textInfo.setGravity(Gravity.LEFT);
-        textInfo.setTextSize(18);
-        textInfo.setText("密码:");
-        layoutUser.addView(textInfo);
-
-        //buttonOK布局参数
-        LinearLayout.LayoutParams layoutParamsET = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParamsET.gravity = Gravity.RIGHT;
-        layoutParamsET.leftMargin = dip2px(this, 10);
-        layoutParamsET.rightMargin = dip2px(this, 5);
-        layoutParamsET.weight = 1;
-        //初始化editInfo
-        passWord = new EditText(this);
-        passWord.setLayoutParams(layoutParamsEditInfo);
-        passWord.setGravity(Gravity.LEFT);
-        passWord.setLines(1);
-        passWord.setEllipsize(TextUtils.TruncateAt.END);
-        passWord.setHint("请输入密码");
-        //设置可输入的最大长度
-        InputFilter[] filters = {new InputFilter.LengthFilter(20)};
-        passWord.setFilters(filters);
-        passWord.setTextSize(18);
-        layoutUser.addView(passWord);
-
-        layoutRoot.addView(layoutUser, layoutParamsEditInfo);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CAMERA) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mScanView.openCamera();
+                mScanView.startScan();
+            }
+            return;
+        } else if (requestCode == PERMISSIONS_REQUEST_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent albumIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(albumIntent, CODE_SELECT_IMAGE);
+            }
+            return;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
 }

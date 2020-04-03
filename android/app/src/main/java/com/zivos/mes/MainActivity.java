@@ -14,7 +14,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
+//import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
 //import pub.devrel.easypermissions.AfterPermissionGranted;
 //import pub.devrel.easypermissions.EasyPermissions;
 
