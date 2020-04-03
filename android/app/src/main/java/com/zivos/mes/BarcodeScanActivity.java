@@ -66,9 +66,6 @@ public class BarcodeScanActivity extends AppCompatActivity implements View.OnCli
         TextView albumTxt = findViewById(R.id.text_view_customize_scan_album);
         mScanView = findViewById(R.id.surface_customize_view_scan);
         TextView myCodeTxt = findViewById(R.id.text_view_customize_my_qr_code);
-        TextView option1Txt = findViewById(R.id.text_view_customize_option_1);
-        TextView option2Txt = findViewById(R.id.text_view_customize_option_2);
-        TextView option3Txt = findViewById(R.id.text_view_customize_option_3);
 
         // 设置扫描模式
 //        mScanView.setScanMode(ScanView.SCAN_MODE_MIX);
@@ -79,7 +76,7 @@ public class BarcodeScanActivity extends AppCompatActivity implements View.OnCli
         // 设置扫码框上下偏移量，可以为负数
         scanBox.setBoxTopOffset(-BarCodeUtil.dp2px(this, 100));
         // 设置边框大小
-        scanBox.setBorderSize(BarCodeUtil.dp2px(this, 200), BarCodeUtil.dp2px(this, 100));
+        scanBox.setBorderSize(BarCodeUtil.dp2px(this, 200), BarCodeUtil.dp2px(this, 200));
         // 设置扫码框四周的颜色
         scanBox.setMaskColor(Color.parseColor("#9C272626"));
         // 设定四个角的颜色
@@ -112,9 +109,6 @@ public class BarcodeScanActivity extends AppCompatActivity implements View.OnCli
         // 获取亮度测量结果
         mScanView.setAnalysisBrightnessListener(this);
         myCodeTxt.setOnClickListener(this);
-        option1Txt.setOnClickListener(this);
-        option2Txt.setOnClickListener(this);
-        option3Txt.setOnClickListener(this);
 
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) titleLayout.getLayoutParams();
         layoutParams.topMargin = ScreenUtil.getStatusBarHeight(this);
@@ -155,18 +149,6 @@ public class BarcodeScanActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.text_view_customize_scan_album:
                 requestStoragePermission();
-                break;
-            case R.id.text_view_customize_my_qr_code:
-//                startActivity(new Intent(this, MyCardActivity.class));
-                break;
-            case R.id.text_view_customize_option_1:
-                Toast.makeText(this, "option 1", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.text_view_customize_option_2:
-                Toast.makeText(this, "option 2", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.text_view_customize_option_3:
-                Toast.makeText(this, "option 3", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
