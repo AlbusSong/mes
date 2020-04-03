@@ -72,7 +72,7 @@ class _CropImagePageState extends State<CropImagePage> {
         }
 
         List contentList = ((blockList[0] as Map)["line"] as List);
-        String code;
+        String code;        
         for (int i = 0; i < listLength(contentList); i++) {
           Map contentDict = contentList[i];
           List wordList = contentDict["word"];
@@ -89,6 +89,10 @@ class _CropImagePageState extends State<CropImagePage> {
             //   code = c;
             //   break;
             // }
+          }
+
+          if (code != null) {
+            break;
           }
         }
 

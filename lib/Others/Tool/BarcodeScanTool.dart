@@ -5,7 +5,8 @@ import 'package:mes/Others/Tool/NativeCommunicationTool.dart';
 class BarcodeScanTool {
   static Future <String> tryToScanBarcode() async {
     if(Platform.isIOS){
-      return "bbb";
+      String barcodeScanRes = await NativeCommunicationTool().tryToScanBarcode();
+      return barcodeScanRes;
     } else if (Platform.isAndroid) {
       String barcodeScanRes = await NativeCommunicationTool().tryToScanBarcode();
       return barcodeScanRes;

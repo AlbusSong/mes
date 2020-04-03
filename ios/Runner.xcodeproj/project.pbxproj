@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		4ED0E691243781AB00616EE8 /* QiCodePreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ED0E68D243781AB00616EE8 /* QiCodePreviewView.m */; };
+		4ED0E692243781AB00616EE8 /* QiCodeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ED0E68E243781AB00616EE8 /* QiCodeManager.m */; };
+		4ED0E6952437824900616EE8 /* BarcodeScanVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ED0E6942437824900616EE8 /* BarcodeScanVC.m */; };
 		4ED110A523C0F40200BCCB1B /* FlutterNativeTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ED110A323C0F40200BCCB1B /* FlutterNativeTool.m */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
@@ -35,6 +38,13 @@
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		28D21E72CB3FD45FAE5A2122 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		4ED0E68D243781AB00616EE8 /* QiCodePreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QiCodePreviewView.m; sourceTree = "<group>"; };
+		4ED0E68E243781AB00616EE8 /* QiCodeManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QiCodeManager.m; sourceTree = "<group>"; };
+		4ED0E68F243781AB00616EE8 /* QiCodePreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QiCodePreviewView.h; sourceTree = "<group>"; };
+		4ED0E690243781AB00616EE8 /* QiCodeManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QiCodeManager.h; sourceTree = "<group>"; };
+		4ED0E6932437824900616EE8 /* BarcodeScanVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BarcodeScanVC.h; sourceTree = "<group>"; };
+		4ED0E6942437824900616EE8 /* BarcodeScanVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BarcodeScanVC.m; sourceTree = "<group>"; };
+		4ED0E697243785BE00616EE8 /* Macro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
 		4ED110A323C0F40200BCCB1B /* FlutterNativeTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlutterNativeTool.m; sourceTree = "<group>"; };
 		4ED110A423C0F40200BCCB1B /* FlutterNativeTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlutterNativeTool.h; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -72,6 +82,25 @@
 				80055BDD252FBAB4FF1F741C /* Pods-Runner.profile.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		4ED0E68C243781AB00616EE8 /* QiCodeReader */ = {
+			isa = PBXGroup;
+			children = (
+				4ED0E68D243781AB00616EE8 /* QiCodePreviewView.m */,
+				4ED0E68E243781AB00616EE8 /* QiCodeManager.m */,
+				4ED0E68F243781AB00616EE8 /* QiCodePreviewView.h */,
+				4ED0E690243781AB00616EE8 /* QiCodeManager.h */,
+			);
+			path = QiCodeReader;
+			sourceTree = "<group>";
+		};
+		4ED0E696243785AE00616EE8 /* Macro */ = {
+			isa = PBXGroup;
+			children = (
+				4ED0E697243785BE00616EE8 /* Macro.h */,
+			);
+			path = Macro;
 			sourceTree = "<group>";
 		};
 		5C3BE3EBEDFE96896421D871 /* Frameworks */ = {
@@ -115,6 +144,10 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				4ED0E696243785AE00616EE8 /* Macro */,
+				4ED0E6932437824900616EE8 /* BarcodeScanVC.h */,
+				4ED0E6942437824900616EE8 /* BarcodeScanVC.m */,
+				4ED0E68C243781AB00616EE8 /* QiCodeReader */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -283,6 +316,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4ED0E691243781AB00616EE8 /* QiCodePreviewView.m in Sources */,
+				4ED0E692243781AB00616EE8 /* QiCodeManager.m in Sources */,
+				4ED0E6952437824900616EE8 /* BarcodeScanVC.m in Sources */,
 				4ED110A523C0F40200BCCB1B /* FlutterNativeTool.m in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,

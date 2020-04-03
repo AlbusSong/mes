@@ -8,14 +8,18 @@
 
 #import "FlutterNativeTool.h"
 #import <Flutter/Flutter.h>
-
-#define WS(weakSelf)      __weak __typeof(&*self)    weakSelf  = self;    //弱引用
+#import "BarcodeScanVC.h"
+#import "Macro.h"
 
 static FlutterNativeTool *instance = nil;
 
 @interface FlutterNativeTool ()
 
+@property (nonatomic, strong) FlutterViewController *flutterVC;
+
 @property (nonatomic, strong) FlutterMethodChannel *platformChannel;
+
+@property (nonatomic, strong) FlutterResult fResult;
 
 @end
 
@@ -40,15 +44,16 @@ static FlutterNativeTool *instance = nil;
 }
 
 - (void)initSomethings {
-    FlutterViewController *flutterVC = (FlutterViewController *)[UIApplication sharedApplication].delegate.window.rootViewController;
+    self.flutterVC = (FlutterViewController *)[UIApplication sharedApplication].delegate.window.rootViewController;
     
-    self.platformChannel = [FlutterMethodChannel methodChannelWithName:@"flutterNativeChannel" binaryMessenger:(NSObject<FlutterBinaryMessenger> * )flutterVC];
+    self.platformChannel = [FlutterMethodChannel methodChannelWithName:@"flutterNativeChannel" binaryMessenger:(NSObject<FlutterBinaryMessenger> * )self.flutterVC];
     
     NSLog(@"self.channel: %@", self.platformChannel);
     
     // Method
     WS(weakSelf);
     [self.platformChannel setMethodCallHandler:^(FlutterMethodCall * _Nonnull call, FlutterResult  _Nonnull result) {
+        weakSelf.fResult = result;
         if ([call.method isEqualToString:@"getBatteryLevel"]) {
             result(@"Hjdas");
 //            result(@([weakSelf getBatteryLevel]));
@@ -61,8 +66,21 @@ static FlutterNativeTool *instance = nil;
 //            } else {
 //                result(@(batteryLevel));
 //            }
+        } else if ([call.method isEqualToString:@"tryToScanBarcode"]) {
+            [weakSelf tryToScanBarcode];
         }
     }];
+}
+
+- (void)tryToScanBarcode {
+    BarcodeScanVC *vc = [[BarcodeScanVC alloc] init];
+    WS(weakSelf)
+    vc.barcodeScsanedHandler = ^(NSString * _Nonnull barcode) {
+        weakSelf.fResult(barcode);
+    };
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    nav.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self.flutterVC presentViewController:nav animated:YES completion:nil];
 }
 
 - (int)getBatteryLevel {
