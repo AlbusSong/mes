@@ -42,7 +42,7 @@ class HttpDigger {
     receiveTimeout: 100000,
     // 5s
     headers: {
-      "user-agent": "EES-Android",
+      "user-agent": "MES-Android",
       // "api": "1.0.0",
       "Cookie": MeInfo().cookie,
     },
@@ -168,7 +168,7 @@ class HttpDigger {
       receiveTimeout: 300000,
       // 5s
       headers: {
-        "user-agent": "EES-Android",
+        "user-agent": "MES-Android",
         "X-Appid":xunfeiAppId,
         "X-CurTime":currentUnixTimeString,
         "X-Param":xParamBase64String,
@@ -214,14 +214,14 @@ class HttpDigger {
       receiveTimeout: 100000,
       // 5s
       headers: {
-        "user-agent": "EES-Android",
+        "user-agent": "MES-Android",
         // "api": "1.0.0",
         // "Cookie": MeInfo().cookie,
       },
       contentType: "application/json",
       responseType: ResponseType.json,
     ))
-      ..post("Login/OutOnline",
+      .post("Login/OutOnline",
               data: {"UserName": username ?? "", "Password": password ?? ""})
           .then((responseObject) {
         if (success != null) {

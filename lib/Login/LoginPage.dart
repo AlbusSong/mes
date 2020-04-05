@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
     hideKeyboard(context);
 
     HudTool.show();
-    HttpDigger().postWithUri("Login/OutOnline", parameters: {"UserName":this.username, "Password":this.password}, success: (int code, String message, dynamic responseJson) {
+    HttpDigger.login(MeInfo().username, MeInfo().password, success: (int code, String message, dynamic responseJson) {
       print("Login/OutOnline: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -147,9 +147,22 @@ class _LoginPageState extends State<LoginPage> {
       MeInfo().username = this.username;
       MeInfo().password = this.password;
       MeInfo().nickname = responseJson["Category"];
-      MeInfo().storeLoginInfo();      
+      MeInfo().storeLoginInfo();
+
+      Future.delayed(Duration(seconds: 2), (){
+        _afterLoginAction();
+      });      
     }, failure: (dynamic e) {
       HudTool.showInfoWithStatus("${e.toString()}");
     });
+  }
+
+  void _afterLoginAction() {
+    HttpDigger.login(MeInfo().username, MeInfo().password,
+        success: ((int code, String message, dynamic responseJson) {
+      print("Login Again: $responseJson");
+
+      hideKeyboard(_scaffoldKey.currentContext);
+    }));
   }
 }

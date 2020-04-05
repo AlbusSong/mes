@@ -3,7 +3,6 @@ import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Const/Const.dart';
-import 'package:mes/Others/Tool/NativeCommunicationTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
 
 import '../Login/LoginPage.dart';
@@ -12,6 +11,7 @@ import '../Management/ProductLine/ProductLinePage.dart';
 import '../Management/Plan/PlanPage.dart';
 import '../Management/Project/ProjectPage.dart';
 import '../Management/Quality/QualityPage.dart';
+import '../Notification/NotificationListPage.dart';
 
 
 class HomeMenu extends StatefulWidget {
@@ -45,6 +45,8 @@ class _HomeMenuState extends State<HomeMenu> {
           _menuFunctionItem("品质管理", 4),
           WidgetTool.createListViewLine(1, backgroundColor),
           _menuFunctionItem("模具管理", 5),
+          WidgetTool.createListViewLine(1, backgroundColor),
+          _menuFunctionItem("通知管理", 6),
         ],
       ),
     );
@@ -87,6 +89,9 @@ class _HomeMenuState extends State<HomeMenu> {
     } else if (index == 5) {
       Navigator.of(context).pop();
       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => MoldPage()));
+    } else if (index == 6) {
+      Navigator.of(context).pop();
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => NotificationListPage()));
     }
   }
 
