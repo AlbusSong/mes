@@ -6,8 +6,10 @@ import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import 'package:mes/Others/View/SelectionBar.dart';
 
-import './Model/ProjectLotLockItemModel.dart';
-import './Model/ProjectLineModel.dart';
+import '.././Model/ProjectLotLockItemModel.dart';
+import '.././Model/ProjectLineModel.dart';
+
+import 'ProjectLotLockHandlingReturnRepairmentPage.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 
@@ -347,10 +349,23 @@ class _ProjectLotLockHandlingPageState
       return;
     }
 
-    Map resultDict = await AlertTool.showInputFeildAlert(_scaffoldKey.currentContext, "确定提交?", placeholder: "请输入备注信息");
+    if (index > 0 && listLength(this.arrOfSelectedIndex) > 1) {
+      HudTool.showInfoWithStatus("只能选择一项");
+      return;
+    }
+
+    if (index == 0) {
+      Map resultDict = await AlertTool.showInputFeildAlert(_scaffoldKey.currentContext, "确定提交?", placeholder: "请输入备注信息");
 
     if (resultDict["confirmation"] == true) {
       _confirmActionWithComment(index, resultDict["text"]);
+    }
+    } else if (index == 1) {
+      ProjectLotLockItemModel itemData = this.arrOfData[this.arrOfSelectedIndex.first];
+      Navigator.of(_scaffoldKey.currentContext)
+          .push(MaterialPageRoute(builder: (BuildContext context) => ProjectLotLockHandlingReturnRepairmentPage(itemData.LotNo)));
+    } else if (index == 2) {
+
     }
   }
 

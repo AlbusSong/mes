@@ -12,7 +12,7 @@ import 'ProjectChangeGearPage.dart';
 import 'Batch/ProjectLotBatchPage.dart';
 import 'Repairment/ProjectRepairmentListPage.dart';
 import 'Scrap/ProjectScrapPage.dart';
-import 'ProjectLotLockHandlingPage.dart';
+import 'LotLockHandling/ProjectLotLockHandlingPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();

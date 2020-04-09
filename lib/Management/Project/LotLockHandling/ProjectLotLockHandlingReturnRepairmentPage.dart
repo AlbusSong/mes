@@ -14,25 +14,27 @@ import 'package:flutter_picker/flutter_picker.dart';
 import '../Model/ProjectLotInfoModel.dart';
 import '../Model/ProjectRepairCodeModel.dart';
 
-class ProjectReturnRepairmentLotPage extends StatefulWidget {
-  ProjectReturnRepairmentLotPage(
-    this.parentScaffoldKey,
+class ProjectLotLockHandlingReturnRepairmentPage extends StatefulWidget {
+  ProjectLotLockHandlingReturnRepairmentPage(
+    this.lotNo
   );
-  final GlobalKey<ScaffoldState> parentScaffoldKey;
+
+  final String lotNo;
 
   @override
   State<StatefulWidget> createState() {
-    return _ProjectReturnRepairmentLotPageState(parentScaffoldKey);
+    return _ProjectLotLockHandlingReturnRepairmentPageState(lotNo: this.lotNo);
   }
 }
 
-class _ProjectReturnRepairmentLotPageState
-    extends State<ProjectReturnRepairmentLotPage>
-    with AutomaticKeepAliveClientMixin {
-  _ProjectReturnRepairmentLotPageState(
-    this.parentScaffoldKey,
+class _ProjectLotLockHandlingReturnRepairmentPageState
+    extends State<ProjectLotLockHandlingReturnRepairmentPage>
+    {
+  _ProjectLotLockHandlingReturnRepairmentPageState(
+    {this.lotNo}
   );
-  final GlobalKey<ScaffoldState> parentScaffoldKey;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();      
 
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
 
@@ -49,8 +51,6 @@ class _ProjectReturnRepairmentLotPageState
   List arrOfRepairCode;
   ProjectRepairCodeModel selectedRepairCode;
 
-  bool get wantKeepAlive => true;
-
   @override
   void initState() {
     super.initState();
@@ -61,9 +61,16 @@ class _ProjectReturnRepairmentLotPageState
     _selectionWgt1 = _buildSelectionInputItem(1);
     _selectionWgt2 = _buildSelectionInputItem(2);
     _selectionWgt3 = _buildSelectionInputItem(3);
+
+    _getDataFromServer();
   }
 
   void _getDataFromServer() {
+    if (isAvailable(this.lotNo) == false) {
+      return;
+    }
+
+    _pTextInputWgt0.setContent(this.lotNo);
     HudTool.show();
     HttpDigger().postWithUri("Repair/GetLotInfo",
         parameters: {"lotno": this.lotNo}, shouldCache: true,
@@ -98,6 +105,18 @@ class _ProjectReturnRepairmentLotPageState
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: hexColor("f2f2f7"),
+      appBar: AppBar(
+        title: Text("返修"),
+        centerTitle: true,
+      ),
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
     return Container(
       color: randomColor(),
       child: Column(
@@ -224,7 +243,7 @@ class _ProjectReturnRepairmentLotPageState
               picker.getSelectedValues().first, index);
         });
     // picker.show(Scaffold.of(context));
-    picker.show(parentScaffoldKey.currentState);
+    picker.show(_scaffoldKey.currentState);
   }
 
   void _handlePickerConfirmation(
@@ -300,7 +319,7 @@ class _ProjectReturnRepairmentLotPageState
     }
 
     bool isOkay = await AlertTool.showStandardAlert(
-        parentScaffoldKey.currentContext, "确认返修？");
+        _scaffoldKey.currentContext, "确认返修？");
 
     if (isOkay) {
       _realConfirmationAction();
