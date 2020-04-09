@@ -14,24 +14,25 @@ import 'package:flutter_picker/flutter_picker.dart';
 import '../Model/ProjectLotInfoModel.dart';
 import '../Model/ProjectScrapItemModel.dart';
 
-class ProjectScrapLotPage extends StatefulWidget {
-  ProjectScrapLotPage(
-    this.parentScaffoldKey,
+class ProjectLotLockHandlingScrapPage extends StatefulWidget {
+  ProjectLotLockHandlingScrapPage(
+    this.lotNo,
   );
-  final GlobalKey<ScaffoldState> parentScaffoldKey;
+
+  final String lotNo;
 
   @override
   State<StatefulWidget> createState() {
-    return _ProjectScrapLotPageState(parentScaffoldKey);
+    return _ProjectLotLockHandlingScrapPageState(lotNo: this.lotNo);
   }
 }
 
-class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
-    with AutomaticKeepAliveClientMixin {
-  _ProjectScrapLotPageState(
-    this.parentScaffoldKey,
+class _ProjectLotLockHandlingScrapPageState extends State<ProjectLotLockHandlingScrapPage> {
+  _ProjectLotLockHandlingScrapPageState(
+    {this.lotNo}
   );
-  final GlobalKey<ScaffoldState> parentScaffoldKey;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();   
 
   ProjectTextInputWidget _pTextInputWgt0;
 
@@ -49,9 +50,6 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
   ProjectScrapItemModel selectedScrapCode;
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   void initState() {
     super.initState();
 
@@ -63,9 +61,15 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
     _selectionWgt3 = _buildSelectionInputItem(3);
 
     _getRepairCodeListFromServer();
+    _getDataFromServer();
   }
 
   void _getDataFromServer() {
+    if (isAvailable(this.lotNo) == false) {
+      return;
+    }
+
+    _pTextInputWgt0.setContent(this.lotNo);
     HudTool.show();
     HttpDigger().postWithUri("Repair/SGetLotInfo",
         parameters: {"lotno": this.lotNo}, shouldCache: true,
@@ -98,6 +102,18 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: hexColor("f2f2f7"),
+      appBar: AppBar(
+        title: Text("报废"),
+        centerTitle: true,
+      ),
+      body: _buildBody(),
+    );        
+  }
+
+  Widget _buildBody() {
     return Container(
       color: randomColor(),
       child: Column(
@@ -224,7 +240,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
               picker.getSelectedValues().first, index);
         });
     // picker.show(Scaffold.of(context));
-    picker.show(parentScaffoldKey.currentState);
+    picker.show(_scaffoldKey.currentState);
   }
 
   void _handlePickerConfirmation(
@@ -300,7 +316,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
     }
 
     bool isOkay = await AlertTool.showStandardAlert(
-        parentScaffoldKey.currentContext, "确认报废？");
+        _scaffoldKey.currentContext, "确认报废？");
 
     if (isOkay) {
       _realConfirmationAction();

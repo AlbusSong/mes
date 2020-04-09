@@ -10,6 +10,7 @@ import '.././Model/ProjectLotLockItemModel.dart';
 import '.././Model/ProjectLineModel.dart';
 
 import 'ProjectLotLockHandlingReturnRepairmentPage.dart';
+import 'ProjectLotLockHandlingScrapPage.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 
@@ -365,7 +366,9 @@ class _ProjectLotLockHandlingPageState
       Navigator.of(_scaffoldKey.currentContext)
           .push(MaterialPageRoute(builder: (BuildContext context) => ProjectLotLockHandlingReturnRepairmentPage(itemData.LotNo)));
     } else if (index == 2) {
-
+      ProjectLotLockItemModel itemData = this.arrOfData[this.arrOfSelectedIndex.first];
+      Navigator.of(_scaffoldKey.currentContext)
+          .push(MaterialPageRoute(builder: (BuildContext context) => ProjectLotLockHandlingScrapPage(itemData.LotNo)));
     }
   }
 
