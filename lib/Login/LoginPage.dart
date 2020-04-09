@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
     hideKeyboard(context);
 
     HudTool.show();
-    HttpDigger.login(MeInfo().username, MeInfo().password, success: (int code, String message, dynamic responseJson) {
+    HttpDigger.login(this.username, this.password, success: (int code, String message, dynamic responseJson) {
       print("Login/OutOnline: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
