@@ -4,9 +4,12 @@ import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
-import 'package:mes/Others/View/SearchBar.dart';
+import 'package:mes/Others/View/SelectionBar.dart';
 
 import './Model/ProjectLotLockItemModel.dart';
+import './Model/ProjectLineModel.dart';
+
+import 'package:flutter_picker/flutter_picker.dart';
 
 class ProjectLotLockHandlingPage extends StatefulWidget {
   @override
@@ -18,9 +21,8 @@ class ProjectLotLockHandlingPage extends StatefulWidget {
 class _ProjectLotLockHandlingPageState
     extends State<ProjectLotLockHandlingPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final SearchBar _sBar = SearchBar(
-    hintText: "产线代码",
-  );
+
+  final SelectionBar _sBar = SelectionBar(content: "选择产线");
 
   List<Widget> bottomFunctionWidgetList = List();
   final List<String> functionTitleList = [
@@ -29,7 +31,8 @@ class _ProjectLotLockHandlingPageState
     "报废",
   ];
 
-  String lotNo;
+  List arrOfLineItem;
+  ProjectLineModel selectedLineItem;
   List arrOfData;
   List arrOfSelectedIndex = List();
 
@@ -37,9 +40,19 @@ class _ProjectLotLockHandlingPageState
   void initState() {
     super.initState();
 
-    _sBar.keyboardReturnBlock = (String c) {
-      _getDataFromServer();
-    };
+    _sBar.setSelectionBlock(() {
+      print("setSelectionBlock");
+      List<String> arrOfSelectionTitle = [];
+      for (ProjectLineModel m in this.arrOfLineItem) {
+        arrOfSelectionTitle.add('${m.LineName}|${m.LineCode}');
+      }
+
+      if (arrOfSelectionTitle.length == 0) {
+        return;
+      }
+
+      _showPickerWithData(arrOfSelectionTitle, 0);
+    });
 
     for (int i = 0; i < functionTitleList.length; i++) {
       String functionTitle = functionTitleList[i];
@@ -66,13 +79,39 @@ class _ProjectLotLockHandlingPageState
       }
     }
 
+    _getProductionLineListFromServer();
     _getDataFromServer();
+  }
+
+  void _getProductionLineListFromServer() {
+    // 获取所有有效的产线
+    // LoadMaterial/AllLine
+    HudTool.show();
+    HttpDigger()
+        .postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/AllLine: $responseJson");
+      // if (code == 0) {
+      //   HudTool.showInfoWithStatus(message);
+      //   return;
+      // } 
+
+      HudTool.dismiss();
+      this.arrOfLineItem = (responseJson['Extend'] as List)
+          .map((item) => ProjectLineModel.fromJson(item))
+          .toList();           
+    });
   }
 
   void _getDataFromServer() {
     // LotSubmit/GetLotLockList
+    Map mDict = Map();
+    if (this.selectedLineItem != null) {
+      mDict["lotno"] = this.selectedLineItem.LineCode;
+    }
+
     HudTool.show();
-    HttpDigger().postWithUri("LotSubmit/GetLotLockList", parameters: {"lotno": avoidNull(this.lotNo)}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LotSubmit/GetLotLockList", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLotLockList: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -276,6 +315,30 @@ class _ProjectLotLockHandlingPageState
 
     setState(() {
     });
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    // picker.show(Scaffold.of(context));
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    _sBar.setContent(title);
+    this.selectedLineItem = this.arrOfLineItem[indexOfSelectedItem];
+
+    _getDataFromServer();
   }
 
   Future _functionItemClickedAtIndex(int index) async {

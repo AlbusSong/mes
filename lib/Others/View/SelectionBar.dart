@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import '../Tool/GlobalTool.dart';
 
 class SelectionBar extends StatefulWidget {
-  _SelectionBarState _theState = _SelectionBarState();
+  SelectionBar(
+    {this.content = "选择"}
+  );
+  
+  final String content;  
+
+  _SelectionBarState _theState = _SelectionBarState("选择产线");
 
   void setContent(String c) {
     _theState.setContent(c);
@@ -15,15 +21,18 @@ class SelectionBar extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     if (_theState == null) {
-      _theState = _SelectionBarState();
+      _theState = _SelectionBarState(this.content);
     }
     return _theState;
   }
 }
 
 class _SelectionBarState extends State<SelectionBar> {
+  _SelectionBarState(
+    this.content
+  );
 
-  String content = "选择工程";
+  String content = "";
   void Function () selectionBlock;
 
   void setContent(String c) {    
@@ -80,7 +89,7 @@ class _SelectionBarState extends State<SelectionBar> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(this.content, style: TextStyle(color: hexColor("333333"), fontSize: 15),),
+                            Text(isAvailable(this.content) ? this.content : "", style: TextStyle(color: hexColor("333333"), fontSize: 15),),
                           ],
                         ),
                       ),
