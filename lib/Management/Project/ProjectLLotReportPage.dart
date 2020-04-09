@@ -239,7 +239,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     bool enabled = true;
     String c = "-";
     if (index == 0) {
-      title = "作业中心";
+      title = "产线";
     } else if (index == 1) {
       title = "工单";
     } else if (index == 2) {
@@ -326,7 +326,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   Future _btnConfirmClicked() async {
     if (this.selectedWork == null ||
         isAvailable(this.selectedWork.LineCode) == false) {
-      HudTool.showInfoWithStatus("请选择作业中心");
+      HudTool.showInfoWithStatus("请选择产线");
       return;
     }
 
