@@ -173,6 +173,10 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       this.arrOfMaterialTag = (responseJson["Extend"] as List)
           .map((item) => ProjectTagInfoModel.fromJson(item))
           .toList();
+      if (listLength(this.arrOfMaterialTag) > 0) {
+        ProjectTagInfoModel firstItemData = this.arrOfMaterialTag.first;
+        _pInfoDisplayWgt2.setContent(firstItemData.Cost.toString());
+      }
      setState(() {});
     });
   }
@@ -354,10 +358,10 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("已上料：${itemData.Qty}",
+                        Text("已上料：${itemData.Cost}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        Text("使用量：${itemData.Cost}",
+                        Text("使用量：${itemData.Qty}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
