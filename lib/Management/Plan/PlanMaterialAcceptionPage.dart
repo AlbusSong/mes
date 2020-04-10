@@ -210,11 +210,23 @@ class _PlanMaterialAcceptionPageState extends State<PlanMaterialAcceptionPage> {
 
   Widget _buildDetailCellItem(int index) {
     bool shouldExpand = this.expansionList[index];
+    PlanMaterialItemModel itemData = this.arrOfData[index];
     if (shouldExpand) {
       return Container(
-        height: 200,
-        color: hexColor("f5f8f7"),
-      );
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("需求仓库：${itemData.DestWareHouseID}", style: TextStyle(color: hexColor("666666"), fontSize: 13),),
+            Text("需求日期：${itemData.NeedDate}", style: TextStyle(color: hexColor("666666"), fontSize: 13),),
+            Text("出库时间：${itemData.AprTime}", style: TextStyle(color: hexColor("666666"), fontSize: 13),),
+            Text("接受时间：${itemData.ReceiveTime}", style: TextStyle(color: hexColor("666666"), fontSize: 13),),
+            Text("配料员：${itemData.Approver}", style: TextStyle(color: hexColor("666666"), fontSize: 13),),
+            Text("产线：${itemData.Line}|${itemData.LineName}", style: TextStyle(color: hexColor("666666"), fontSize: 13),)
+          ],
+        ));
     } else {
       return Container(
         height: 1,
