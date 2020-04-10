@@ -48,6 +48,12 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
   void initState() {
     super.initState();
 
+    DateTime date = DateTime.now();
+    String todayDateString =
+        "${date.year.toString()}-${date.month.toString()}-${date.day.toString()}";
+    this.startDateString = todayDateString;
+    this.endDateString = todayDateString;
+
     this.selectedIndex = -1;
 
     for (int i = 0; i < functionTitleList.length; i++) {
@@ -79,7 +85,13 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     _simpleSelectionWgt1 = _buildSimpleSelectionItem(1);
     _selectionWgt0 = _buildSelectionInputItem(0);
 
+    Future.delayed(Duration(milliseconds: 300), () {
+      _simpleSelectionWgt0.setContent(this.startDateString);
+      _simpleSelectionWgt1.setContent(this.endDateString);
+    });
+
     _getLineDataFromServer();
+    _getProgressListFromServer();
   }
 
   void _getLineDataFromServer() {
@@ -105,6 +117,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     if (this.selectedLineItem != null) {
       mDict["LineCode"] = this.selectedLineItem.LineCode;
     }
+
     if (isAvailable(this.startDateString)) {
       mDict["WoStartDate"] = this.startDateString;
     }
@@ -171,7 +184,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     PlanProcessItemModel selectedItem = this.arrOfData[index];
     Map mDict = {"Wono": selectedItem.Wono};
     print("$uri mDict: $mDict");
-    HudTool.show();    
+    HudTool.show();
     HttpDigger().postWithUri(uri, parameters: mDict,
         success: (int code, String message, dynamic responseJson) {
       print("$uri: $responseJson");
