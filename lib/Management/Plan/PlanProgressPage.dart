@@ -169,8 +169,10 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     }
 
     PlanProcessItemModel selectedItem = this.arrOfData[index];
-    HudTool.show();
-    HttpDigger().postWithUri(uri, parameters: {"Wono": selectedItem.Wono},
+    Map mDict = {"Wono": selectedItem.Wono};
+    print("$uri mDict: $mDict");
+    HudTool.show();    
+    HttpDigger().postWithUri(uri, parameters: mDict,
         success: (int code, String message, dynamic responseJson) {
       print("$uri: $responseJson");
       if (code == 0) {

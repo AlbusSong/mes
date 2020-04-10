@@ -35,15 +35,17 @@ class _ProjectRepairmentDetailPageState
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   ProjectTextInputWidget _pTextInputWgt0;
-  MESSelectionItemWidget _selectionWgt0;
-  MESSelectionItemWidget _selectionWgt1;
-  MESSelectionItemWidget _selectionWgt2;
+  List<MESSelectionItemWidget> _selectionWgtList = [];
 
+  final List<String> functionTitleList = [
+    "添加",
+    "确定",
+  ];
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+
+  List<Widget> bottomFunctionWidgetList = List();
   List arrOfData;
-  ProjectRepairMaterialItemModel selectedMaterialItem0;
-  ProjectRepairMaterialItemModel selectedMaterialItem1;
-  ProjectRepairMaterialItemModel selectedMaterialItem2;
+  List<ProjectRepairMaterialItemModel> _selectedMaterialItemList = [];
   String remarkContent;
   String lotNo;
 
@@ -52,9 +54,37 @@ class _ProjectRepairmentDetailPageState
     super.initState();
 
     _pTextInputWgt0 = _buildTextInputWidgetItem(0);
-    _selectionWgt0 = _buildSelectionInputItem(0);
-    _selectionWgt1 = _buildSelectionInputItem(1);
-    _selectionWgt2 = _buildSelectionInputItem(2);
+    _selectionWgtList.add(_buildSelectionInputItem(0));
+    _selectionWgtList.add(_buildSelectionInputItem(1));
+    _selectionWgtList.add(_buildSelectionInputItem(2));
+    _selectedMaterialItemList.add(null);
+    _selectedMaterialItemList.add(null);
+    _selectedMaterialItemList.add(null);
+
+    for (int i = 0; i < functionTitleList.length; i++) {
+      String functionTitle = functionTitleList[i];
+      Widget btn = Expanded(
+        child: Container(
+          height: 50,
+          color: hexColor(MAIN_COLOR),
+          child: FlatButton(
+            padding: EdgeInsets.all(0),
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text(functionTitle),
+            onPressed: () {
+              print(functionTitle);
+              _functionItemClickedAtIndex(i);
+            },
+          ),
+        ),
+      );
+      bottomFunctionWidgetList.add(btn);
+
+      if (i != (functionTitleList.length - 1)) {
+        bottomFunctionWidgetList.add(SizedBox(width: 1));
+      }
+    }
 
     _getDataFromServer();
   }
@@ -104,13 +134,9 @@ class _ProjectRepairmentDetailPageState
           height: 50,
           width: double.infinity,
           // color: randomColor(),
-          child: FlatButton(
-            textColor: Colors.white,
-            color: hexColor(MAIN_COLOR),
-            child: Text("确认"),
-            onPressed: () {
-              _btnConfirmClicked();
-            },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: this.bottomFunctionWidgetList,
           ),
         ),
       ],
@@ -118,17 +144,18 @@ class _ProjectRepairmentDetailPageState
   }
 
   Widget _buildListView() {
+    List<Widget> children = [
+      WidgetTool.createListViewLine(10, hexColor("f2f2f7")),
+      _buildInfoCell(),
+      WidgetTool.createListViewLine(10, hexColor("f2f2f7")),
+      _pTextInputWgt0,
+    ];
+    for (int i = 0; i < _selectionWgtList.length; i++) {
+      children.add(_selectionWgtList[i]);
+    }
+    children.add(_buildContentInputItem());
     return ListView(
-      children: <Widget>[
-        WidgetTool.createListViewLine(10, hexColor("f2f2f7")),
-        _buildInfoCell(),
-        WidgetTool.createListViewLine(10, hexColor("f2f2f7")),
-        _pTextInputWgt0,
-        _selectionWgt0,
-        _selectionWgt1,
-        _selectionWgt2,
-        _buildContentInputItem(),
-      ],
+      children: children,
     );
   }
 
@@ -159,14 +186,7 @@ class _ProjectRepairmentDetailPageState
   }
 
   Widget _buildSelectionInputItem(int index) {
-    String title = "";
-    if (index == 0) {
-      title = "耗用辅料1";
-    } else if (index == 1) {
-      title = "耗用辅料2";
-    } else if (index == 2) {
-      title = "耗用辅料3";
-    }
+    String title = "耗用辅料${index + 1}";
     void Function() selectionBlock = () {
       _hasSelectedItem(index);
     };
@@ -290,24 +310,32 @@ class _ProjectRepairmentDetailPageState
     );
   }
 
+  void _functionItemClickedAtIndex(int index) {
+    if (index == 0) {
+      this
+          ._selectionWgtList
+          .add(_buildSelectionInputItem(listLength(this._selectionWgtList)));
+      this._selectedMaterialItemList.add(null);
+      setState(() {});
+    } else if (index == 1) {
+      _btnConfirmClicked();
+    }
+  }
+
   Future _btnConfirmClicked() async {
     if (isAvailable(this.lotNo) == false) {
       HudTool.showInfoWithStatus("请输入/扫码获取Lot NO");
       return;
     }
 
-    if (this.selectedMaterialItem0 == null) {
-      HudTool.showInfoWithStatus("请选择耗用辅料1");
-      return;
+    int availableCount = 0;
+    for (int i = 0; i < listLength(_selectedMaterialItemList); i++) {
+      if (_selectedMaterialItemList[i] != null) {
+        availableCount++;
+      }
     }
-
-    if (this.selectedMaterialItem1 == null) {
-      HudTool.showInfoWithStatus("请选择耗用辅料2");
-      return;
-    }
-
-    if (this.selectedMaterialItem2 == null) {
-      HudTool.showInfoWithStatus("请选择耗用辅料3");
+    if (availableCount < 3) {
+      HudTool.showInfoWithStatus("请选择至少3个耗用辅料");
       return;
     }
 
@@ -330,9 +358,14 @@ class _ProjectRepairmentDetailPageState
     mDict["ctool"] = this.lotNo;
     mDict["rpwo"] = this.data.RPWO;
     mDict["comment"] = this.remarkContent;
-    mDict["item1"] = this.selectedMaterialItem0.BomID;
-    mDict["item2"] = this.selectedMaterialItem1.BomID;
-    mDict["item3"] = this.selectedMaterialItem2.BomID;
+    // mDict["item1"] = this.selectedMaterialItem0.BomID;
+    // mDict["item2"] = this.selectedMaterialItem1.BomID;
+    // mDict["item3"] = this.selectedMaterialItem2.BomID;
+    for (int i = 0; i < listLength(this._selectedMaterialItemList); i++) {
+      ProjectRepairMaterialItemModel selectedMaterialItem =
+          this._selectedMaterialItemList[i];
+      mDict["item${i + 1}"] = selectedMaterialItem.BomID;
+    }
     print("Repair/RepairOK mDict: $mDict");
 
     HudTool.show();
@@ -390,16 +423,9 @@ class _ProjectRepairmentDetailPageState
 
   void _handlePickerConfirmation(
       int indexOfSelectedItem, String title, int index) {
-    if (index == 0) {
-      _selectionWgt0.setContent(title);
-      this.selectedMaterialItem0 = this.arrOfData[indexOfSelectedItem];
-    } else if (index == 1) {
-      _selectionWgt1.setContent(title);
-      this.selectedMaterialItem1 = this.arrOfData[indexOfSelectedItem];
-    } else if (index == 2) {
-      _selectionWgt2.setContent(title);
-      this.selectedMaterialItem2 = this.arrOfData[indexOfSelectedItem];
-    }
+    MESSelectionItemWidget _selectionWgt = this._selectionWgtList[index];
+    _selectionWgt.setContent(title);
+    this._selectedMaterialItemList[index] = this.arrOfData[indexOfSelectedItem];
   }
 
   Future _tryToscan() async {
