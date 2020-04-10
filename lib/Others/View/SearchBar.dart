@@ -54,6 +54,7 @@ class SearchBar extends StatelessWidget {
                         // color: hexColor("ffff00"),
                         height: 45,
                         child: TextField(
+                          textInputAction: TextInputAction.search,
                           controller: _txtController,
                           style: TextStyle(
                               fontSize: 15, color: hexColor("333333")),

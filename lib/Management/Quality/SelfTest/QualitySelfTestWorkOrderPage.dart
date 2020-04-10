@@ -22,19 +22,29 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
     hintText: "产线代码",
   );
 
+  String lineCode;
   List arrOfData;
 
   @override
   void initState() {
     super.initState();
 
+    _sBar.keyboardReturnBlock = (String c) {
+      this.lineCode = c;
+      _getDataFromServer();
+    };
+
     _getDataFromServer();
   }
 
   void _getDataFromServer() {
     // MEC/LoadWorkOrder
+    Map mDict = Map();
+    if (isAvailable(this.lineCode) == true) {
+      mDict["lineCode"] = this.lineCode;
+    }
     HudTool.show();
-    HttpDigger().postWithUri("MEC/LoadWorkOrder", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("MEC/LoadWorkOrder", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
       print("MEC/LoadWorkOrder: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
