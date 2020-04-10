@@ -32,7 +32,7 @@ class MoldPage extends StatelessWidget {
       key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("设备管理(EES)"),
+        title: Text("模具管理(EES)"),
         centerTitle: true,
       ),
       body: _buildGridView(),
