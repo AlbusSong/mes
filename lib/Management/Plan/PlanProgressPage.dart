@@ -88,10 +88,10 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
         .postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true,
             success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/AllLine: $responseJson");
-      if (code == 0) {
-        HudTool.showInfoWithStatus(message);
-        return;
-      }
+      // if (code == 0) {
+      //   HudTool.showInfoWithStatus(message);
+      //   return;
+      // }
 
       this.arrOfLineItem = (responseJson['Extend'] as List)
           .map((item) => ProjectLineModel.fromJson(item))
