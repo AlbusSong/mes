@@ -71,7 +71,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       }
       this.detailData = ProjectItemModel.fromJson(extend[0]);
       _selectionWgt0.setContent(this.detailData.LotNo);
-      _selectionWgt1.setContent(this.detailData.LOTSize.toString());
+      _selectionWgt1.setContent(this.detailData.Qty.toString());
     });
   }
 
