@@ -5,6 +5,7 @@ import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
+import '../../Others/View/MESContentInputWidget.dart';
 
 class ProjectLotUnlockPage extends StatefulWidget {
   @override
@@ -18,7 +19,12 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
   final SearchBarWithFunction _sBar = SearchBarWithFunction(
     hintText: "LOT NO或载具ID",
   );
+
   String lotNo;
+  List arrOfData;
+  List arrOfSelectedIndex;
+  bool isSelected = false;
+  String remarkContent;
 
   @override
   void initState() {
@@ -35,7 +41,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
   }
 
   void _getDataFromServer() {
-
+    //
   }
 
   @override
@@ -61,28 +67,170 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
           ),
         ),
         Container(
-            height: 50,
-            width: double.infinity,
-            // color: randomColor(),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: hexColor(MAIN_COLOR),
-              child: Text("解锁"),
-              onPressed: () {
-                // _btnConfirmClicked();
-              },
-            ),
+          height: 50,
+          width: double.infinity,
+          // color: randomColor(),
+          child: FlatButton(
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text("解锁"),
+            onPressed: () {
+              // _btnConfirmClicked();
+            },
           ),
+        ),
       ],
     );
   }
 
   Widget _buildListView() {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: <Widget>[
-      ],
+    return ListView.builder(
+        // itemCount: listLength(this.arrOfData),
+        itemCount: 2,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return GestureDetector(
+              onTap: () => _hasSelectedIndex(index),
+              child: _buildListItem(index),
+            );
+          } else {
+            return _buildContentInputItem();
+          }
+        });
+  }
+
+  Widget _buildContentInputItem() {
+    void Function(String) contentChangedBlock = (String newContent) {
+      // print("contentChangedBlock: $newContent");
+      this.remarkContent = newContent;
+    };
+    return MESContentInputWidget(
+      placeholder: "备注",
+      contentChangedBlock: contentChangedBlock,
     );
+  }
+
+  Widget _buildListItem(int index) {
+    // ProjectLotLockItemModel itemData = this.arrOfData[index];
+    return Container(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                    height: 25,
+                    color: Colors.white,
+                    child: Text(
+                      "LotNo：{itemData.LotNo}",
+                      maxLines: 2,
+                      style: TextStyle(
+                          color: hexColor(MAIN_COLOR_BLACK),
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("物料ID：{itemData.ItemCode}",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("物料名称：{itemData.ItemName}",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.only(left: 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text("数量：15",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                        Text("代码：LOTLock",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15)),
+                        SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
+                    height: 21,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text("备注：{itemData.Comment}",
+                            style: TextStyle(
+                                color: hexColor("999999"), fontSize: 15))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: hexColor("dddddd"),
+                    height: 1,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 5),
+          Container(
+            margin: EdgeInsets.only(right: 8),
+            color: Colors.white,
+            child: Icon(
+              _checkIfSelected(index) == true
+                  ? Icons.check_box
+                  : Icons.check_box_outline_blank,
+              color: _checkIfSelected(index) == true
+                  ? hexColor(MAIN_COLOR)
+                  : hexColor("dddddd"),
+              size: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _checkIfSelected(int index) {
+    // return this.arrOfSelectedIndex.contains(index);
+    return this.isSelected;
+  }
+
+  void _hasSelectedIndex(int index) {
+    this.isSelected = !this.isSelected;
+    setState(() {      
+    });
   }
 
   void _popSheetAlert() {

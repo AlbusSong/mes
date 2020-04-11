@@ -136,7 +136,7 @@ class _ProjectLotLockHandlingPageState
       key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("Lot锁定"),
+        title: Text("Lot锁定处理"),
         centerTitle: true,
       ),
       body: _buildBody(),
