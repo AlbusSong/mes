@@ -16,7 +16,8 @@ class QualitySelfTestWorkOrderPage extends StatefulWidget {
   }
 }
 
-class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderPage> {
+class _QualitySelfTestWorkOrderPageState
+    extends State<QualitySelfTestWorkOrderPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final SearchBar _sBar = SearchBar(
     hintText: "产线代码",
@@ -44,7 +45,9 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
       mDict["lineCode"] = this.lineCode;
     }
     HudTool.show();
-    HttpDigger().postWithUri("MEC/LoadWorkOrder", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger()
+        .postWithUri("MEC/LoadWorkOrder", parameters: mDict, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
       print("MEC/LoadWorkOrder: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -55,9 +58,8 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
       this.arrOfData = (responseJson['Extend'] as List)
           .map((item) => QualitySelfTestWorkOrderItemModel.fromJson(item))
           .toList();
-      
-      setState(() {        
-      });
+
+      setState(() {});
     });
   }
 
@@ -97,7 +99,7 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
             child: _buildListItem(index),
           );
         });
-  }  
+  }
 
   Widget _buildListItem(int index) {
     QualitySelfTestWorkOrderItemModel itemData = this.arrOfData[index];
@@ -203,6 +205,8 @@ class _QualitySelfTestWorkOrderPageState extends State<QualitySelfTestWorkOrderP
   void _hasSelectedIndex(int index) {
     print("_hasSelectedIndex: $index");
 
-    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => QualitySelfTestWorkOrderReportPage(this.arrOfData[index])));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) =>
+            QualitySelfTestWorkOrderReportPage(this.arrOfData[index])));
   }
 }
