@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/View/SelectionBar.dart';
+
+import '../../Project/Model/ProjectLineModel.dart';
+import '../Model/QualitySelfTestItemModel.dart';
+
+import 'package:flutter_picker/flutter_picker.dart';
 
 class QualitySelfTestNewPage extends StatefulWidget {
   @override
@@ -17,6 +24,69 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
 
 
   List arrOfData;
+  ProjectLineModel selectedLineItem;
+  List arrOfLineItem;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _sBar.setSelectionBlock(() {
+      List<String> arrOfSelectionTitle = [];
+      for (ProjectLineModel m in this.arrOfLineItem) {
+        arrOfSelectionTitle.add('${m.LineName}|${m.LineCode}');
+      }
+
+      if (arrOfSelectionTitle.length == 0) {
+        return;
+      }
+
+      _showPickerWithData(arrOfSelectionTitle, 0);
+    });
+
+    _getProductionLineListFromServer();
+  }
+
+  void _getDataFromServer() {
+    // MEC/GetWorkOrderAndProduct
+    Map mDict = Map();
+    if (this.selectedLineItem != null) {
+      mDict["lineCode"] = this.selectedLineItem.LineCode;
+    }
+
+    HudTool.show();
+    HttpDigger().postWithUri("MEC/GetWorkOrderAndProduct", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("MEC/GetWorkOrderAndProduct: $responseJson");
+      // if (code == 0) {
+      //   HudTool.showInfoWithStatus(message);
+      //   return;
+      // } 
+
+      HudTool.dismiss();
+      this.arrOfData = (responseJson['Extend'] as List)
+          .map((item) => QualitySelfTestItemModel.fromJson(item))
+          .toList();     
+      setState(() {        
+      });      
+    });
+  }
+
+  void _getProductionLineListFromServer() {
+    // LoadMaterial/AllLine
+    HudTool.show();
+    HttpDigger().postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/AllLine: $responseJson");
+      // if (code == 0) {
+      //   HudTool.showInfoWithStatus(message);
+      //   return;
+      // } 
+
+      HudTool.dismiss();
+      this.arrOfLineItem = (responseJson['Extend'] as List)
+          .map((item) => ProjectLineModel.fromJson(item))
+          .toList();           
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +130,8 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
 
   Widget _buildListView() {
     return ListView.builder(
-        // itemCount: listLength(this.arrOfData),
-        itemCount: 10,
+        itemCount: listLength(this.arrOfData),
+        // itemCount: 10,
         itemBuilder: (context, index) {
           return _buildListItem(index);
         });
@@ -73,18 +143,19 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
   }
 
   Widget _buildUncheckedListItem(int index) {
+    QualitySelfTestItemModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       // height: 250,
       child: Column(
-        // mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
             margin: EdgeInsets.fromLTRB(10, 15 + 3.0, 10, 3),
             // color: randomColor(),
             child: Text(
-              "活塞线：MECWC201923232",
+              "${itemData.LineName}：${itemData.MECWorkOrderNo}",
               style: TextStyle(color: hexColor("333333"), fontSize: 17),
             ),
           ),
@@ -97,7 +168,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
             margin: EdgeInsets.fromLTRB(10, 10 + 3.0, 10, 3),
             // color: randomColor(),
             child: Text(
-              "工序：精磨外圆",
+              "工序：${itemData.Step}",
               style: TextStyle(color: hexColor("999999"), fontSize: 15),
             ),
           ),
@@ -105,7 +176,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
             margin: EdgeInsets.fromLTRB(10, 3.0, 10, 3),
             // color: randomColor(),
             child: Text(
-              "项目：1",
+              "项目：${itemData.Item}",
               style: TextStyle(color: hexColor("999999"), fontSize: 15),
             ),
           ),
@@ -113,7 +184,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             // color: randomColor(),
             child: Text(
-              "工具：1",
+              "工具：${itemData.MethodTool}",
               style: TextStyle(color: hexColor("999999"), fontSize: 15),
             ),
           ),
@@ -121,7 +192,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             // color: randomColor(),
             child: Text(
-              "工单类型：定期自检",
+              "工单类型：${itemData.AppWoType}",
               style: TextStyle(color: hexColor("999999"), fontSize: 15),
             ),
           ),
@@ -129,7 +200,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             // color: randomColor(),
             child: Text(
-              "机型：12230292",
+              "机型：${itemData.Product}",
               style: TextStyle(color: hexColor("999999"), fontSize: 15),
             ),
           ),
@@ -137,7 +208,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             // color: randomColor(),
             child: Text(
-              "基准：1",
+              "基准：${itemData.AppStandard}",
               style: TextStyle(color: hexColor("999999"), fontSize: 15),
             ),
           ),
@@ -156,90 +227,10 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
       ),
     );
   }
-  
-  // Widget _buildCheckedOrAbnormalListItem(dynamic itemData) {
-  //   return Container(
-  //     color: Colors.white,
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: <Widget>[
-  //         Expanded(
-  //           child: Container(
-  //             color: Colors.white,
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: <Widget>[
-  //                 Container(
-  //                   margin: EdgeInsets.fromLTRB(10, 10, 0, 5),
-  //                   color: Colors.white,
-  //                   child: Text(
-  //                     "点检项目：{itemData.Project}",
-  //                     style: TextStyle(
-  //                         color: hexColor("999999"),
-  //                         fontSize: 15,
-  //                         fontWeight: FontWeight.normal),
-  //                   ),
-  //                 ),
-  //                 Container(
-  //                   color: Colors.white,
-  //                   margin: EdgeInsets.fromLTRB(10, 5, 0, 5),
-  //                   child: Text("判断类型：：{itemData.JudgeType}",
-  //                       style:
-  //                       TextStyle(color: hexColor("999999"), fontSize: 15)),
-  //                 ),
-
-  //                 Container(
-  //                   color: Colors.white,
-  //                   margin: EdgeInsets.fromLTRB(10, 5, 0, 5),
-  //                   child: Text("方法工具：{itemData.MethodTool}",
-  //                       style:
-  //                       TextStyle(color: hexColor("999999"), fontSize: 15)),
-  //                 ),
-  //                 Container(
-  //                   color: Colors.white,
-  //                   margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-  //                   child: Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: <Widget>[
-  //                       Text("结果：s",
-  //                           style: TextStyle(
-  //                               color: hexColor("999999"), fontSize: 15)),
-  //                       Offstage(
-  //                         // offstage: (this.groupCheckType == GroupCheckType.Checked),
-  //                         offstage: false,
-  //                         child: Text("处理进度：d",
-  //                             style: TextStyle(
-  //                                 color: hexColor("999999"), fontSize: 15)),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //                 Container(
-  //                   color: hexColor("dddddd"),
-  //                   height: 1,
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //         SizedBox(width: 5),
-  //         Container(
-  //           margin: EdgeInsets.only(right: 8),
-  //           color: Colors.white,
-  //           child: Icon(
-  //             Icons.arrow_forward_ios,
-  //             color: hexColor("dddddd"),
-  //             size: 20,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildCorrespondingWidget(int index) {
-    // bool isTextFeild = (isAvailable(itemData.JudgeType) && (itemData.JudgeType == "数值判断"));
-    bool isTextFeild = (index % 3 > 0);
+    QualitySelfTestItemModel itemData = this.arrOfData[index];
+    bool isTextFeild = (isAvailable(itemData.Judge) && (itemData.Judge != "人为判断"));
     if (isTextFeild) {
       return Container(
         margin: EdgeInsets.fromLTRB(10, 5, 10, 3),
@@ -247,9 +238,10 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
         width: 100,
         height: 30,
         child: TextField(
+          keyboardType: TextInputType.numberWithOptions(decimal: true, signed: false),
           style: TextStyle(fontSize: 18, color: hexColor(MAIN_COLOR_BLACK)),
           textAlignVertical: TextAlignVertical.center,
-          controller: TextEditingController(text: "实际值"),
+          controller: TextEditingController(text: itemData.Actual),
           decoration: InputDecoration(
               hintText: "请输入数值",
               border: InputBorder.none,
@@ -257,7 +249,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
           ),
           onChanged: (text) {
             print("text: $text");
-            // itemData.Actual = text;
+            itemData.Actual = text;
           },
         ),
       );
@@ -275,12 +267,11 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
                   0: Text("OK"),
                   1: Text("NG"),
                 },
-                // groupValue: (isAvailable(itemData.Actual) ? (int.parse(itemData.Actual) == 1 ? 0 : 1) : 0),
-                groupValue: 0,
+                groupValue: (isAvailable(itemData.Actual) ? (int.parse(itemData.Actual) == 1 ? 0 : 1) : 0),
                 onValueChanged: (value) {
                   print("onValueChanged: $value");
                   setState(() {
-                    // itemData.Actual = (value == 0 ? "1" : "0");
+                    itemData.Actual = (value == 0 ? "1" : "0");
                   });
                 },
               ),
@@ -289,5 +280,29 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
         ),
       );
     }
+  }
+
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    // picker.show(Scaffold.of(context));
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    _sBar.setContent(title);
+    this.selectedLineItem = this.arrOfLineItem[indexOfSelectedItem];
+
+    _getDataFromServer();
   }
 }
