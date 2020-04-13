@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/View/SelectionBar.dart';
 
@@ -57,10 +58,10 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
     HudTool.show();
     HttpDigger().postWithUri("MEC/GetWorkOrderAndProduct", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
       print("MEC/GetWorkOrderAndProduct: $responseJson");
-      // if (code == 0) {
-      //   HudTool.showInfoWithStatus(message);
-      //   return;
-      // } 
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      } 
 
       HudTool.dismiss();
       this.arrOfData = (responseJson['Extend'] as List)
@@ -118,9 +119,9 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
           child: FlatButton(
             textColor: Colors.white,
             color: hexColor(MAIN_COLOR),
-            child: Text("解锁"),
+            child: Text("确认"),
             onPressed: () {
-              // _btnConfirmClicked();
+              _btnConfirmClicked();
             },
           ),
         ),
@@ -304,5 +305,51 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
     this.selectedLineItem = this.arrOfLineItem[indexOfSelectedItem];
 
     _getDataFromServer();
+  }
+
+  Future _btnConfirmClicked() async {
+    List arrayResult = List();
+    for (QualitySelfTestItemModel model in this.arrOfData) {
+      if (isAvailable(model.Actual) == false) {
+        continue;
+      }
+
+      Map<String, dynamic> obj = Map();
+      obj["MECWorkOrderNo"] = model.MECWorkOrderNo;
+      obj["Actual"] = model.Actual;
+      obj["Judge"] = model.Judge;
+      obj["ManualJudge"] = model.AppStandard;
+      obj["Product"] = model.Product;
+      arrayResult.add(obj);
+    }
+
+    if (listLength(arrayResult) == 0) {
+      HudTool.showInfoWithStatus("请至少修改一项数据");
+      return;
+    }
+
+    bool isOkay = await AlertTool.showStandardAlert(context, "确定提交更改项?");
+
+    if (isOkay) {
+      _realConfirmationAction(arrayResult);
+    }
+  }
+
+  void _realConfirmationAction(List arrayResult) {
+    Map mDict = Map();
+    mDict["arrayResult"] = arrayResult;
+    print("MEC/Commit mDict: $mDict");
+
+    HudTool.show();
+    HttpDigger().postWithUri("MEC/Commit", parameters: mDict, success: (int code, String message, dynamic responseJson) {
+      print("MEC/Commit: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.pop(context);
+    });
   }
 }
