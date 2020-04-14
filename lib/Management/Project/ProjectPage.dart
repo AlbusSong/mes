@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
-import 'ProjectLLotReportPage.dart';
+import 'ProjectLotReportPage.dart';
 import 'OrderMaterial/ProjectOrderMaterialPage.dart';
 import 'ProjectLotSearchPage.dart';
 import 'ProjectLotLockPage.dart';
@@ -69,7 +69,7 @@ class ProjectPage extends StatelessWidget {
     if (index == 0) {
       w = ProjectOrderMaterialPage();
     } else if (index == 1) {
-      w = ProjectLLotReportPage();
+      w = ProjectLotReportPage();
     } else if (index == 2) {
       w = ProjectLotSearchPage();
     } else if (index == 3) {

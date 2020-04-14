@@ -15,14 +15,14 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'Model/ProjectLineModel.dart';
 import 'Model/ProjectWorkOrderModel.dart';
 
-class ProjectLLotReportPage extends StatefulWidget {
+class ProjectLotReportPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _ProjectLLotReportPageState();
+    return _ProjectLotReportPageState();
   }
 }
 
-class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
+class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   MESSelectionItemWidget _selectionWgt0;
