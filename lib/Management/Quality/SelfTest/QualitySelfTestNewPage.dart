@@ -271,6 +271,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
                 groupValue: (isAvailable(itemData.Actual) ? (int.parse(itemData.Actual) == 1 ? 0 : 1) : 0),
                 onValueChanged: (value) {
                   print("onValueChanged: $value");
+                  hideKeyboard(context);
                   setState(() {
                     itemData.Actual = (value == 0 ? "1" : "0");
                   });
@@ -308,6 +309,8 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
   }
 
   Future _btnConfirmClicked() async {
+    hideKeyboard(context);
+    
     List arrayResult = List();
     for (QualitySelfTestItemModel model in this.arrOfData) {
       if (isAvailable(model.Actual) == false) {
