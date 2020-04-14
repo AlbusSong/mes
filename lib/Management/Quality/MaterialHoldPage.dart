@@ -6,9 +6,9 @@ import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 
-import '../../Project/Widget/ProjectTextInputWidget.dart';
+import '../Project/Widget/ProjectTextInputWidget.dart';
 
-import '../Model/QualityMaterialHoldItemModel.dart';
+import 'Model/QualityMaterialHoldItemModel.dart';
 
 class MaterialHoldPage extends StatefulWidget {
   @override
@@ -48,17 +48,17 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
   }
 
   void _getDataFromServer() {
-    // LoadPlanProcess/SearchHoldTagInfo
+    // LoadPlanProcess/SearchTagInfo
     Map mDict = Map();
     mDict["ItemCode"] = this.itemCode;
     mDict["TagID"] = this.tagNo;
     mDict["Batch"] = this.batchNo;
 
     HudTool.show();
-    HttpDigger().postWithUri("LoadPlanProcess/SearchHoldTagInfo",
+    HttpDigger().postWithUri("LoadPlanProcess/SearchTagInfo",
         parameters: mDict, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
-      print("LoadPlanProcess/SearchHoldTagInfo: $responseJson");
+      print("LoadPlanProcess/SearchTagInfo: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
         return;
@@ -85,7 +85,7 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
       key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
-        title: Text("自检工单"),
+        title: Text("原材料Hold"),
         centerTitle: true,
       ),
       body: _buildBody(),

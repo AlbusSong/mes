@@ -5,7 +5,8 @@ import '../../Others/View/MESSquareItemWidget.dart';
 // import 'SelfTest/QualitySelfTestWorkOrderPage.dart';
 import 'SelfTest/QualitySelfTestNewPage.dart';
 import 'PatrolTest/QualityPatrolTestWorkOrderPage.dart';
-import 'MaterialHold/MaterialHoldPage.dart';
+import 'MaterialHoldPage.dart';
+import 'MaterialUnholdPage.dart';
 
 class QualityPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -14,6 +15,7 @@ class QualityPage extends StatelessWidget {
     {"title": "自检工单", "icon": "", "badgeValue": 0},
     {"title": "巡检工单", "icon": "", "badgeValue": 0},
     {"title": "原材料Hold", "icon": "", "badgeValue": 0},
+    {"title": "解Hold", "icon": "", "badgeValue": 0},
   ];
 
   final List<MESSquareItemWidget> functionItemArray = [];
@@ -58,6 +60,8 @@ class QualityPage extends StatelessWidget {
       w = QualityPatrolTestWorkOrderPage();
     } else if (index == 2) {
       w = MaterialHoldPage();
+    } else if (index == 3) {
+      w = MaterialUnholdPage();
     }
     if (w != null) {
       Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
