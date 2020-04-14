@@ -263,7 +263,7 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
                         height: 20,
                         // color: randomColor(),
                         child: Text(
-                          "${itemData.TagID}|${itemData.ItemCode}|${itemData.State}",
+                          "${itemData.TagID} | ${itemData.ItemCode} | ${itemData.State}",
                           style: TextStyle(
                               color: hexColor("666666"),
                               fontSize: 12,
@@ -377,7 +377,54 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
     _getDataFromServer();
   }
 
-  void _btnConfirmClicked() {
+  Future _btnConfirmClicked() async {
+    List selectedItems = List();
+    for (int i = 0; i < listLength(this.selectionList); i++) {
+      bool selectionStatus = this.selectionList[i];
+      if (selectionStatus == false) {
+        continue;
+      }
+      QualityMaterialHoldItemModel item = this.arrOfData[i];
+      selectedItems.add(item);
+    }
 
+    if (listLength(selectedItems) == 0) {
+      HudTool.showInfoWithStatus("请至少选择一项");
+      return;
+    }
+
+    bool isOkay = await AlertTool.showStandardAlert(context, "确定锁定?");    
+    if (isOkay) {
+      _realConfirmationAction(selectedItems);
+    }
+  }
+
+  void _realConfirmationAction(List selectedItems) {
+    // LoadPlanProcess/UnLockTag
+    String tagIDString = "";
+    for (int i = 0; i < listLength(selectedItems); i++) {
+      QualityMaterialHoldItemModel item = selectedItems[i];
+      if (i == listLength(selectedItems) - 1) {
+        // 如果是最好一个元素
+        tagIDString += item.TagID;
+      } else {
+        tagIDString += "${item.TagID},";
+      }
+      print("tagIDString: $tagIDString");
+    }
+
+    Map mDict = Map();
+    mDict["TagID"] = tagIDString;
+
+    HudTool.show();
+    HttpDigger().postWithUri("LoadPlanProcess/UnLockTag", parameters: mDict, success: (int code, String message, dynamic responseJson) {
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("操作成功");
+      Navigator.of(context).pop();
+    });
   }
 }

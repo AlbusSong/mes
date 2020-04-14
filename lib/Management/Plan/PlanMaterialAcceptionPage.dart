@@ -171,6 +171,8 @@ class _PlanMaterialAcceptionPageState extends State<PlanMaterialAcceptionPage> {
   void _tryToSearch() {
     print("_tryToSearch");
 
+    hideKeyboard(context);
+
     _getDataFromServer();
   }
 
