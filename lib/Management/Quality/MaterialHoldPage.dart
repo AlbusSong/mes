@@ -400,7 +400,7 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
   }
 
   void _realConfirmationAction(List selectedItems) {
-    // LoadPlanProcess/UnLockTag
+    // LoadPlanProcess/LockTag
     String tagIDString = "";
     for (int i = 0; i < listLength(selectedItems); i++) {
       QualityMaterialHoldItemModel item = selectedItems[i];
@@ -417,7 +417,8 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
     mDict["TagID"] = tagIDString;
 
     HudTool.show();
-    HttpDigger().postWithUri("LoadPlanProcess/UnLockTag", parameters: mDict, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LoadPlanProcess/LockTag", parameters: mDict, success: (int code, String message, dynamic responseJson) {
+      print("LoadPlanProcess/LockTag: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
         return;

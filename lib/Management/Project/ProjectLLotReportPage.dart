@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import 'package:mes/Others/Tool/WidgetTool.dart';
@@ -14,7 +12,7 @@ import 'Widget/ProjectInfoDisplayWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 
-import 'Model/ProjectWorkItemDataModel.dart';
+import 'Model/ProjectLineModel.dart';
 import 'Model/ProjectWorkOrderModel.dart';
 
 class ProjectLLotReportPage extends StatefulWidget {
@@ -45,7 +43,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   String lotNo;
   String lotAmount;
   List arrOfWork;
-  ProjectWorkItemDataModel selectedWork = ProjectWorkItemDataModel.fromJson({});
+  ProjectLineModel selectedWork = ProjectLineModel.fromJson({});
   List arrOfPlanInfo;
   ProjectWorkOrderModel selectedPlanInfo = ProjectWorkOrderModel.fromJson({});
   Map selectedGradeInfo;
@@ -78,18 +76,18 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
   }
 
   void _getDataFromServer() {
-    // 获取所有的作业中心
-    HttpDigger().postWithUri("LoadMaterial/GetAllWorkCenter",
+    // LoadMaterial/AllLine 获取所有的产线
+    HttpDigger().postWithUri("LoadMaterial/AllLine",
         parameters: {}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
-      print("LoadMaterial/GetAllWorkCenter: $responseJson");
+      print("LoadMaterial/AllLine: $responseJson");
       ;
       this.arrOfWork = (responseJson["Extend"] as List)
-          .map((item) => ProjectWorkItemDataModel.fromJson(item))
+          .map((item) => ProjectLineModel.fromJson(item))
           .toList();
       if (listLength(this.arrOfWork) > 0) {
-        ProjectWorkItemDataModel firstWorkData = this.arrOfWork.first;
-        _getPlanListFromServer(firstWorkData.WorkCenterCode);
+        ProjectLineModel firstWorkData = this.arrOfWork.first;
+        _getPlanListFromServer(firstWorkData.LineCode);
       }
     });
   }
@@ -120,7 +118,11 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetGrade: $responseJson");
       _selectionWgt2.setContent("BBB");
-      this.selectedGradeInfo = jsonDecode(responseJson['Extend']);
+      List gradeInfoList = responseJson['Extend'] as List;
+      if (listLength(gradeInfoList) == 0) {
+        return;
+      }
+      this.selectedGradeInfo = gradeInfoList.first;
       print("selectedGradeInfo: $selectedGradeInfo");
     });
   }
@@ -263,8 +265,8 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     print("_hasSelectedItem: $index");
     List<String> arrOfSelectionTitle = [];
     if (index == 0) {
-      for (ProjectWorkItemDataModel m in this.arrOfWork) {
-        arrOfSelectionTitle.add('${m.WorkCenterCode}|${m.WorkCenterName}');
+      for (ProjectLineModel m in this.arrOfWork) {
+        arrOfSelectionTitle.add('${m.LineCode}|${m.LineName}');
       }
     } else if (index == 1) {
       for (ProjectWorkOrderModel m in this.arrOfPlanInfo) {
@@ -301,7 +303,7 @@ class _ProjectLLotReportPageState extends State<ProjectLLotReportPage> {
     if (index == 0) {
       this.selectedWork = this.arrOfWork[indexOfSelectedItem];
       print("this.selectedWork.LineCode: ${this.selectedWork.LineCode}");
-      _getPlanListFromServer(this.selectedWork.WorkCenterCode);
+      _getPlanListFromServer(this.selectedWork.LineCode);
       _selectionWgt0.setContent(title);
     } else if (index == 1) {
       this.selectedPlanInfo = this.arrOfPlanInfo[indexOfSelectedItem];
