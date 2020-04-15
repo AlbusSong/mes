@@ -3,9 +3,14 @@ import '../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
+import '../../Others/Tool/AlertTool.dart';
 import '../../Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESContentInputWidget.dart';
+
+import 'Model/ProjectLotUnlockItemModel.dart';
+
+import 'package:flutter_picker/flutter_picker.dart';
 
 class ProjectLotUnlockPage extends StatefulWidget {
   @override
@@ -15,15 +20,16 @@ class ProjectLotUnlockPage extends StatefulWidget {
 }
 
 class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(
     hintText: "LOT NO或载具ID",
   );
 
-  String lotNo;
+  String lotNo = "HSO0042004090007";
   List arrOfData;
-  List arrOfSelectedIndex;
-  bool isSelected = false;
+  List arrOfSelectedIndex = List();
   String remarkContent;
 
   @override
@@ -41,12 +47,37 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
   }
 
   void _getDataFromServer() {
-    //
+    // LotSubmit/GetUnLockLot
+    Map mDict = Map();
+    if (isAvailable(this.lotNo)) {
+      mDict["Lotno"] = this.lotNo;      
+    } else {
+      return;
+    }
+
+    HudTool.show();
+    HttpDigger().postWithUri("LotSubmit/GetUnLockLot", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/GetUnLockLot: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      this.arrOfData = (responseJson["Extend"] as List)
+          .map((item) => ProjectLotUnlockItemModel.fromJson(item))
+          .toList();
+      // this.arrOfSelectedIndex.clear();
+
+      setState(() {        
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
       appBar: AppBar(
         title: Text("Lot解锁"),
@@ -75,7 +106,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
             color: hexColor(MAIN_COLOR),
             child: Text("解锁"),
             onPressed: () {
-              // _btnConfirmClicked();
+              _btnConfirmClicked();
             },
           ),
         ),
@@ -85,16 +116,16 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
 
   Widget _buildListView() {
     return ListView.builder(
-        // itemCount: listLength(this.arrOfData),
-        itemCount: 2,
+        itemCount: listLength(this.arrOfData) == 0 ? 0 : listLength(this.arrOfData) + 1,
         itemBuilder: (context, index) {
-          if (index == 0) {
+          if (index == listLength(this.arrOfData)) {
+            // 如果是最后一项
+            return _buildContentInputItem();
+          } else {
             return GestureDetector(
               onTap: () => _hasSelectedIndex(index),
               child: _buildListItem(index),
             );
-          } else {
-            return _buildContentInputItem();
           }
         });
   }
@@ -111,7 +142,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
   }
 
   Widget _buildListItem(int index) {
-    // ProjectLotLockItemModel itemData = this.arrOfData[index];
+    ProjectLotUnlockItemModel itemData = this.arrOfData[index];
     return Container(
       color: Colors.white,
       child: Row(
@@ -128,7 +159,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                      "LotNo：{itemData.LotNo}",
+                      "LotNo：${itemData.LotNo}",
                       maxLines: 2,
                       style: TextStyle(
                           color: hexColor(MAIN_COLOR_BLACK),
@@ -143,7 +174,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("物料ID：{itemData.ItemCode}",
+                        Text("物料ID：${itemData.ItemCode}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
@@ -156,7 +187,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("物料名称：{itemData.ItemName}",
+                        Text("物料名称：${itemData.ItemName}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -170,10 +201,10 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text("数量：15",
+                        Text("数量：${itemData.Qty}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        Text("代码：LOTLock",
+                        Text("代码：${itemData.HoldCode}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                         SizedBox(
@@ -189,7 +220,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("备注：{itemData.Comment}",
+                        Text("备注：${itemData.Comment}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
@@ -223,12 +254,15 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
   }
 
   bool _checkIfSelected(int index) {
-    // return this.arrOfSelectedIndex.contains(index);
-    return this.isSelected;
+    return this.arrOfSelectedIndex.contains(index);
   }
 
   void _hasSelectedIndex(int index) {
-    this.isSelected = !this.isSelected;
+    if (this.arrOfSelectedIndex.contains(index)) {
+      this.arrOfSelectedIndex.remove(index);
+    } else {
+      this.arrOfSelectedIndex.add(index);      
+    }
     setState(() {      
     });
   }
@@ -254,6 +288,45 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
         height: 120,
       ),
     );
+  }
+
+  Future _btnConfirmClicked() async {
+    if (listLength(this.arrOfSelectedIndex) == 0) {
+      HudTool.showInfoWithStatus("请选择解锁项");
+      return;
+    }
+
+    if (isAvailable(this.remarkContent) == false) {
+      HudTool.showInfoWithStatus("请填写备注");
+      return;
+    }
+
+    bool isOkay = await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确认解锁？");
+
+    if (isOkay) {
+      _confirmAction();
+    }
+  }
+
+  void _confirmAction() {
+    Map<String, dynamic> mDict = Map();
+    mDict["lotno"] = this.lotNo;
+    mDict["comment"] = this.remarkContent;
+
+    print("LotSubmit/LotUnLock mDict: $mDict");
+
+    HudTool.show();
+    HttpDigger().postWithUri("LotSubmit/LotUnLock", parameters: mDict,
+        success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/LotUnLock: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.showInfoWithStatus("解锁成功");
+      Navigator.pop(context);
+    });
   }
 
   Future _tryToscan() async {
