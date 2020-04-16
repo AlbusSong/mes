@@ -173,10 +173,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       this.arrOfMaterialTag = (responseJson["Extend"] as List)
           .map((item) => ProjectTagInfoModel.fromJson(item))
           .toList();
-      if (listLength(this.arrOfMaterialTag) > 0) {
-        ProjectTagInfoModel firstItemData = this.arrOfMaterialTag.first;
-        _pInfoDisplayWgt2.setContent(firstItemData.Cost.toString());
-      }
+      _pInfoDisplayWgt2.setContent(responseJson["Extend2"]);
      setState(() {});
     });
   }
@@ -358,10 +355,10 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("已上料：${itemData.Cost}",
+                        Text("已上料：${itemData.Qty}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
-                        Text("使用量：${itemData.Qty}",
+                        Text("使用量：${itemData.Cost}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
@@ -463,8 +460,6 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       _selectionWgt1.setContent(title);
       _pInfoDisplayWgt0.setContent(this.selectedTodayWork.Rpno);
       _pInfoDisplayWgt1.setContent(this.selectedTodayWork.WoPlanQty.toString());
-      _pInfoDisplayWgt2
-          .setContent(this.selectedTodayWork.WoOutPutQty.toString());
     }
 
     setState(() {});
