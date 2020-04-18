@@ -1,19 +1,24 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../../Others/Network/HttpDigger.dart';
+import 'package:mes/Others/Tool/WidgetTool.dart';
+import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
-import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Const/Const.dart';
-import '../../Others/View/SearchBarWithFunction.dart';
-import '../../Others/View/MESSelectionItemWidget.dart';
-import '../../Others/View/MESContentInputWidget.dart';
+import '../../../Others/Tool/GlobalTool.dart';
+import '../../../Others/Const/Const.dart';
+import '../../../Others/View/SearchBarWithFunction.dart';
+import '../../../Others/View/MESSelectionItemWidget.dart';
+import '../../../Others/View/MESContentInputWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 
-import 'Model/ProjectItemModel.dart';
-import 'Model/ProjectLockCodeModel.dart';
+import '../Model/ProjectItemModel.dart';
+import '../Model/ProjectLockCodeModel.dart';
+import '../Model/ProjectLineModel.dart';
+import '../Model/ProjectPushPersonItemModel.dart';
+
+import 'ProjectLockProductionLinePage.dart';
+import 'ProjectLockPushPersonPage.dart';
 
 class ProjectLotLockPage extends StatefulWidget {
   @override
@@ -37,6 +42,8 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   ProjectItemModel detailData = ProjectItemModel.fromJson({});
   List arrOfLockCode;
   ProjectLockCodeModel selectedLockCode;
+  List arrOfProductionLine;
+  List arrOfPushPerson;
 
   @override
   void initState() {
@@ -56,6 +63,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     };
 
     _getLockCodeListFromServer();
+    _getProductionLineListFromServer();
   }
 
   void _getDataFromServer() {
@@ -76,13 +84,24 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   }
 
   void _getLockCodeListFromServer() {
+    HudTool.show();
     HttpDigger()
         .postWithUri("LotSubmit/GetLockCode", parameters: {}, shouldCache: true,
             success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetLockCode: $responseJson");
+      HudTool.dismiss();
       this.arrOfLockCode = (responseJson['Extend'] as List)
           .map((item) => ProjectLockCodeModel.fromJson(item))
           .toList();
+    });
+  }
+
+  void _getProductionLineListFromServer() {
+    // LotSubmit/AllLine
+    HttpDigger()
+        .postWithUri("LotSubmit/AllLine", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/AllLine: $responseJson");
     });
   }
 
@@ -134,9 +153,106 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
         _selectionWgt1,
         _selectionWgt2,
         _buildContentInputItem(),
+        WidgetTool.createListViewLine(20, hexColor("f1f1f7")),
+        _buildPushSectionHeader(),
+        _buildPushSectionCell(0),
+        WidgetTool.createListViewLine(1, hexColor("f1f1f7")),
+        _buildPushSectionCell(1),
         _buildFooter(),
       ],
     );
+  }
+
+  Widget _buildPushSectionHeader() {
+    return Container(
+      margin: EdgeInsets.fromLTRB(10, 10, 10, 5),
+      child: Text(
+        "推送设置",
+        style: TextStyle(fontSize: 20, color: hexColor("333333"), fontWeight: FontWeight.normal),
+      ),
+    );
+  }
+
+  Widget _buildPushSectionCell(int index) {
+    return GestureDetector(
+      child: Container(
+      // height: 50,
+      constraints: BoxConstraints(minHeight: 50),
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Text(
+            _fillContentForPushSectionCell(index),
+            style: TextStyle(fontSize: 16),
+          ),
+          ),
+          Icon(Icons.arrow_forward_ios, color: hexColor("999999"), size: 16,),
+        ],
+      ),
+    ),
+    onTap: () {
+      _hasClickedPushSectionCell(index);
+    },
+    );
+  }
+
+  String _fillContentForPushSectionCell(int index) {
+    String result = "选择";
+
+    if (index == 0) {
+      result += "产线:    ";
+
+      for (int i = 0; i < listLength(this.arrOfProductionLine); i++) {
+        ProjectLineModel itemData = this.arrOfProductionLine[i];
+        result += "${itemData.LineName} ";
+      }
+    } else if (index == 1) {
+      result += "推送人:    ";
+      for (int i = 0; i < listLength(this.arrOfPushPerson); i++) {
+        ProjectPushPersonItemModel itemData = this.arrOfPushPerson[i];
+        result += "${itemData.Comment} ";
+      }
+    }
+
+    return result;
+  }
+
+  Future _hasClickedPushSectionCell(int index) async {
+    print("_hasClickedPushSectionCell: $index");
+
+    Widget w;
+    if (index == 0) {
+      w = ProjectLockProductionLinePage();
+    } else if (index == 1) {
+      if (listLength(this.arrOfProductionLine) == 0) {
+        HudTool.showInfoWithStatus("请先选择产线");
+        return;
+      }
+
+      List lineList = List();
+      for (ProjectLineModel itemData in this.arrOfProductionLine) {
+        lineList.add(itemData.LineCode);
+      }
+
+      w = ProjectLockPushPersonPage(lineList);
+    }
+
+    if (w == null) {      
+      return;
+    } 
+
+    if (index == 0) {
+      this.arrOfProductionLine = await Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
+    } else {
+      this.arrOfPushPerson = await Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
+    }    
+
+    setState(() {      
+    });
   }
 
   Widget _buildSelectionInputItem(int index) {
@@ -207,6 +323,8 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       this.selectedLockCode = this.arrOfLockCode[indexOfSelectedItem];
 
       _selectionWgt2.setContent(title);
+    } else if (index == 3) {
+    } else if (index == 4) {
     }
   }
 
@@ -274,6 +392,16 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       return;
     }
 
+    // if (listLength(this.arrOfProductionLine) == 0) {
+    //   HudTool.showInfoWithStatus("请选择产线");
+    //   return;
+    // }
+
+    if (listLength(this.arrOfPushPerson) == 0) {
+      HudTool.showInfoWithStatus("请选择推送人");
+      return;
+    }
+
     bool isOkay =
         await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定锁定?");
 
@@ -288,7 +416,12 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     mDict["lotno"] = this.detailData.LotNo;
     mDict["holdcode"] = this.selectedLockCode.LockCode;
     mDict["comment"] = this.remarkContent;
-    mDict["personList"] = [];
+
+    List arrOfPushPersonId = List();
+    for (ProjectPushPersonItemModel m in this.arrOfPushPerson) {
+      arrOfPushPersonId.add(m.UserID);
+    }
+    mDict["personList"] = arrOfPushPersonId;
     
     HudTool.show();
     HttpDigger().postWithUri("LotSubmit/LotLock", parameters: mDict,

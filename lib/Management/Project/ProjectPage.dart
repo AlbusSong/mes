@@ -5,7 +5,7 @@ import '../../Others/View/MESSquareItemWidget.dart';
 import 'ProjectLotReportPage.dart';
 import 'OrderMaterial/ProjectOrderMaterialPage.dart';
 import 'ProjectLotSearchPage.dart';
-import 'ProjectLotLockPage.dart';
+import 'Lock/ProjectLotLockPage.dart';
 import 'ProjectLotUnlockPage.dart';
 import 'ReturnRepairment/ProjectReturnRepairmentPage.dart';
 import 'ProjectChangeGearPage.dart';

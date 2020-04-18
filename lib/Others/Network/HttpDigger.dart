@@ -154,6 +154,12 @@ class HttpDigger {
     return result;
   }
 
+
+  void cancelAllRequest() {
+    dio.clear();
+  }
+
+
   static void xunfeiOCR(String imageBase64String, {HttpSuccess success, HttpFailure failure}) {
     String xunfeiAppId = "5e73354e";
     String xunfeiAppKey = "323f4a078dc0102067b66b2088e7c73e";
