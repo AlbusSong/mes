@@ -65,7 +65,7 @@ class _ProjectReturnRepairmentPageState
                 Expanded(
                   child: CupertinoSegmentedControl(
                     children: {
-                      0: Text("非Lot"),
+                      0: Text("工程"),
                       1: Text("Lot"),
                     },
                     groupValue: selectedPageIndex,
