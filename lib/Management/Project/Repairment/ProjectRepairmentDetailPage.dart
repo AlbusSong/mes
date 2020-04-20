@@ -36,6 +36,7 @@ class _ProjectRepairmentDetailPageState
 
   ProjectTextInputWidget _pTextInputWgt0;
   List<MESSelectionItemWidget> _selectionWgtList = [];
+  MESContentInputWidget _contentInputWgt;
 
   final List<String> functionTitleList = [
     "添加",
@@ -45,7 +46,7 @@ class _ProjectRepairmentDetailPageState
 
   List<Widget> bottomFunctionWidgetList = List();
   List arrOfData;
-  List<ProjectRepairMaterialItemModel> _selectedMaterialItemList = [];
+  List<ProjectRepairMaterialItemModel> selectedMaterialItemList = [];
   String remarkContent;
   String lotNo;
 
@@ -57,9 +58,10 @@ class _ProjectRepairmentDetailPageState
     _selectionWgtList.add(_buildSelectionInputItem(0));
     _selectionWgtList.add(_buildSelectionInputItem(1));
     _selectionWgtList.add(_buildSelectionInputItem(2));
-    _selectedMaterialItemList.add(null);
-    _selectedMaterialItemList.add(null);
-    _selectedMaterialItemList.add(null);
+    selectedMaterialItemList.add(null);
+    selectedMaterialItemList.add(null);
+    selectedMaterialItemList.add(null);
+    _contentInputWgt = _buildContentInputItem();
 
     for (int i = 0; i < functionTitleList.length; i++) {
       String functionTitle = functionTitleList[i];
@@ -86,14 +88,21 @@ class _ProjectRepairmentDetailPageState
       }
     }
 
+    this.lotNo = this.data.LotNo;
+    _pTextInputWgt0.setContent(this.lotNo);
     _getDataFromServer();
   }
 
   void _getDataFromServer() {
     // Repair/GetRepairItem
+    Map mDict = Map();
+    mDict["item"] = this.data.ItemCode;
+    mDict["lotNo"] = this.lotNo;
+    print("Repair/GetRepairItem mDict: $mDict");
+
     HudTool.show();
     HttpDigger().postWithUri("Repair/GetRepairItem",
-        parameters: {"item": this.data.ItemCode}, shouldCache: true,
+        parameters: mDict, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("Repair/GetRepairItem: $responseJson");
       if (code == 0) {
@@ -153,7 +162,7 @@ class _ProjectRepairmentDetailPageState
     for (int i = 0; i < _selectionWgtList.length; i++) {
       children.add(_selectionWgtList[i]);
     }
-    children.add(_buildContentInputItem());
+    children.add(_contentInputWgt);
     return ListView(
       children: children,
     );
@@ -202,7 +211,11 @@ class _ProjectRepairmentDetailPageState
     print("_hasSelectedItem: $index");
     List<String> arrOfSelectionTitle = [];
     for (ProjectRepairMaterialItemModel m in this.arrOfData) {
-      arrOfSelectionTitle.add('${m.ItemCode}|${m.ItemName}');
+      String itemTitle = "没有物料";
+      if (isAvailable(m.ItemCode) && isAvailable(m.ItemName)) {
+        itemTitle = '${m.ItemCode}|${m.ItemName}';
+      }
+      arrOfSelectionTitle.add(itemTitle);
     }
 
     if (arrOfSelectionTitle.length == 0) {
@@ -315,7 +328,7 @@ class _ProjectRepairmentDetailPageState
       this
           ._selectionWgtList
           .add(_buildSelectionInputItem(listLength(this._selectionWgtList)));
-      this._selectedMaterialItemList.add(null);
+      this.selectedMaterialItemList.add(null);
       setState(() {});
     } else if (index == 1) {
       _btnConfirmClicked();
@@ -329,8 +342,8 @@ class _ProjectRepairmentDetailPageState
     }
 
     int availableCount = 0;
-    for (int i = 0; i < listLength(_selectedMaterialItemList); i++) {
-      if (_selectedMaterialItemList[i] != null) {
+    for (int i = 0; i < listLength(selectedMaterialItemList); i++) {
+      if (selectedMaterialItemList[i] != null) {
         availableCount++;
       }
     }
@@ -361,9 +374,9 @@ class _ProjectRepairmentDetailPageState
     // mDict["item1"] = this.selectedMaterialItem0.BomID;
     // mDict["item2"] = this.selectedMaterialItem1.BomID;
     // mDict["item3"] = this.selectedMaterialItem2.BomID;
-    for (int i = 0; i < listLength(this._selectedMaterialItemList); i++) {
+    for (int i = 0; i < listLength(this.selectedMaterialItemList); i++) {
       ProjectRepairMaterialItemModel selectedMaterialItem =
-          this._selectedMaterialItemList[i];
+          this.selectedMaterialItemList[i];
       mDict["item${i + 1}"] = selectedMaterialItem.BomID;
     }
     print("Repair/RepairOK mDict: $mDict");
@@ -425,7 +438,7 @@ class _ProjectRepairmentDetailPageState
       int indexOfSelectedItem, String title, int index) {
     MESSelectionItemWidget _selectionWgt = this._selectionWgtList[index];
     _selectionWgt.setContent(title);
-    this._selectedMaterialItemList[index] = this.arrOfData[indexOfSelectedItem];
+    this.selectedMaterialItemList[index] = this.arrOfData[indexOfSelectedItem];
   }
 
   Future _tryToscan() async {
