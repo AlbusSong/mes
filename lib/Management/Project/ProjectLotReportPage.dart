@@ -14,6 +14,7 @@ import 'package:flutter_picker/flutter_picker.dart';
 
 import 'Model/ProjectLineModel.dart';
 import 'Model/ProjectWorkOrderModel.dart';
+import 'Model/ProjectRealGradeItemModel.dart';
 
 class ProjectLotReportPage extends StatefulWidget {
   @override
@@ -46,7 +47,8 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
   ProjectLineModel selectedWork = ProjectLineModel.fromJson({});
   List arrOfPlanInfo;
   ProjectWorkOrderModel selectedPlanInfo = ProjectWorkOrderModel.fromJson({});
-  Map selectedGradeInfo;
+  List arrofGradeInfo;
+  ProjectRealGradeItemModel selectedGradeInfo;
 
   @override
   void initState() {
@@ -117,13 +119,14 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
         parameters: {"proclass": prodClass}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/GetGrade: $responseJson");
-      _selectionWgt2.setContent("BBB");
-      List gradeInfoList = responseJson['Extend'] as List;
-      if (listLength(gradeInfoList) == 0) {
-        return;
+
+      this.arrofGradeInfo = (responseJson["Extend2"] as List)
+          .map((item) => ProjectRealGradeItemModel.fromJson(item))
+          .toList();
+      if (listLength(this.arrofGradeInfo) > 0) {
+        this.selectedGradeInfo = this.arrofGradeInfo.first;
+        _selectionWgt2.setContent(this.selectedGradeInfo.Level);
       }
-      this.selectedGradeInfo = gradeInfoList.first;
-      print("selectedGradeInfo: $selectedGradeInfo");
     });
   }
 
@@ -246,7 +249,7 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       title = "工单";
     } else if (index == 2) {
       title = "档位";
-      enabled = false;
+      enabled = true;
     }
     void Function() selectionBlock = () {
       _hasSelectedItem(index);
@@ -271,6 +274,10 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     } else if (index == 1) {
       for (ProjectWorkOrderModel m in this.arrOfPlanInfo) {
         arrOfSelectionTitle.add('${m.Wono}|${m.StateDesc}');
+      }
+    } else if (index == 2) {
+      for (ProjectRealGradeItemModel m in this.arrofGradeInfo) {
+        arrOfSelectionTitle.add('${m.Level}');
       }
     }
 
@@ -317,9 +324,12 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       _pInfoDisplayWgt1.setContent(
           '${this.selectedPlanInfo.ItemCode}|${this.selectedPlanInfo.ItemName}');
       _pInfoDisplayWgt2.setContent('${this.selectedPlanInfo.WoPlanQty}');
-      _pInfoDisplayWgt3.setContent('${this.selectedPlanInfo.WoRepareQty}');
+      _pInfoDisplayWgt3.setContent('${this.selectedPlanInfo.WoOutPutQty}');
 
       _pTextInputWgt1.setContent('${this.selectedPlanInfo.LOTSize}');
+    } else if (index == 2) {
+      this.selectedGradeInfo = this.arrofGradeInfo[indexOfSelectedItem];
+      _selectionWgt2.setContent(title);
     }
 
     setState(() {});
