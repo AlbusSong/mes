@@ -3,35 +3,35 @@ import '../Tool/GlobalTool.dart';
 import '../Const/Const.dart';
 
 
-class MESContentInputWidget extends StatefulWidget {
+class MESContentInputWidget extends StatelessWidget {
   MESContentInputWidget({
     this.placeholder,
     this.contentChangedBlock,
   });
 
-  final String placeholder;
-  void Function (String newContent) contentChangedBlock;
+//   final String placeholder;
+//   void Function (String newContent) contentChangedBlock;
 
-  _MESContentInputWidgetState _state;
+//   _MESContentInputWidgetState _state;
 
-  void setContent(String c) {
-    _state.setContent(c);
-  }
+//   void setContent(String c) {
+//     _state.setContent(c);
+//   }
 
-  @override
-  State<StatefulWidget> createState() {
-    if (_state == null) {
-      _state = _MESContentInputWidgetState(placeholder: this.placeholder, contentChangedBlock:this.contentChangedBlock);
-    }    
-    return _state;
-  }  
-}
+//   @override
+//   State<StatefulWidget> createState() {
+//     if (_state == null) {
+//       _state = _MESContentInputWidgetState(placeholder: this.placeholder, contentChangedBlock:this.contentChangedBlock);
+//     }    
+//     return _state;
+//   }  
+// }
 
-class _MESContentInputWidgetState extends State<MESContentInputWidget> {
-  _MESContentInputWidgetState({
-    this.placeholder,
-    this.contentChangedBlock,
-  });  
+// class _MESContentInputWidgetState extends State<MESContentInputWidget> {
+//   _MESContentInputWidgetState({
+//     this.placeholder,
+//     this.contentChangedBlock,
+//   });  
 
   final String placeholder;
   void Function (String newContent) contentChangedBlock;
