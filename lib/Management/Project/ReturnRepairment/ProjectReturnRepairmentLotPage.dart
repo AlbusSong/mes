@@ -174,6 +174,7 @@ class _ProjectReturnRepairmentLotPageState
       enabled = false;
     } else if (index == 1) {
       title = "原因工序";
+      enabled = true;
     } else if (index == 2) {
       title = "数量";
       enabled = false;
@@ -308,8 +309,18 @@ class _ProjectReturnRepairmentLotPageState
   }
 
   void _realConfirmationAction() {
+    Map mDict = Map();
+    mDict["Wono"] = this.lotInfoData.Wono;
+    mDict["LotNo"] = this.lotNo;
+    mDict["StepCode"] = this.lotInfoData.ItemCode;
+    mDict["Comment"] = this.remarkContent;
+    mDict["Qty"] = this.lotInfoData.Qty.toString();
+    mDict["RepairCode"] = this.selectedRepairCode.LOTRepairCode;
+    mDict["myPic"] = "";
+    mDict["myFile"] = "";
+
     HudTool.show();
-    HttpDigger().postWithUri("Repair/RepairLot", parameters: {"mdl": ""},
+    HttpDigger().postWithUri("Repair/RepairLot", parameters: mDict,
         success: (int code, String message, dynamic responseJson) {
       print("Repair/RepairLot: $responseJson");
       if (code == 0) {
@@ -317,7 +328,7 @@ class _ProjectReturnRepairmentLotPageState
         return;
       }
 
-      HudTool.showInfoWithStatus(message);
+      HudTool.showInfoWithStatus("操作成功");
       Navigator.pop(context);
     });
   }
