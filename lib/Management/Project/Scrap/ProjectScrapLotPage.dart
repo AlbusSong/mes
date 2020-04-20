@@ -71,6 +71,11 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
         parameters: {"lotno": this.lotNo}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("Repair/SGetLotInfo: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
       HudTool.dismiss();
 
       List arr = responseJson["Extend"];
