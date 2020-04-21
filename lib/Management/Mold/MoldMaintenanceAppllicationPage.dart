@@ -220,7 +220,7 @@ class _MoldMaintenanceAppllicationPageState extends State<MoldMaintenanceAppllic
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToscan();
+                _tryToScan();
               }),
         )),
         height: 120,
@@ -228,7 +228,7 @@ class _MoldMaintenanceAppllicationPageState extends State<MoldMaintenanceAppllic
     );
   }
 
-  Future _tryToscan() async {
+  Future _tryToScan() async {
     print("start scanning");
 
     this.moldCode = await BarcodeScanTool.tryToScanBarcode();

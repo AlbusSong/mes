@@ -4,6 +4,7 @@ import '../../../Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/AlertTool.dart';
 import '../../../Others/Tool/GlobalTool.dart';
+import '../../../Others/Tool/BarcodeScanTool.dart';
 import '../../../Others/Const/Const.dart';
 import '../../../Others/View/MESSelectionItemWidget.dart';
 import '../Widget/ProjectInfoDisplayWidget.dart';
@@ -41,7 +42,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
   ];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> bottomFunctionWidgetList = List();
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  final List<String> bottomFunctionTitleList = ["二维码", "手动"];
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
   List arrOfLineItem;
@@ -465,6 +466,40 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     setState(() {});
   }
 
+  void _popSheetAlert() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        child: ListView(
+            children: List.generate(
+          2,
+          (index) => InkWell(
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 60.0,
+                  child: Text(bottomFunctionTitleList[index])),
+              onTap: () {
+                print('tapped item ${index + 1}');
+                Navigator.pop(context);
+                if (index == 0) {
+                  _tryToScan();
+                } else if (index == 1) {
+                  _gotoAddMaterialTagPage(this.materialInfo, this.selectedTodayWork.Wono);
+                }
+              }),
+        )),
+        height: 120,
+      ),
+    );
+  }
+
+  void _gotoAddMaterialTagPage(ProjectMaterialItemModel materialInfo, String wono) {
+    Widget w = ProjectAddMaterialTagPage(
+          materialInfo, wono);
+      Navigator.of(_scaffoldKey.currentContext)
+          .push(MaterialPageRoute(builder: (BuildContext context) => w));
+  }
+
   Future _functionItemClickedAtIndex(int index) async {
     if (this.selectedLineItem == null) {
       HudTool.showInfoWithStatus("请选择产线");
@@ -486,10 +521,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     }
 
     if (index == 3) {
-      Widget w = ProjectAddMaterialTagPage(
-          this.materialInfo.ItemCode, this.selectedTodayWork.Wono);
-      Navigator.of(_scaffoldKey.currentContext)
-          .push(MaterialPageRoute(builder: (BuildContext context) => w));
+      _popSheetAlert();      
     } else {
       String hintTitle = "确定上升?";
       if (index == 1) {
@@ -520,7 +552,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     mDict["item"] = this.materialInfo.ItemCode;
     mDict["tag"] = this.selectedMaterialTag.TagID;
     mDict["id"] = this.selectedTodayWork.ID;
-    print("$uri: $mDict");
+    print("$uri mDict: $mDict");
     
     HudTool.show();
     HttpDigger().postWithUri(uri, parameters: mDict,
@@ -533,6 +565,35 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
 
       HudTool.showInfoWithStatus("操作成功");
       Navigator.pop(context);
+    });
+  }
+
+  Future _tryToScan() async {
+    print("start scanning");
+
+    String wono = await BarcodeScanTool.tryToScanBarcode();
+    HudTool.show();
+    HttpDigger().postWithUri("LoadMaterial/RPTItem",
+        parameters: {"wono": wono}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/RPTItem: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      List arr = responseJson["Extend"];
+      if (listLength(arr) == 0) {
+        return;
+      }
+
+      _gotoAddMaterialTagPage(ProjectMaterialItemModel.fromJson(arr[0]), this.selectedTodayWork.Wono);
+
+      // this.materialInfo = ProjectMaterialItemModel.fromJson(arr[0]);
+      // _selectionWgt2.setContent(
+      //     '${this.materialInfo.ItemType}|${this.materialInfo.ItemCode}|${this.materialInfo.ItemName}');
+      // _getTagListFromServer(wono, this.materialInfo.ItemCode);
     });
   }
 }

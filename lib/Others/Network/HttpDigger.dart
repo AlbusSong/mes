@@ -94,12 +94,13 @@ class HttpDigger {
     responseFuture.then((responseObject) {
       dynamic responseObjectData = responseObject.data;
       Map responseJson;
-      if ((responseObjectData is Map) == false || 
-          ((responseObjectData is Map) == true && responseObjectData["Success"] == null)) {
+      if ((responseObjectData is Map) == false ||
+          ((responseObjectData is Map) == true &&
+              responseObjectData["Success"] == null)) {
         responseJson = {
-          "Success":true,
-          "Message":"",
-          "Extend":responseObjectData,
+          "Success": true,
+          "Message": "",
+          "Extend": responseObjectData,
         };
       } else {
         responseJson = responseObjectData;
@@ -128,15 +129,15 @@ class HttpDigger {
       }
     }).catchError((error) {
       if (_checkIfNeedReLoginFromError(error) == true) {
-        HomePage.eventBus.fire(null);        
+        HomePage.eventBus.fire(null);
       } else {
         if (failure != null) {
-        failure(error);
-      } else {
-        print("$uri error: $error");
-        HudTool.showInfoWithStatus("网络或服务器错误: $uri");
+          failure(error);
+        } else {
+          print("$uri error: $error");
+          HudTool.showInfoWithStatus("网络或服务器错误: $uri");
+        }
       }
-      }      
     });
   }
 
@@ -154,19 +155,20 @@ class HttpDigger {
     return result;
   }
 
-
   void cancelAllRequest() {
     dio.clear();
   }
 
-
-  static void xunfeiOCR(String imageBase64String, {HttpSuccess success, HttpFailure failure}) {
+  static void xunfeiOCR(String imageBase64String,
+      {HttpSuccess success, HttpFailure failure}) {
     String xunfeiAppId = "5e73354e";
     String xunfeiAppKey = "323f4a078dc0102067b66b2088e7c73e";
-    String currentUnixTimeString = "${(DateTime.now().millisecondsSinceEpoch/1000).round()}";
-    Map xParam = {"language":"en", "location":"false"};
+    String currentUnixTimeString =
+        "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}";
+    Map xParam = {"language": "en", "location": "false"};
     String xParamBase64String = base64.encode(utf8.encode(jsonEncode(xParam)));
-    String checkSumMaterial = "$xunfeiAppKey$currentUnixTimeString$xParamBase64String";
+    String checkSumMaterial =
+        "$xunfeiAppKey$currentUnixTimeString$xParamBase64String";
     String checkSum = generateMd5(checkSumMaterial);
     Dio(BaseOptions(
       baseUrl: "https://webapi.xfyun.cn/",
@@ -175,10 +177,10 @@ class HttpDigger {
       // 5s
       headers: {
         "user-agent": "MES-Android",
-        "X-Appid":xunfeiAppId,
-        "X-CurTime":currentUnixTimeString,
-        "X-Param":xParamBase64String,
-        "X-CheckSum":checkSum,
+        "X-Appid": xunfeiAppId,
+        "X-CurTime": currentUnixTimeString,
+        "X-Param": xParamBase64String,
+        "X-CheckSum": checkSum,
         // "api": "1.0.0",
         // "Cookie": MeInfo().cookie,
       },
@@ -186,24 +188,24 @@ class HttpDigger {
       contentType: "application/x-www-form-urlencoded",
       responseType: ResponseType.json,
     ))
-      ..post("v1/service/v1/ocr/general",
-              data: {"image":imageBase64String})
+      ..post("v1/service/v1/ocr/general", data: {"image": imageBase64String})
           .then((responseObject) {
-            // print("responseObject: $responseObject");
-            // print("responseObject Data: ${responseObject.data is String}");
-            Map responseJson;
-          if (responseObject.data is String) {
-            responseJson = jsonDecode(responseObject.data);
-          } else {
-            responseJson = responseObject.data;
-          }
-        if (success != null) {                    
+        // print("responseObject: $responseObject");
+        // print("responseObject Data: ${responseObject.data is String}");
+        Map responseJson;
+        if (responseObject.data is String) {
+          responseJson = jsonDecode(responseObject.data);
+        } else {
+          responseJson = responseObject.data;
+        }
+        if (success != null) {
           // print("responseJson: $responseJson");
           // MeInfo().cookie = responseObject.headers.value("set-cookie");
           // Map responseJson = responseObject.data;
           // bool s = responseJson["Success"];
           // String message = responseJson["Message"];
-          success(int.parse(responseJson["code"]), responseJson["desc"], responseJson);
+          success(int.parse(responseJson["code"]), responseJson["desc"],
+              responseJson);
         }
       }).catchError((error) {
         if (failure != null) {
@@ -226,21 +228,21 @@ class HttpDigger {
       },
       contentType: "application/json",
       responseType: ResponseType.json,
-    ))
-      .post("Login/OutOnline",
-              data: {"UserName": username ?? "", "Password": password ?? ""})
-          .then((responseObject) {
-        if (success != null) {
-          MeInfo().cookie = responseObject.headers.value("set-cookie");
-          Map responseJson = responseObject.data;
-          bool s = responseJson["Success"];
-          String message = responseJson["Message"];
-          success(s ? 1 : 0, message, responseJson);
-        }
-      }).catchError((error) {
-        if (failure != null) {
-          failure(error);
-        }
-      });
+    )).post("Login/OutOnline", data: {
+      "UserName": username ?? "",
+      "Password": password ?? ""
+    }).then((responseObject) {
+      if (success != null) {
+        MeInfo().cookie = responseObject.headers.value("set-cookie");
+        Map responseJson = responseObject.data;
+        bool s = responseJson["Success"];
+        String message = responseJson["Message"];
+        success(s ? 1 : 0, message, responseJson);
+      }
+    }).catchError((error) {
+      if (failure != null) {
+        failure(error);
+      }
+    });
   }
 }

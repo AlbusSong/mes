@@ -325,9 +325,11 @@ class _ProjectRepairmentDetailPageState
 
   void _functionItemClickedAtIndex(int index) {
     if (index == 0) {
-      this
-          ._selectionWgtList
-          .add(_buildSelectionInputItem(listLength(this._selectionWgtList)));
+      if (listLength(this._selectionWgtList) == 10) {
+        HudTool.showInfoWithStatus("最多10个");
+        return;
+      }
+      this._selectionWgtList.add(_buildSelectionInputItem(listLength(this._selectionWgtList)));
       this.selectedMaterialItemList.add(null);
       setState(() {});
     } else if (index == 1) {
@@ -371,13 +373,16 @@ class _ProjectRepairmentDetailPageState
     mDict["ctool"] = this.lotNo;
     mDict["rpwo"] = this.data.RPWO;
     mDict["comment"] = this.remarkContent;
-    // mDict["item1"] = this.selectedMaterialItem0.BomID;
-    // mDict["item2"] = this.selectedMaterialItem1.BomID;
-    // mDict["item3"] = this.selectedMaterialItem2.BomID;
-    for (int i = 0; i < listLength(this.selectedMaterialItemList); i++) {
-      ProjectRepairMaterialItemModel selectedMaterialItem =
-          this.selectedMaterialItemList[i];
-      mDict["item${i + 1}"] = selectedMaterialItem.BomID;
+    for (int i = 0; i < 10; i++) {
+      ProjectRepairMaterialItemModel selectedMaterialItem;
+      if (i < listLength(this.selectedMaterialItemList)) {
+        selectedMaterialItem = this.selectedMaterialItemList[i];
+      }
+      if (selectedMaterialItem != null) {
+        mDict["item${i + 1}"] = selectedMaterialItem.BomID;
+      } else {
+        mDict["item${i + 1}"] = "|0";
+      }     
     }
     print("Repair/RepairOK mDict: $mDict");
 
@@ -410,7 +415,7 @@ class _ProjectRepairmentDetailPageState
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToscan();
+                _tryToScan();
               }),
         )),
         height: 120,
@@ -441,7 +446,7 @@ class _ProjectRepairmentDetailPageState
     this.selectedMaterialItemList[index] = this.arrOfData[indexOfSelectedItem];
   }
 
-  Future _tryToscan() async {
+  Future _tryToScan() async {
     print("start scanning");
 
     String c = await BarcodeScanTool.tryToScanBarcode();

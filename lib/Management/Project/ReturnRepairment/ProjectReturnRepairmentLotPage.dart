@@ -348,7 +348,7 @@ class _ProjectReturnRepairmentLotPageState
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToscan();
+                _tryToScan();
               }),
         )),
         height: 120,
@@ -356,7 +356,7 @@ class _ProjectReturnRepairmentLotPageState
     );
   }
 
-  Future _tryToscan() async {
+  Future _tryToScan() async {
     print("start scanning");
 
     String c = await BarcodeScanTool.tryToScanBarcode();

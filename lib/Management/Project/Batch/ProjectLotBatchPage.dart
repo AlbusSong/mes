@@ -200,7 +200,7 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToscan();
+                _tryToScan();
               }),
         )),
         height: 120,
@@ -208,7 +208,7 @@ class _ProjectLotBatchPageState extends State<ProjectLotBatchPage> {
     );
   }
 
-  Future _tryToscan() async {
+  Future _tryToScan() async {
     print("start scanning");
 
     String c = await BarcodeScanTool.tryToScanBarcode();

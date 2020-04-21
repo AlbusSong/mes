@@ -7,29 +7,30 @@ import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/View/SearchBar.dart';
 
 import '../Model/ProjectTagInfoModel.dart';
+import '../Model/ProjectMaterialItemModel.dart';
 
 class ProjectAddMaterialTagPage extends StatefulWidget {
   ProjectAddMaterialTagPage(
-      this.materialInfoId,
+      this.materialInfo,
       this.wono,
   );
 
-  final String materialInfoId;
+  final ProjectMaterialItemModel materialInfo;
   final String wono;
 
   @override
   State<StatefulWidget> createState() {
-    return _ProjectAddMaterialTagPageState(materialInfoId, wono);
+    return _ProjectAddMaterialTagPageState(materialInfo, wono);
   }
 }
 
 class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
   _ProjectAddMaterialTagPageState(
-    this.materialInfoId,
+    this.materialInfo,
     this.wono,
   );
 
-  final String materialInfoId;
+  final ProjectMaterialItemModel materialInfo;
   final String wono;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -47,22 +48,24 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
       _getDataFromServer();
     };
 
+    _sBar.setContent('${this.materialInfo.ItemType}|${this.materialInfo.ItemCode}|${this.materialInfo.ItemName}');
+
     _getDataFromServer();
   }
 
   void _getDataFromServer() {
-    if (isAvailable(this.materialInfoId) == false) {      
+    if (isAvailable(this.materialInfo.ItemCode) == false) {      
       return;
     }
     // 获取所有有效的产线
     HudTool.show();
-    HttpDigger().postWithUri("LoadMaterial/GetTagInfo", parameters: {"item":this.materialInfoId}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LoadMaterial/GetTagInfo", parameters: {"item":this.materialInfo.ItemCode}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/GetTagInfo: $responseJson");
       HudTool.dismiss();
       this.arrOfData = (responseJson['Extend'] as List)
           .map((item) => ProjectTagInfoModel.fromJson(item))
           .toList();
-      setState(() {        
+      setState(() {                
       });
     });
   }      
@@ -250,7 +253,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
   void _confirmAction() {    
     ProjectTagInfoModel tagInfo = this.arrOfData[this.selectedIndex];
     HudTool.show();
-    HttpDigger().postWithUri("LoadMaterial/BarcodeScan", parameters: {"wono":this.wono, "item":this.materialInfoId, "tag":tagInfo.TagID}, success: (int code, String message, dynamic responseJson){
+    HttpDigger().postWithUri("LoadMaterial/BarcodeScan", parameters: {"wono":this.wono, "item":this.materialInfo.ItemCode, "tag":tagInfo.TagID}, success: (int code, String message, dynamic responseJson){
       print("LoadMaterial/BarcodeScan: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);

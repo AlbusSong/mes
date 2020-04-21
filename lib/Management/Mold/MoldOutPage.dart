@@ -198,7 +198,7 @@ class _MoldOutPageState extends State<MoldOutPage> {
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToscan();
+                _tryToScan();
               }),
         )),
         height: 120,
@@ -206,7 +206,7 @@ class _MoldOutPageState extends State<MoldOutPage> {
     );
   }
 
-  Future _tryToscan() async {
+  Future _tryToScan() async {
     print("start scanning");
 
     this.moldCode = await BarcodeScanTool.tryToScanBarcode();

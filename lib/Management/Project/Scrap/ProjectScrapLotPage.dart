@@ -342,7 +342,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToscan();
+                _tryToScan();
               }),
         )),
         height: 120,
@@ -350,7 +350,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
     );
   }
 
-  Future _tryToscan() async {
+  Future _tryToScan() async {
     print("start scanning");
     
     String c = await BarcodeScanTool.tryToScanBarcode();

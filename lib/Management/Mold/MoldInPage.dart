@@ -65,7 +65,7 @@ class _MoldInPageState extends State<MoldInPage> {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
                 if (index == 0) {
-                  _tryToscan();
+                  _tryToScan();
                 } else if (index == 1) {
                   _tryToUseOCR();
                 }                
@@ -239,7 +239,7 @@ class _MoldInPageState extends State<MoldInPage> {
     _getDataFromServer();
   }
 
-  Future _tryToscan() async {
+  Future _tryToScan() async {
     print("start scanning");
 
     this.moldCode = await BarcodeScanTool.tryToScanBarcode();
