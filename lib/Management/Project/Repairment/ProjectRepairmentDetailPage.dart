@@ -379,7 +379,7 @@ class _ProjectRepairmentDetailPageState
         selectedMaterialItem = this.selectedMaterialItemList[i];
       }
       if (selectedMaterialItem != null) {
-        mDict["item${i + 1}"] = selectedMaterialItem.BomID;
+        mDict["item${i + 1}"] = '${selectedMaterialItem.ItemCode}|${selectedMaterialItem.SingleUsage}';
       } else {
         mDict["item${i + 1}"] = "|0";
       }     
