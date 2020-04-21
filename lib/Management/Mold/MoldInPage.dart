@@ -3,14 +3,15 @@ import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
 import 'package:mes/Others/Tool/BarcodeScanTool.dart';
 import '../../Others/Tool/GlobalTool.dart';
-import '../../Others/Tool/AlertTool.dart';
-import '../../Others/Const/Const.dart';
+import 'package:mes/Others/Tool/AlertTool.dart';
+import 'package:mes/Others/Const/Const.dart';
 import '../../Others/View/SearchBarWithFunction.dart';
 import '../../Others/View/MESSelectionItemWidget.dart';
 
 import 'Model/MoldInModel.dart';
 
 import 'package:mes/Others/Page/CropImagePage.dart';
+import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MoldInPage extends StatefulWidget {
@@ -224,12 +225,8 @@ class _MoldInPageState extends State<MoldInPage> {
 
   Future _tryToUseOCR() async {
     print("_tryToUseOCR");
-
-    var picture = await ImagePicker.pickImage(source: ImageSource.camera);
-    if (picture == null) {
-      return;
-    }    
-    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => CropImagePage(picture)));
+    // TakePhotoForOCRPage
+    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
     print("cccccc: $c");
     if (c == null) {
       return;
@@ -237,6 +234,20 @@ class _MoldInPageState extends State<MoldInPage> {
     this.moldCode = c;
     _sBar.setContent(this.moldCode);
     _getDataFromServer();
+    // return;
+
+    // var picture = await ImagePicker.pickImage(source: ImageSource.camera);
+    // if (picture == null) {
+    //   return;
+    // }    
+    // var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => CropImagePage(picture)));
+    // print("cccccc: $c");
+    // if (c == null) {
+    //   return;
+    // }
+    // this.moldCode = c;
+    // _sBar.setContent(this.moldCode);
+    // _getDataFromServer();
   }
 
   Future _tryToScan() async {

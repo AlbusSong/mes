@@ -37,7 +37,7 @@ class HttpDigger {
   }
 
   void _startTimer() {
-    Timer.periodic(const Duration(minutes: 60), (timer) {
+    Timer.periodic(const Duration(minutes: 25), (timer) {
       // Every hour
       _periodicalLogin();
     });
@@ -46,7 +46,7 @@ class HttpDigger {
   void _periodicalLogin() {
     if (isAvailable(MeInfo().username) == false ||
         isAvailable(MeInfo().password)) {
-          return;
+      return;
     }
 
     HttpDigger.login(MeInfo().username, MeInfo().password);

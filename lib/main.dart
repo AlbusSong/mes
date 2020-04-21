@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'Others/Model/MeInfo.dart';
+import 'package:mes/Others/Model/MeInfo.dart';
+import 'package:mes/Others/Model/Trifle.dart';
 import 'Home/HomePage.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Tool/NativeCommunicationTool.dart';
@@ -19,9 +20,10 @@ void main() {
 void _initSomeThings() {
   print("MeInfo: ${MeInfo().username}, ${MeInfo().password}");
   FlutterCache();
-  NativeCommunicationTool();  
+  NativeCommunicationTool();
+  Trifle();
 }
-  
+
 class MESApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
