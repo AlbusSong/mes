@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
@@ -32,6 +33,23 @@ class HttpDigger {
   void _initSomeThings() {
 //    dio.interceptors.add(DioCacheManager(CacheConfig()).interceptor);
 //    FlutterCache();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    Timer.periodic(const Duration(minutes: 60), (timer) {
+      // Every hour
+      _periodicalLogin();
+    });
+  }
+
+  void _periodicalLogin() {
+    if (isAvailable(MeInfo().username) == false ||
+        isAvailable(MeInfo().password)) {
+          return;
+    }
+
+    HttpDigger.login(MeInfo().username, MeInfo().password);
   }
 
   static const String baseUrl = "http://58.210.106.178:8088/";

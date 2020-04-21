@@ -19,7 +19,7 @@ void main() {
 void _initSomeThings() {
   print("MeInfo: ${MeInfo().username}, ${MeInfo().password}");
   FlutterCache();
-  NativeCommunicationTool();
+  NativeCommunicationTool();  
 }
   
 class MESApp extends StatelessWidget {
