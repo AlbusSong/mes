@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  camera:
+  camera: ^0.5.7+4
   path_provider:
   path:
   image: ^2.1.12
