@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
@@ -33,7 +35,22 @@ class HttpDigger {
   void _initSomeThings() {
 //    dio.interceptors.add(DioCacheManager(CacheConfig()).interceptor);
 //    FlutterCache();
-    _startTimer();
+    // _setCertificateForHttpClient(this.dio);
+
+    _startTimer();    
+  }
+
+  void _setCertificateForHttpClient(Dio d) {
+    (d.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate  = (client) {
+    SecurityContext sc =  SecurityContext.defaultContext;
+    //file is the path of certificate
+    sc.setTrustedCertificates("");
+    HttpClient httpClient = new HttpClient(context: sc);
+    // httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
+    //   return true;
+    // };
+    return httpClient;
+};
   }
 
   void _startTimer() {
@@ -52,7 +69,8 @@ class HttpDigger {
     HttpDigger.login(MeInfo().username, MeInfo().password);
   }
 
-  static const String baseUrl = "http://58.210.106.178:8088/";
+  static const String baseUrl = "https://szzivos.51vip.biz/";
+  // static const String baseUrl = "http://58.210.106.178:8088/";
 
   final Dio dio = Dio(BaseOptions(
     baseUrl: baseUrl,
@@ -145,14 +163,14 @@ class HttpDigger {
       if (shouldCache == true) {
         FlutterCache().cacheData(jsonEncode(responseJson), cacheKey);
       }
-    }).catchError((error) {
+    }).catchError((error) {      
       if (_checkIfNeedReLoginFromError(error) == true) {
         HomePage.eventBus.fire(null);
       } else {
-        if (failure != null) {
+        print("$uri error: $error");
+        if (failure != null) {          
           failure(error);
-        } else {
-          print("$uri error: $error");
+        } else {          
           HudTool.showInfoWithStatus("网络或服务器错误: $uri");
         }
       }
@@ -162,8 +180,8 @@ class HttpDigger {
   bool _checkIfNeedReLoginFromError(dynamic error) {
     bool result = false;
     if (error is DioError) {
-      DioError dError = error as DioError;
-      if (dError.response.statusCode == 302) {
+      DioError dError = error;
+      if ((dError.response.statusCode != null) && (dError.response.statusCode == 302)) {
         // 302 means wrong data type（html）
         // 302 means needing relogin
         result = true;
@@ -259,6 +277,7 @@ class HttpDigger {
       }
     }).catchError((error) {
       if (failure != null) {
+        print("Login/OutOnline error: $error");
         failure(error);
       }
     });

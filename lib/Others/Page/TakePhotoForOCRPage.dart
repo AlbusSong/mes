@@ -180,14 +180,15 @@ class _TakePhotoForOCRPageState extends State<TakePhotoForOCRPage> {
           }
           for (Map contentSubDict in wordList) {
             String c = contentSubDict["content"] as String;
-            if (isAvailable(c)) {
-              code = c;
-              break;
-            }
-            // if (c.startsWith("C") && c.endsWith("F")) {
+            // if (isAvailable(c)) {
             //   code = c;
             //   break;
             // }
+            // 以C开头，16位
+            if (isAvailable(c) && c.startsWith("C") && c.length == 16) {
+              code = c;
+              break;
+            }
           }
 
           if (code != null) {
