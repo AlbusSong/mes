@@ -14,6 +14,8 @@ import 'package:flutter_picker/flutter_picker.dart';
 import '../Model/ProjectLotInfoModel.dart';
 import '../Model/ProjectRepairCodeModel.dart';
 
+import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
+
 class ProjectLotLockHandlingReturnRepairmentPage extends StatefulWidget {
   ProjectLotLockHandlingReturnRepairmentPage(
     this.lotNo
@@ -36,7 +38,7 @@ class _ProjectLotLockHandlingReturnRepairmentPageState
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();      
 
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
 
   ProjectTextInputWidget _pTextInputWgt0;
 
@@ -356,12 +358,29 @@ class _ProjectLotLockHandlingReturnRepairmentPageState
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToScan();
+                if (index == 0) {
+                  _tryToScan();
+                } else if (index == 1) {
+                  _tryToUseOCR();
+                }
               }),
         )),
         height: 120,
       ),
     );
+  }
+
+  Future _tryToUseOCR() async {
+    print("_tryToUseOCR");
+    // TakePhotoForOCRPage 
+    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    print("cccccc: $c");
+    if (c == null) {
+      return;
+    }
+    this.lotNo = c;
+    _pTextInputWgt0.setContent(this.lotNo);
+    _getDataFromServer();
   }
 
   Future _tryToScan() async {

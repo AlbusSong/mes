@@ -15,6 +15,8 @@ import 'package:flutter_picker/flutter_picker.dart';
 import '../Model/ProjectRepairListItemModel.dart';
 import '../Model/ProjectRepairMaterialItemModel.dart';
 
+import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
+
 class ProjectRepairmentDetailPage extends StatefulWidget {
   ProjectRepairmentDetailPage(this.data);
 
@@ -42,7 +44,7 @@ class _ProjectRepairmentDetailPageState
     "添加",
     "确定",
   ];
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
 
   List<Widget> bottomFunctionWidgetList = List();
   List arrOfData;
@@ -415,7 +417,11 @@ class _ProjectRepairmentDetailPageState
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToScan();
+                if (index == 0) {
+                  _tryToScan();
+                } else if (index == 1) {
+                  _tryToUseOCR();
+                }
               }),
         )),
         height: 120,
@@ -444,6 +450,19 @@ class _ProjectRepairmentDetailPageState
     MESSelectionItemWidget _selectionWgt = this._selectionWgtList[index];
     _selectionWgt.setContent(title);
     this.selectedMaterialItemList[index] = this.arrOfData[indexOfSelectedItem];
+  }
+
+  Future _tryToUseOCR() async {
+    print("_tryToUseOCR");
+    // TakePhotoForOCRPage 
+    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    print("cccccc: $c");
+    if (c == null) {
+      return;
+    }
+    this.lotNo = c;
+    _pTextInputWgt0.setContent(this.lotNo);
+    _getDataFromServer();
   }
 
   Future _tryToScan() async {

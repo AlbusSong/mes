@@ -14,6 +14,8 @@ import '../Model/ProjectGradeItemModel.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 
+import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
+
 class ProjectLotBatchDetailPage extends StatefulWidget {
   ProjectLotBatchDetailPage(
     this.data,
@@ -35,7 +37,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
 
   final ProjectItemModel data;
 
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
 
   MESSelectionItemWidget _selectionWgt0;
   MESSelectionItemWidget _selectionWgt1;
@@ -350,12 +352,28 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToScan();
+                if (index == 0) {
+                  _tryToScan();
+                } else if (index == 1) {
+                  _tryToUseOCR();
+                }
               }),
         )),
         height: 120,
       ),
     );
+  }
+
+  Future _tryToUseOCR() async {
+    print("_tryToUseOCR");
+    // TakePhotoForOCRPage 
+    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    print("cccccc: $c");
+    if (c == null) {
+      return;
+    }
+    _pTextInputWgt1.setContent(c);
+    _checkBatchLotNoFromServer(c);
   }
 
   Future _tryToScan() async {

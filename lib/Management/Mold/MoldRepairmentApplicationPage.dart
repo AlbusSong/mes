@@ -11,6 +11,8 @@ import '../../Others/View/MESContentInputWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
 
+import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
+
 class MoldRepairmentApplicationPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -20,7 +22,7 @@ class MoldRepairmentApplicationPage extends StatefulWidget {
 
 class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicationPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(hintText: "模具编码",);
   String content;
   String moldCode;
@@ -270,12 +272,29 @@ class _MoldRepairmentApplicationPageState extends State<MoldRepairmentApplicatio
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToScan();
+                if (index == 0) {
+                  _tryToScan();
+                } else if (index == 1) {
+                  _tryToUseOCR();
+                }
               }),
         )),
         height: 120,
       ),
     );
+  }
+
+  Future _tryToUseOCR() async {
+    print("_tryToUseOCR");
+    // TakePhotoForOCRPage 
+    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    print("cccccc: $c");
+    if (c == null) {
+      return;
+    }
+    this.moldCode = c;
+    _sBar.setContent(this.moldCode);
+    _getDataFromServer();
   }
 
   Future _tryToScan() async {

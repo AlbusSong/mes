@@ -225,7 +225,7 @@ class _MoldInPageState extends State<MoldInPage> {
 
   Future _tryToUseOCR() async {
     print("_tryToUseOCR");
-    // TakePhotoForOCRPage
+    // TakePhotoForOCRPage 
     var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
     print("cccccc: $c");
     if (c == null) {

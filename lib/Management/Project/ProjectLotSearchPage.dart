@@ -7,6 +7,8 @@ import '../../Others/View/SearchBarWithFunction.dart';
 
 import 'Model/ProjectItemModel.dart';
 
+import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
+
 class ProjectLotSearchPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -15,7 +17,7 @@ class ProjectLotSearchPage extends StatefulWidget {
 }
 
 class _ProjectLotSearchPageState extends State<ProjectLotSearchPage> {
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
   final SearchBarWithFunction _sBar = SearchBarWithFunction(
     hintText: "LOT NO或载具ID",
   );
@@ -214,12 +216,29 @@ class _ProjectLotSearchPageState extends State<ProjectLotSearchPage> {
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToScan();
+                if (index == 0) {
+                  _tryToScan();
+                } else if (index == 1) {
+                  _tryToUseOCR();
+                }
               }),
         )),
         height: 120,
       ),
     );
+  }
+
+  Future _tryToUseOCR() async {
+    print("_tryToUseOCR");
+    // TakePhotoForOCRPage 
+    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    print("cccccc: $c");
+    if (c == null) {
+      return;
+    }
+    this.lotNo = c;
+    _sBar.setContent(this.lotNo);
+    _getDataFromServer();
   }
 
   Future _tryToScan() async {

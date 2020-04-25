@@ -16,6 +16,8 @@ import 'Model/ProjectLineModel.dart';
 import 'Model/ProjectWorkOrderModel.dart';
 import 'Model/ProjectRealGradeItemModel.dart';
 
+import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
+
 class ProjectLotReportPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -38,7 +40,7 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
   ProjectTextInputWidget _pTextInputWgt0;
   ProjectTextInputWidget _pTextInputWgt1;
 
-  final List<String> bottomFunctionTitleList = ["一维码", "二维码"];
+  final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
   final List<MESSelectionItemWidget> selectionItemList = List();
   int selectedIndex = -1;
   String lotNo;
@@ -405,12 +407,29 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
               onTap: () {
                 print('tapped item ${index + 1}');
                 Navigator.pop(context);
-                _tryToScan();
+                if (index == 0) {
+                  _tryToScan();
+                } else if (index == 1) {
+                  _tryToUseOCR();
+                }
               }),
         )),
         height: 120,
       ),
     );
+  }
+
+  Future _tryToUseOCR() async {
+    print("_tryToUseOCR");
+    // TakePhotoForOCRPage 
+    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    print("cccccc: $c");
+    if (c == null) {
+      return;
+    }
+    this.lotNo = c;
+    _pTextInputWgt0.setContent(this.lotNo);
+    _getDataFromServer();
   }
 
   Future _tryToScan() async {
