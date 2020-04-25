@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 
 import 'NotificationDetailPage.dart';
+
+import 'Model/NotificationItemModel.dart';
 
 class NotificationListPage extends StatefulWidget {
   @override
@@ -19,6 +25,30 @@ class _NotificationListPageState extends State<NotificationListPage> {
     [3],
     [4, 5]
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getDataFromServer();
+  }
+
+  void _getDataFromServer() {
+    // Push/GetPushSubject
+    HudTool.show();
+    HttpDigger().postWithUri("Push/GetPushSubject", parameters: {}, shouldCache: true, success:  (int code, String message, dynamic responseJson) {
+      print("Push/GetPushSubject: $responseJson");
+
+      HudTool.dismiss();
+      print("asfekkdkkdkd: ${responseJson["Extend"] is String}");
+      this.arrOfData = (jsonDecode(responseJson["Extend"]) as List)
+          .map((item) => NotificationItemModel.fromJson(item))
+          .toList();
+
+      setState(() {        
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

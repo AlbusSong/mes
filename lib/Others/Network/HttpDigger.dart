@@ -157,6 +157,13 @@ class HttpDigger {
         if ((responseJson is Map) && responseJson["Message"] != null) {
           message = responseJson["Message"];
         }
+
+        if (_checkIfTimeoutByResponse(responseJson) == true) {
+          HudTool.showInfoWithStatus("登陆超时");
+          HomePage.eventBus.fire(null);
+          return;
+        }
+
         success(s ? 1 : 0, message, responseJson);
       }
 
@@ -165,6 +172,7 @@ class HttpDigger {
       }
     }).catchError((error) {      
       if (_checkIfNeedReLoginFromError(error) == true) {
+        HudTool.showInfoWithStatus("登录错误");
         HomePage.eventBus.fire(null);
       } else {
         print("$uri error: $error");
@@ -175,6 +183,10 @@ class HttpDigger {
         }
       }
     });
+  }
+
+  bool _checkIfTimeoutByResponse(Map responseDict) {
+    return ((responseDict is Map) && responseDict["Message"] != null && (responseDict["Message"] == ";ErrorCodeSys001:登录超时"));
   }
 
   bool _checkIfNeedReLoginFromError(dynamic error) {
