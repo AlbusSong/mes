@@ -66,8 +66,10 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
-
-    _checkLoginStatus();
+    
+    Future.delayed(Duration(seconds: 1), (){
+      _checkLoginStatus();
+    }); 
 
     return scf;
   }
