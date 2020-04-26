@@ -95,6 +95,12 @@ class HttpDigger {
       HttpFailure failure}) {
     print("NetworkRequest Url: ${baseUrl + uri}");
 
+    // update headers
+    this.dio.options.headers = {
+      "user-agent": "MES-Android",
+      "Cookie": MeInfo().cookie,
+    };
+
     String md5OfParameters = generateMd5(jsonEncode(parameters));
     String cacheKey = (baseUrl + uri + "/" + md5OfParameters);
     print("cacheKey: $cacheKey");
@@ -186,7 +192,11 @@ class HttpDigger {
   }
 
   bool _checkIfTimeoutByResponse(Map responseDict) {
-    return ((responseDict is Map) && responseDict["Message"] != null && (responseDict["Message"] == ";ErrorCodeSys001:登录超时"));
+    bool result = ((responseDict is Map) && responseDict["Message"] != null && ((responseDict["Message"] as String).contains("登录超时")));
+    if (result) {
+      print("_checkIfTimeoutByResponse: $responseDict");
+    }
+    return result;
   }
 
   bool _checkIfNeedReLoginFromError(dynamic error) {
