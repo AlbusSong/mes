@@ -351,8 +351,8 @@ class _ProjectRepairmentDetailPageState
         availableCount++;
       }
     }
-    if (availableCount < 3) {
-      HudTool.showInfoWithStatus("请选择至少3个耗用辅料");
+    if (availableCount == 0) {
+      HudTool.showInfoWithStatus("请选择至少1个耗用辅料");
       return;
     }
 

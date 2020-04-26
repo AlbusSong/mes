@@ -95,11 +95,8 @@ class HttpDigger {
       HttpFailure failure}) {
     print("NetworkRequest Url: ${baseUrl + uri}");
 
-    // update headers
-    this.dio.options.headers = {
-      "user-agent": "MES-Android",
-      "Cookie": MeInfo().cookie,
-    };
+    // update Cookie in header
+    this.dio.options.headers["Cookie"] = MeInfo().cookie;
 
     String md5OfParameters = generateMd5(jsonEncode(parameters));
     String cacheKey = (baseUrl + uri + "/" + md5OfParameters);

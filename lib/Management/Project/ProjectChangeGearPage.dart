@@ -181,6 +181,10 @@ class _ProjectChangeGearPageState extends State<ProjectChangeGearPage> {
     print("_hasSelectedItem: $index");
     List<String> arrOfSelectionTitle = [];
     if (index == 4) {
+      if (this.lotDetailData == null) {
+        HudTool.showInfoWithStatus("请先获取Lot信息");
+        return;
+      }
       for (ProjectGradeItemModel m in this.arrOfGradeItem) {
         arrOfSelectionTitle.add('${m.Level}');
       }
