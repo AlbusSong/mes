@@ -149,9 +149,9 @@ class _LoginPageState extends State<LoginPage> {
       MeInfo().nickname = responseJson["Category"];
       MeInfo().storeLoginInfo();
 
-      Future.delayed(Duration(seconds: 2), (){
-        _afterLoginAction();
-      });      
+      // Future.delayed(Duration(seconds: 2), (){
+      //   _afterLoginAction();
+      // });      
     }, failure: (dynamic e) {
       HudTool.showInfoWithStatus("${e.toString()}");
     });

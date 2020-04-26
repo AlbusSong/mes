@@ -280,8 +280,9 @@ class HttpDigger {
       "UserName": username ?? "",
       "Password": password ?? ""
     }).then((responseObject) {
-      if (success != null) {
-        MeInfo().cookie = responseObject.headers.value("set-cookie");
+      MeInfo().cookie = responseObject.headers.value("set-cookie");
+      MeInfo().storeCookie();
+      if (success != null) {        
         Map responseJson = responseObject.data;
         bool s = responseJson["Success"];
         String message = responseJson["Message"];

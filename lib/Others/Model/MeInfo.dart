@@ -31,6 +31,7 @@ class MeInfo {
     this.username = (pref.getString("username") ?? "");
     this.password = (pref.getString("password") ?? "");
     this.nickname = (pref.getString("nickname") ?? "");
+    this.cookie = (pref.getString("cookie") ?? "");
   }
 
   Future storeLoginInfo() async {
@@ -41,10 +42,17 @@ class MeInfo {
       pref.setString("password", this.password);
       pref.setString("username", this.username);
       pref.setString("nickname", this.nickname);
+      pref.setString("cookie", this.cookie);
     } else {
       pref.setString("", this.password);
       pref.setString("", this.username);
       pref.setString("", this.nickname);
+      pref.setString("cookie", this.cookie);
     }
+  }
+
+  Future storeCookie() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString("cookie", this.cookie);
   }
 }

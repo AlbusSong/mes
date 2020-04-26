@@ -24,9 +24,12 @@ class HomePage extends StatelessWidget {
     _isLoginInfoRefreshed = true;
     HttpDigger.login(MeInfo().username, MeInfo().password,
         success: ((int code, String message, dynamic responseJson) {
-      print("Login: $responseJson");
-
+      print("Login: $responseJson");      
       hideKeyboard(_scaffoldKey.currentContext);
+
+      MeInfo().isLogined = true;
+      MeInfo().nickname = responseJson["Category"];
+      MeInfo().storeLoginInfo();
     }));
   }
 

@@ -27,7 +27,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
     hintText: "LOT NO或载具ID",
   );
 
-  String lotNo = "HSO0042004090007";
+  String lotNo;
   List arrOfData;
   List arrOfSelectedIndex = List();
   String remarkContent;
@@ -50,7 +50,7 @@ class _ProjectLotUnlockPageState extends State<ProjectLotUnlockPage> {
     // LotSubmit/GetUnLockLot
     Map mDict = Map();
     if (isAvailable(this.lotNo)) {
-      mDict["Lotno"] = this.lotNo;      
+      mDict["lotno"] = this.lotNo;      
     } else {
       return;
     }
