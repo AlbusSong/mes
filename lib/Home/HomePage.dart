@@ -40,9 +40,8 @@ class HomePage extends StatelessWidget {
 
     eventBus.on().listen((event) {
       print("event.runtimeType: ${event.runtimeType}");
-      HudTool.dismiss();
-      Navigator.of(context).popUntil((r) => r.isFirst);
-      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+
+      _pushToLoginPage();
     });
 
     Scaffold scf = Scaffold(
@@ -73,11 +72,23 @@ class HomePage extends StatelessWidget {
     return scf;
   }
 
+  void _pushToLoginPage() {
+    HudTool.dismiss();
+    Navigator.of(_scaffoldKey.currentContext).popUntil((r) => r.isFirst);
+    Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+  }
+
   void _checkLoginStatus() {
     // if (MeInfo().isLogined == true) {
     //   _getDataFromServer();
     //   return;
     // }
+    int currentUnixTime = DateTime.now().millisecondsSinceEpoch;
+    if (currentUnixTime - MeInfo().lastLoginUnixTime >= (1000 * 60 * 60 * 8)) {
+      // 如果上次登录时间是8小时之前的话，需要重新登录
+      _pushToLoginPage();
+      return;
+    }
 
     Future.delayed(Duration(seconds: 2), () {
       if (MeInfo().isLogined == false) {

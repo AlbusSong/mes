@@ -24,6 +24,7 @@ class MeInfo {
   String password;
   String nickname;
   bool shouldRememberMe;
+  int lastLoginUnixTime;
 
   Future _initSomeThings() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -32,6 +33,7 @@ class MeInfo {
     this.password = (pref.getString("password") ?? "");
     this.nickname = (pref.getString("nickname") ?? "");
     this.cookie = (pref.getString("cookie") ?? "");
+    this.lastLoginUnixTime = (pref.getInt("lastLoginUnixTime") ?? DateTime.now().millisecondsSinceEpoch);
   }
 
   Future storeLoginInfo() async {
@@ -54,5 +56,8 @@ class MeInfo {
   Future storeCookie() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString("cookie", this.cookie);
+
+    // 记录登录时间
+    pref.setInt("lastLoginUnixTime", DateTime.now().millisecondsSinceEpoch);
   }
 }
