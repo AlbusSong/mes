@@ -33,6 +33,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   MESSelectionItemWidget _selectionWgt0;
   MESSelectionItemWidget _selectionWgt1;
   MESSelectionItemWidget _selectionWgt2;
+  MESContentInputWidget _contentInputWgt;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
@@ -54,6 +55,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     _selectionWgt0 = _buildSelectionInputItem(0);
     _selectionWgt1 = _buildSelectionInputItem(1);
     _selectionWgt2 = _buildSelectionInputItem(2);
+    _contentInputWgt = _buildContentInputItem();
 
     _sBar.functionBlock = () {
       print("functionBlock");
@@ -154,7 +156,7 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
         _selectionWgt0,
         _selectionWgt1,
         _selectionWgt2,
-        _buildContentInputItem(),
+        _contentInputWgt,
         WidgetTool.createListViewLine(20, hexColor("f1f1f7")),
         _buildPushSectionHeader(),
         _buildPushSectionCell(0),
@@ -166,6 +168,11 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   }
 
   Widget _buildPushSectionHeader() {
+    if (this.selectedLockCode == null || this.selectedLockCode.LockCode != "TL") {
+      // 如果锁定代码不是“退料”的话
+      return Container(height: 1,);
+    }
+
     return Container(
       margin: EdgeInsets.fromLTRB(10, 10, 10, 5),
       child: Text(
@@ -176,6 +183,11 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   }
 
   Widget _buildPushSectionCell(int index) {
+    if (this.selectedLockCode == null || this.selectedLockCode.LockCode != "TL") {
+      // 如果锁定代码不是“退料”的话
+      return Container(height: 1,);
+    }
+
     return GestureDetector(
       child: Container(
       // height: 50,
@@ -328,6 +340,8 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     } else if (index == 3) {
     } else if (index == 4) {
     }
+    setState(() {      
+    });
   }
 
   Widget _buildContentInputItem() {
@@ -399,10 +413,13 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     //   return;
     // }
 
-    if (listLength(this.arrOfPushPerson) == 0) {
+    if (this.selectedLockCode != null && this.selectedLockCode.LockCode == "TL") {
+      // 如果是“退料”的话
+      if (listLength(this.arrOfPushPerson) == 0) {
       HudTool.showInfoWithStatus("请选择推送人");
       return;
     }
+    }    
 
     bool isOkay =
         await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定锁定?");

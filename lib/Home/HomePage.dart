@@ -76,7 +76,7 @@ class HomePage extends StatelessWidget {
 
   void _pushToLoginPage() {
     HudTool.dismiss();
-    Navigator.of(_scaffoldKey.currentContext).popUntil((r) => r.isFirst);
+    // Navigator.of(_scaffoldKey.currentContext).popUntil((r) => r.isFirst);
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
   }
 
