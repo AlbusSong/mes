@@ -582,9 +582,9 @@ class _QualityPatrolTestWorkOrderReportPageState
             child: FlatButton(
             textColor: hexColor("333333"),
             color: hexColor("dddddd"),
-            child: Text("选择文件"),
+            child: Text("上传图片"),
             onPressed: () {
-              _tryToChooseImage();
+              _tryToGetImage();
             },
           ),
           ),
@@ -615,9 +615,38 @@ class _QualityPatrolTestWorkOrderReportPageState
     }
   }
 
-  Future _tryToChooseImage() async {
+  void _tryToGetImage() {
+    print("_tryToGetImage");
+    _popSheetAlert();    
+  }
+
+  void _popSheetAlert() {
+    List<String> titleList = ["相册", "拍照"];
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        child: ListView(
+            children: List.generate(
+          2,
+          (index) => InkWell(
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 60.0,
+                  child: Text(titleList[index])),
+              onTap: () {
+                print('tapped item ${index + 1}');
+                Navigator.pop(context);
+                _tryToObtainImage(index);
+              }),
+        )),
+        height: 120,
+      ),
+    );
+  }
+
+  Future _tryToObtainImage(int index) async {
     print("_tryToChooseImage");
-    var picture = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var picture = await ImagePicker.pickImage(source: (index == 0 ? ImageSource.gallery : ImageSource.camera));
     print("picture: $picture");
     if (picture == null) {
       return;
