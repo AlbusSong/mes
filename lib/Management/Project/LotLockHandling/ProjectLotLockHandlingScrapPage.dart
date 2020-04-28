@@ -47,6 +47,8 @@ class _ProjectLotLockHandlingScrapPageState extends State<ProjectLotLockHandling
   MESSelectionItemWidget _selectionWgt2;
   MESSelectionItemWidget _selectionWgt3;
 
+  MESContentInputWidget _contentInputWgt;
+
   final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
 
   String remarkContent;
@@ -66,6 +68,8 @@ class _ProjectLotLockHandlingScrapPageState extends State<ProjectLotLockHandling
     _selectionWgt1 = _buildSelectionInputItem(1);
     _selectionWgt2 = _buildSelectionInputItem(2);
     _selectionWgt3 = _buildSelectionInputItem(3);
+
+    _contentInputWgt = _buildContentInputItem();
 
     _getRepairCodeListFromServer();
     _getDataFromServer();
@@ -157,7 +161,8 @@ class _ProjectLotLockHandlingScrapPageState extends State<ProjectLotLockHandling
         _selectionWgt1,
         _selectionWgt2,
         _selectionWgt3,
-        _buildContentInputItem(),
+        _contentInputWgt,
+        _buildImageInputCell(),
         _buildFooter(),
       ],
     );

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/Const/Const.dart';
@@ -10,6 +12,7 @@ import '../../../Others/View/MESContentInputWidget.dart';
 import '../Widget/ProjectTextInputWidget.dart';
 
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../Model/ProjectLotInfoModel.dart';
 import '../Model/ProjectRepairCodeModel.dart';
@@ -45,11 +48,14 @@ class _ProjectReturnRepairmentLotPageState
   MESSelectionItemWidget _selectionWgt2;
   MESSelectionItemWidget _selectionWgt3;
 
+  MESContentInputWidget _contentInputWgt;
+
   String remarkContent;
   String lotNo;
   ProjectLotInfoModel lotInfoData;
   List arrOfRepairCode;
   ProjectRepairCodeModel selectedRepairCode;
+  File obtainedPicture;
 
   bool get wantKeepAlive => true;
 
@@ -63,6 +69,8 @@ class _ProjectReturnRepairmentLotPageState
     _selectionWgt1 = _buildSelectionInputItem(1);
     _selectionWgt2 = _buildSelectionInputItem(2);
     _selectionWgt3 = _buildSelectionInputItem(3);
+
+    _contentInputWgt = _buildContentInputItem();
   }
 
   void _getDataFromServer() {
@@ -136,7 +144,8 @@ class _ProjectReturnRepairmentLotPageState
         _selectionWgt1,
         _selectionWgt2,
         _selectionWgt3,
-        _buildContentInputItem(),
+        _contentInputWgt,
+        _buildImageInputCell(),
         _buildFooter(),
       ],
     );
@@ -193,6 +202,90 @@ class _ProjectReturnRepairmentLotPageState
     );
     wgt.selectionBlock = selectionBlock;
     return wgt;
+  }
+
+  Widget _buildImageInputCell() {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            height: 40,
+            child: FlatButton(
+            textColor: hexColor("333333"),
+            color: hexColor("dddddd"),
+            child: Text("上传图片"),
+            onPressed: () {
+              _tryToGetImage();
+            },
+          ),
+          ),
+
+          _buildImageContentArea(),          
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageContentArea() {
+    if (this.obtainedPicture == null) {
+      return Container(
+        height: 1,
+      );
+    } else {
+      return Container(
+        margin: EdgeInsets.all(10),
+        height: 200,
+        color: randomColor(),
+        child: Image.file(this.obtainedPicture),
+      );
+    }
+  }
+
+  void _tryToGetImage() {
+    print("_tryToGetImage");
+    _popSheetAlertForImage();    
+  }
+
+  void _popSheetAlertForImage() {
+    List<String> titleList = ["相册", "拍照"];
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        child: ListView(
+            children: List.generate(
+          2,
+          (index) => InkWell(
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 60.0,
+                  child: Text(titleList[index])),
+              onTap: () {
+                print('tapped item ${index + 1}');
+                Navigator.pop(context);
+                _tryToObtainImage(index);
+              }),
+        )),
+        height: 120,
+      ),
+    );
+  }
+
+  Future _tryToObtainImage(int index) async {
+    print("_tryToChooseImage");
+    var picture = await ImagePicker.pickImage(source: (index == 0 ? ImageSource.gallery : ImageSource.camera));
+    print("picture: $picture");
+    if (picture == null) {
+      return;
+    }
+
+    this.obtainedPicture = picture;
+
+    setState(() {      
+    });
   }
 
   void _hasSelectedItem(int index) {
@@ -318,7 +411,11 @@ class _ProjectReturnRepairmentLotPageState
     mDict["Comment"] = this.remarkContent;
     mDict["Qty"] = this.lotInfoData.Qty.toString();
     mDict["RepairCode"] = this.selectedRepairCode.LOTRepairCode;
-    mDict["myPic"] = "";
+    if (this.obtainedPicture != null) {
+      mDict["myPic"] = base64Encode(this.obtainedPicture.readAsBytesSync());
+    } else {
+      mDict["myPic"] = "";
+    }
     mDict["myFile"] = "";
 
     HudTool.show();
@@ -330,7 +427,7 @@ class _ProjectReturnRepairmentLotPageState
         return;
       }
 
-      HudTool.showInfoWithStatus("操作成功");
+      HudTool.showInfoWithStatus("返修成功");
       Navigator.pop(context);
     });
   }
