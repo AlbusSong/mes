@@ -290,13 +290,11 @@ class HttpDigger {
     )).post("Login/OutOnline", data: {
       "UserName": username ?? "",
       "Password": password ?? ""
-    }).then((responseObject) {
-      Map responseJson = responseObject.data;
-      String sessionId = responseJson["SessionId"];
-      String cookie = responseObject.headers.value("set-cookie");
-      MeInfo().cookie = "ASP.NET_SessionId=$sessionId;$cookie";
+    }).then((responseObject) {      
+      MeInfo().cookie = responseObject.headers.value("set-cookie");
       MeInfo().storeCookie();
-      if (success != null) {               
+      if (success != null) {      
+        Map responseJson = responseObject.data;         
         bool s = responseJson["Success"];
         String message = responseJson["Message"];
         success(s ? 1 : 0, message, responseJson);
