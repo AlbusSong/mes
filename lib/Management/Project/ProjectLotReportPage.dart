@@ -210,7 +210,7 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     bool canScan = true;
     TextInputType keyboardType = TextInputType.text;
     if (index == 0) {
-      title = "LotNo/模具ID";
+      title = "LotNo/载具ID";
       placeholder = "扫描/输入";
     } else if (index == 1) {
       title = "数量";
@@ -371,12 +371,10 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     Map<String, dynamic> mDict = Map();
     mDict["tool"] = this.lotNo;
     mDict["wono"] = this.selectedPlanInfo.Wono;
-    mDict["grade"] = "BBB";
+    mDict["grade"] = this.selectedGradeInfo.Level;
     mDict["qty"] = this.lotAmount;
     mDict["line"] = this.selectedPlanInfo.WorkCenterCode;
     mDict["productCode"] = this.selectedPlanInfo.ItemCode;
-
-    print("LotSubmit/Submit mDict: $mDict");
 
     HudTool.show();
     HttpDigger().postWithUri("LotSubmit/Submit", parameters: mDict,

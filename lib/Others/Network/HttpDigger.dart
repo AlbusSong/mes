@@ -291,10 +291,12 @@ class HttpDigger {
       "UserName": username ?? "",
       "Password": password ?? ""
     }).then((responseObject) {
-      MeInfo().cookie = responseObject.headers.value("set-cookie");
+      Map responseJson = responseObject.data;
+      String sessionId = responseJson["SessionId"];
+      String cookie = responseObject.headers.value("set-cookie");
+      MeInfo().cookie = "ASP.NET_SessionId=$sessionId;$cookie";
       MeInfo().storeCookie();
-      if (success != null) {        
-        Map responseJson = responseObject.data;
+      if (success != null) {               
         bool s = responseJson["Success"];
         String message = responseJson["Message"];
         success(s ? 1 : 0, message, responseJson);
