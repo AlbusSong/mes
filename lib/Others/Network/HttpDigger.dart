@@ -78,7 +78,7 @@ class HttpDigger {
     receiveTimeout: 100000,
     // 5s
     headers: {
-      "user-agent": "MES-Android",
+      "user-agent": "MES-App",
       // "api": "1.0.0",
       "Cookie": MeInfo().cookie,
     },
@@ -97,10 +97,14 @@ class HttpDigger {
 
     // update Cookie in header
     this.dio.options.headers["Cookie"] = MeInfo().cookie;
+    // this.dio.options.headers["cookie"] = MeInfo().cookie;
+    this.dio.options.headers.remove("cookie");
+    print("$uri header: ${this.dio.options.headers}");
+    print("$uri mDict: $parameters");
 
     String md5OfParameters = generateMd5(jsonEncode(parameters));
     String cacheKey = (baseUrl + uri + "/" + md5OfParameters);
-    print("cacheKey: $cacheKey");
+    // print("cacheKey: $cacheKey");
     if (shouldCache == true) {
       Future<dynamic> cachedDataFuture = FlutterCache().getCachedData(cacheKey);
       cachedDataFuture.then((responseJsonString) {
@@ -231,7 +235,7 @@ class HttpDigger {
       receiveTimeout: 300000,
       // 5s
       headers: {
-        "user-agent": "MES-Android",
+        "user-agent": "MES-App",
         "X-Appid": xunfeiAppId,
         "X-CurTime": currentUnixTimeString,
         "X-Param": xParamBase64String,
@@ -277,7 +281,7 @@ class HttpDigger {
       receiveTimeout: 100000,
       // 5s
       headers: {
-        "user-agent": "MES-Android",
+        "user-agent": "MES-App",
         // "api": "1.0.0",
         // "Cookie": MeInfo().cookie,
       },

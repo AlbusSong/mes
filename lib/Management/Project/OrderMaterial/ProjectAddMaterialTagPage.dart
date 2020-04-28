@@ -11,8 +11,8 @@ import '../Model/ProjectMaterialItemModel.dart';
 
 class ProjectAddMaterialTagPage extends StatefulWidget {
   ProjectAddMaterialTagPage(
-      this.materialInfo,
-      this.wono,
+    this.materialInfo,
+    this.wono,
   );
 
   final ProjectMaterialItemModel materialInfo;
@@ -44,31 +44,33 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
   void initState() {
     super.initState();
 
-     _sBar.keyboardReturnBlock = (String c) {
+    _sBar.keyboardReturnBlock = (String c) {
       _getDataFromServer();
     };
 
-    _sBar.setContent('${this.materialInfo.ItemType}|${this.materialInfo.ItemCode}|${this.materialInfo.ItemName}');
+    _sBar.setContent(
+        '${this.materialInfo.ItemType}|${this.materialInfo.ItemCode}|${this.materialInfo.ItemName}');
 
     _getDataFromServer();
   }
 
   void _getDataFromServer() {
-    if (isAvailable(this.materialInfo.ItemCode) == false) {      
+    if (isAvailable(this.materialInfo.ItemCode) == false) {
       return;
     }
     // 获取所有有效的产线
     HudTool.show();
-    HttpDigger().postWithUri("LoadMaterial/GetTagInfo", parameters: {"item":this.materialInfo.ItemCode}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LoadMaterial/GetTagInfo",
+        parameters: {"item": this.materialInfo.ItemCode}, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/GetTagInfo: $responseJson");
       HudTool.dismiss();
       this.arrOfData = (responseJson['Extend'] as List)
           .map((item) => ProjectTagInfoModel.fromJson(item))
           .toList();
-      setState(() {                
-      });
+      setState(() {});
     });
-  }      
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
       ),
       body: _buildBody(),
     );
-  }  
+  }
 
   Widget _buildBody() {
     return Column(
@@ -94,18 +96,18 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
           ),
         ),
         Container(
-            height: 50,
-            width: double.infinity,
-            // color: randomColor(),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: hexColor(MAIN_COLOR),
-              child: Text("添加"),
-              onPressed: () {
-                _btnConfirmClicked();
-              },
-            ),
+          height: 50,
+          width: double.infinity,
+          // color: randomColor(),
+          child: FlatButton(
+            textColor: Colors.white,
+            color: hexColor(MAIN_COLOR),
+            child: Text("添加"),
+            onPressed: () {
+              _btnConfirmClicked();
+            },
           ),
+        ),
       ],
     );
   }
@@ -141,13 +143,13 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
                     height: 25,
                     color: Colors.white,
                     child: Text(
-                          "标签：${itemData.TagID}",
-                          maxLines: 2,
-                          style: TextStyle(
-                              color: hexColor(MAIN_COLOR_BLACK),
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      "标签：${itemData.TagID}",
+                      maxLines: 2,
+                      style: TextStyle(
+                          color: hexColor(MAIN_COLOR_BLACK),
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                   Container(
                     color: Colors.white,
@@ -203,7 +205,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
                                 color: hexColor("999999"), fontSize: 15)),
                       ],
                     ),
-                  ),                  
+                  ),
                   Container(
                     color: hexColor("dddddd"),
                     height: 1,
@@ -232,8 +234,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
 
   void _hasSelectedIndex(int index) {
     this.selectedIndex = index;
-    setState(() {      
-    });
+    setState(() {});
   }
 
   Future _btnConfirmClicked() async {
@@ -250,10 +251,14 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
     }
   }
 
-  void _confirmAction() {    
+  void _confirmAction() {
     ProjectTagInfoModel tagInfo = this.arrOfData[this.selectedIndex];
     HudTool.show();
-    HttpDigger().postWithUri("LoadMaterial/BarcodeScan", parameters: {"wono":this.wono, "item":this.materialInfo.ItemCode, "tag":tagInfo.TagID}, success: (int code, String message, dynamic responseJson){
+    HttpDigger().postWithUri("LoadMaterial/BarcodeScan", parameters: {
+      "wono": this.wono,
+      "item": this.materialInfo.ItemCode,
+      "tag": tagInfo.TagID
+    }, success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/BarcodeScan: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);

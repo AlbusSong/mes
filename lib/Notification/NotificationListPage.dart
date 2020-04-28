@@ -35,15 +35,21 @@ class _NotificationListPageState extends State<NotificationListPage> {
 
   void _getDataFromServer() {
     // Push/GetPushSubject
+    Map mDict = Map();
+    mDict["wono"] = "";
+    mDict["item"] = "";
+    mDict["tag"] = "";
+    mDict["id"] = "";
+
     HudTool.show();
-    HttpDigger().postWithUri("Push/GetPushSubject", parameters: {}, shouldCache: true, success:  (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("Push/GetPushSubject", parameters: mDict, shouldCache: true, success:  (int code, String message, dynamic responseJson) {
       print("Push/GetPushSubject: $responseJson");
 
       HudTool.dismiss();
       print("asfekkdkkdkd: ${responseJson["Extend"] is String}");
-      this.arrOfData = (jsonDecode(responseJson["Extend"]) as List)
-          .map((item) => NotificationItemModel.fromJson(item))
-          .toList();
+      // this.arrOfData = (jsonDecode(responseJson["Extend"]) as List)
+      //     .map((item) => NotificationItemModel.fromJson(item))
+      //     .toList();
 
       setState(() {        
       });

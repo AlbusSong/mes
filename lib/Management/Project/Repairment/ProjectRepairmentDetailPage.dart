@@ -362,7 +362,7 @@ class _ProjectRepairmentDetailPageState
     }
 
     bool isOkay =
-        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定锁定?");
+        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定提交?");
 
     if (isOkay) {
       _confirmAction();
