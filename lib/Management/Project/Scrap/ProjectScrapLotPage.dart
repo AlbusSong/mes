@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import '../../../Others/Const/Const.dart';
@@ -15,6 +17,8 @@ import '../Model/ProjectLotInfoModel.dart';
 import '../Model/ProjectScrapItemModel.dart';
 
 import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
+
+import 'package:image_picker/image_picker.dart';
 
 class ProjectScrapLotPage extends StatefulWidget {
   ProjectScrapLotPage(
@@ -42,6 +46,8 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
   MESSelectionItemWidget _selectionWgt2;
   MESSelectionItemWidget _selectionWgt3;
 
+  MESContentInputWidget _contentInputWgt;
+
   final List<String> bottomFunctionTitleList = ["二维码", "OCR"];
 
   String remarkContent;
@@ -49,6 +55,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
   ProjectLotInfoModel lotInfoData;
   List arrOfScrapCode;
   ProjectScrapItemModel selectedScrapCode;
+  File obtainedPicture;
 
   @override
   bool get wantKeepAlive => true;
@@ -63,6 +70,8 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
     _selectionWgt1 = _buildSelectionInputItem(1);
     _selectionWgt2 = _buildSelectionInputItem(2);
     _selectionWgt3 = _buildSelectionInputItem(3);
+
+    _contentInputWgt = _buildContentInputItem();
 
     _getRepairCodeListFromServer();
   }
@@ -141,7 +150,8 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
         _selectionWgt1,
         _selectionWgt2,
         _selectionWgt3,
-        _buildContentInputItem(),
+        _contentInputWgt,
+        _buildImageInputCell(),
         _buildFooter(),
       ],
     );
@@ -197,6 +207,90 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
     );
     wgt.selectionBlock = selectionBlock;
     return wgt;
+  }
+
+  Widget _buildImageInputCell() {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            height: 40,
+            child: FlatButton(
+            textColor: hexColor("333333"),
+            color: hexColor("dddddd"),
+            child: Text("上传图片"),
+            onPressed: () {
+              _tryToGetImage();
+            },
+          ),
+          ),
+
+          _buildImageContentArea(),          
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageContentArea() {
+    if (this.obtainedPicture == null) {
+      return Container(
+        height: 1,
+      );
+    } else {
+      return Container(
+        margin: EdgeInsets.all(10),
+        height: 200,
+        color: randomColor(),
+        child: Image.file(this.obtainedPicture),
+      );
+    }
+  }
+
+  void _tryToGetImage() {
+    print("_tryToGetImage");
+    _popSheetAlertForImage();    
+  }
+
+  void _popSheetAlertForImage() {
+    List<String> titleList = ["相册", "拍照"];
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        child: ListView(
+            children: List.generate(
+          2,
+          (index) => InkWell(
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 60.0,
+                  child: Text(titleList[index])),
+              onTap: () {
+                print('tapped item ${index + 1}');
+                Navigator.pop(context);
+                _tryToObtainImage(index);
+              }),
+        )),
+        height: 120,
+      ),
+    );
+  }
+
+  Future _tryToObtainImage(int index) async {
+    print("_tryToChooseImage");
+    var picture = await ImagePicker.pickImage(source: (index == 0 ? ImageSource.gallery : ImageSource.camera));
+    print("picture: $picture");
+    if (picture == null) {
+      return;
+    }
+
+    this.obtainedPicture = picture;
+
+    setState(() {      
+    });
   }
 
   void _hasSelectedItem(int index) {
@@ -315,8 +409,22 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
   }
 
   void _realConfirmationAction() {
+    Map mDict = Map();
+    mDict["Wono"] = this.lotInfoData.Wono;
+    mDict["LotNo"] = this.lotNo;
+    mDict["StepCode"] = this.lotInfoData.ItemCode;
+    mDict["Comment"] = this.remarkContent;
+    mDict["Qty"] = this.lotInfoData.Qty.toString();
+    mDict["ScrapCode"] = this.selectedScrapCode.ScrapCode;
+    if (this.obtainedPicture != null) {
+      mDict["myPic"] = base64Encode(this.obtainedPicture.readAsBytesSync());
+    } else {
+      mDict["myPic"] = "";
+    }
+    mDict["myFile"] = "";
+
     HudTool.show();
-    HttpDigger().postWithUri("Repair/ScrapLot", parameters: {"mdl": ""},
+    HttpDigger().postWithUri("Repair/ScrapLot", parameters: mDict,
         success: (int code, String message, dynamic responseJson) {
       print("Repair/ScrapLot: $responseJson");
       if (code == 0) {
@@ -324,7 +432,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
         return;
       }
 
-      HudTool.showInfoWithStatus(message);
+      HudTool.showInfoWithStatus("报废成功");
       Navigator.pop(context);
     });
   }

@@ -92,7 +92,7 @@ class HomePage extends StatelessWidget {
       return;
     }
 
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       if (MeInfo().isLogined == false) {
         Navigator.of(_scaffoldKey.currentContext).push(
           MaterialPageRoute(builder: (BuildContext context) => LoginPage()));

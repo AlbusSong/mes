@@ -42,6 +42,8 @@ class _ProjectScrapNonLotPageState extends State<ProjectScrapNonLotPage> with Au
 
   ProjectTextInputWidget _txtInputWgt0;
 
+  MESContentInputWidget _contentInputWgt;
+
   String remarkContent;
   String scrapNum;
 
@@ -69,6 +71,8 @@ class _ProjectScrapNonLotPageState extends State<ProjectScrapNonLotPage> with Au
     _selectionWgt4 = _buildSelectionInputItem(4);
 
     _txtInputWgt0 = _buildTextInputWidgetItem(0);
+
+    _contentInputWgt = _buildContentInputItem();
 
     _getDataFromServer();
   }
@@ -122,6 +126,9 @@ class _ProjectScrapNonLotPageState extends State<ProjectScrapNonLotPage> with Au
       }
 
       HudTool.dismiss();
+      if (responseJson["Extend"] == null) {
+        return;
+      }
       this.currentDayProject = ProjectReturnRepairmentCurrentDayProjectModel.fromJson(responseJson["Extend"]);
       _selectionWgt2.setContent(this.currentDayProject.Wono);
     });
@@ -204,7 +211,7 @@ class _ProjectScrapNonLotPageState extends State<ProjectScrapNonLotPage> with Au
         _selectionWgt3,
         _txtInputWgt0,
         _selectionWgt4,
-        _buildContentInputItem(),
+        _contentInputWgt,
         _buildFooter(),
       ],
     );
