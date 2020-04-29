@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../Others/Tool/GlobalTool.dart';
-import '../../../Others/Const/Const.dart';
+// import '../../../Others/Const/Const.dart';
 
 class ProjectTextInputWidget extends StatelessWidget {
   ProjectTextInputWidget({
@@ -8,12 +8,16 @@ class ProjectTextInputWidget extends StatelessWidget {
     this.placeholder = "输入",
     this.canScan = true,
     this.keyboardType = TextInputType.text,
+    this.textInputAction = TextInputAction.done,
+    this.enabled = true,
   });
 
   String title;
   String placeholder;
   bool canScan;
   TextInputType keyboardType;
+  TextInputAction textInputAction;
+  bool enabled;
 
   void Function() functionBlock;
   void Function(String newContent) contentChangeBlock;
@@ -49,6 +53,8 @@ class ProjectTextInputWidget extends StatelessWidget {
                     child: TextField(
                       controller: _textInputController,
                       keyboardType: this.keyboardType,
+                      textInputAction: this.textInputAction,
+                      enabled: this.enabled,
                       style: TextStyle(fontSize: 17, color: hexColor("333333")),
                       decoration: InputDecoration(
                           hintText: this.placeholder,

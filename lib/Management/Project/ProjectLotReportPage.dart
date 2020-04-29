@@ -15,6 +15,7 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'Model/ProjectLineModel.dart';
 import 'Model/ProjectWorkOrderModel.dart';
 import 'Model/ProjectRealGradeItemModel.dart';
+import 'Model/ProjectQingxixianInfoModel.dart';
 
 import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
 
@@ -45,12 +46,13 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
   int selectedIndex = -1;
   String lotNo;
   String lotAmount;
-  List arrOfWork;
-  ProjectLineModel selectedWork = ProjectLineModel.fromJson({});
+  List arrOfProductLine;
+  ProjectLineModel selectedProductLine = ProjectLineModel.fromJson({});
   List arrOfPlanInfo;
   ProjectWorkOrderModel selectedPlanInfo = ProjectWorkOrderModel.fromJson({});
   List arrofGradeInfo;
   ProjectRealGradeItemModel selectedGradeInfo;
+  ProjectQingxixianInfoModel qingxixianInfo;
 
   @override
   void initState() {
@@ -81,16 +83,16 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
 
   void _getDataFromServer() {
     // LoadMaterial/AllLine 获取所有的产线
-    HttpDigger().postWithUri("LoadMaterial/AllLine",
-        parameters: {}, shouldCache: true,
-        success: (int code, String message, dynamic responseJson) {
+    HttpDigger()
+        .postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true,
+            success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/AllLine: $responseJson");
       ;
-      this.arrOfWork = (responseJson["Extend"] as List)
+      this.arrOfProductLine = (responseJson["Extend"] as List)
           .map((item) => ProjectLineModel.fromJson(item))
           .toList();
-      if (listLength(this.arrOfWork) > 0) {
-        ProjectLineModel firstWorkData = this.arrOfWork.first;
+      if (listLength(this.arrOfProductLine) > 0) {
+        ProjectLineModel firstWorkData = this.arrOfProductLine.first;
         _getPlanListFromServer(firstWorkData.LineCode);
       }
     });
@@ -129,6 +131,39 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
         this.selectedGradeInfo = this.arrofGradeInfo.first;
         _selectionWgt2.setContent(this.selectedGradeInfo.Level);
       }
+    });
+  }
+
+  void _getQingxixianInfoFromServer() {
+    // LotSubmit/UnplanInfo
+    Map mDict = Map();
+    mDict["lotNo"] = this.lotNo;
+    mDict["nPagesize"] = 10;
+    mDict["nPageindex"] = 0;
+
+    HudTool.show();
+    HttpDigger().postWithUri("LotSubmit/UnplanInfo", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("LotSubmit/UnplanInfo: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+      List arr = (responseJson["Extend"] as List)
+          .map((item) => ProjectQingxixianInfoModel.fromJson(item))
+          .toList();
+      if (listLength(arr) == 0) {
+        return;
+      }
+      this.qingxixianInfo = arr.first;
+
+      this.lotAmount = "3";
+
+      _pInfoDisplayWgt0.setContent(this.qingxixianInfo.ProcessName);
+      _pInfoDisplayWgt1.setContent(this.qingxixianInfo.ItemCode);
+      _pTextInputWgt1.setContent(this.lotAmount);
+      _selectionWgt2.setContent(this.qingxixianInfo.Grade);
     });
   }
 
@@ -176,24 +211,30 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       physics: const AlwaysScrollableScrollPhysics(),
       children: <Widget>[
         _selectionWgt0,
-        _selectionWgt1,
+        Offstage(
+          offstage: _isQingXiXian(),
+          child: _selectionWgt1,
+        ),
         _pInfoDisplayWgt0,
         _pInfoDisplayWgt1,
-        Container(
-          color: Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                child: _pInfoDisplayWgt2,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: _pInfoDisplayWgt3,
-              ),
-            ],
+        Offstage(
+          offstage: _isQingXiXian(),
+          child: Container(
+            color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  child: _pInfoDisplayWgt2,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: _pInfoDisplayWgt3,
+                ),
+              ],
+            ),
           ),
         ),
         WidgetTool.createListViewLine(15, hexColor("f2f2f7")),
@@ -208,6 +249,7 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     String title = "";
     String placeholder = "";
     bool canScan = true;
+    bool enabled = true;
     TextInputType keyboardType = TextInputType.text;
     if (index == 0) {
       title = "LotNo/载具ID";
@@ -217,17 +259,27 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       placeholder = "请输入数字";
       canScan = false;
       keyboardType = TextInputType.number;
+
+      if (_isQingXiXian()) {
+        enabled = false;
+      }
     }
     ProjectTextInputWidget wgt = ProjectTextInputWidget(
       title: title,
       placeholder: placeholder,
       canScan: canScan,
       keyboardType: keyboardType,
+      enabled: enabled,
     );
 
     wgt.functionBlock = () {
       hideKeyboard(context);
       _popSheetAlert();
+    };
+    wgt.keyboardReturnBlock = (String content) {
+      if (index == 0 && _isQingXiXian()) {
+        _getQingxixianInfoFromServer();
+      }
     };
     wgt.contentChangeBlock = (String newContent) {
       print("contentChangeBlock: $newContent");
@@ -270,7 +322,7 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     print("_hasSelectedItem: $index");
     List<String> arrOfSelectionTitle = [];
     if (index == 0) {
-      for (ProjectLineModel m in this.arrOfWork) {
+      for (ProjectLineModel m in this.arrOfProductLine) {
         arrOfSelectionTitle.add('${m.LineCode}|${m.LineName}');
       }
     } else if (index == 1) {
@@ -278,6 +330,10 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
         arrOfSelectionTitle.add('${m.Wono}|${m.StateDesc}');
       }
     } else if (index == 2) {
+      if (_isQingXiXian()) {
+        HudTool.showInfoWithStatus("清洗线不可手动选择档位");
+        return;
+      }
       for (ProjectRealGradeItemModel m in this.arrofGradeInfo) {
         arrOfSelectionTitle.add('${m.Level}');
       }
@@ -290,6 +346,16 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     _showPickerWithData(arrOfSelectionTitle, index);
 
     hideKeyboard(context);
+  }
+
+  bool _isQingXiXian() {
+    bool result = false;
+    if (this.selectedProductLine != null) {
+      if (this.selectedProductLine.LineCode == "QXX") {
+        result = true;
+      }
+    }
+    return result;
   }
 
   void _showPickerWithData(List<String> listData, int index) {
@@ -308,12 +374,16 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     picker.show(_scaffoldKey.currentState);
   }
 
-  void _handlePickerConfirmation(int indexOfSelectedItem, String title, int index) {
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
     if (index == 0) {
-      this.selectedWork = this.arrOfWork[indexOfSelectedItem];
-      print("this.selectedWork.LineCode: ${this.selectedWork.LineCode}");
-      _getPlanListFromServer(this.selectedWork.LineCode);
+      this.selectedProductLine = this.arrOfProductLine[indexOfSelectedItem];
+      print("this.selectedWork.LineCode: ${this.selectedProductLine.LineCode}");
+      _getPlanListFromServer(this.selectedProductLine.LineCode);
       _selectionWgt0.setContent(title);
+      if (_isQingXiXian()) {
+        _pTextInputWgt1 = _buildTextInputWidgetItem(1);
+      }
     } else if (index == 1) {
       this.selectedPlanInfo = this.arrOfPlanInfo[indexOfSelectedItem];
       this.lotAmount = '${this.selectedPlanInfo.LOTSize}';
@@ -338,16 +408,18 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
   }
 
   Future _btnConfirmClicked() async {
-    if (this.selectedWork == null ||
-        isAvailable(this.selectedWork.LineCode) == false) {
+    if (this.selectedProductLine == null ||
+        isAvailable(this.selectedProductLine.LineCode) == false) {
       HudTool.showInfoWithStatus("请选择产线");
       return;
     }
 
-    if (this.selectedPlanInfo == null ||
+    if (_isQingXiXian() == false) {
+      if (this.selectedPlanInfo == null ||
         isAvailable(this.selectedPlanInfo.LineCode) == false) {
       HudTool.showInfoWithStatus("请选择工单");
       return;
+    }
     }
 
     if (isAvailable(this.lotNo) == false) {
@@ -355,12 +427,15 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       return;
     }
 
-    if (isAvailable(this.lotAmount) == false) {
+    if (_isQingXiXian() == false) {
+      if (isAvailable(this.lotAmount) == false) {
       HudTool.showInfoWithStatus("请输入模具数量");
       return;
     }
+    }
 
-    bool isOkay = await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定提交?");
+    bool isOkay =
+        await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定提交?");
 
     if (isOkay) {
       _confirmAction();
@@ -370,11 +445,18 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
   void _confirmAction() {
     Map<String, dynamic> mDict = Map();
     mDict["tool"] = this.lotNo;
-    mDict["wono"] = this.selectedPlanInfo.Wono;
-    mDict["grade"] = this.selectedGradeInfo.Level;
     mDict["qty"] = this.lotAmount;
-    mDict["line"] = this.selectedPlanInfo.WorkCenterCode;
-    mDict["productCode"] = this.selectedPlanInfo.ItemCode;
+    if (_isQingXiXian()) {
+      mDict["wono"] = "";
+      mDict["grade"] = this.qingxixianInfo.Grade;
+      mDict["line"] = this.qingxixianInfo.ItemCode;
+      mDict["productCode"] = this.qingxixianInfo.ProcessCode;
+    } else {
+      mDict["wono"] = this.selectedPlanInfo.Wono;
+      mDict["grade"] = this.selectedGradeInfo.Level;
+      mDict["line"] = this.selectedPlanInfo.WorkCenterCode;
+      mDict["productCode"] = this.selectedPlanInfo.ItemCode;
+    }            
 
     HudTool.show();
     HttpDigger().postWithUri("LotSubmit/Submit", parameters: mDict,
@@ -419,8 +501,9 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
 
   Future _tryToUseOCR() async {
     print("_tryToUseOCR");
-    // TakePhotoForOCRPage 
-    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    // TakePhotoForOCRPage
+    var c = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => TakePhotoForOCRPage()));
     print("cccccc: $c");
     if (c == null) {
       return;
