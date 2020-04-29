@@ -24,6 +24,9 @@ part 'NotificationItemModel.g.dart';
   @JsonKey(name: 'PushStatus')
   int PushStatus;
 
+  @JsonKey(name: 'CreateTime')
+  String CreateTime;
+
   NotificationItemModel(this.PushCode,this.PushType,this.PushSubject,this.PushText,this.PushFunctionCode,this.PushStatus,);
 
   factory NotificationItemModel.fromJson(Map<String, dynamic> srcJson) => _$NotificationItemModelFromJson(srcJson);

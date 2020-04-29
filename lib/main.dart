@@ -18,7 +18,7 @@ void main() {
 }
 
 void _initSomeThings() {
-  print("MeInfo: ${MeInfo().username}, ${MeInfo().password}");
+  MeInfo();
   FlutterCache();
   NativeCommunicationTool();
   Trifle();

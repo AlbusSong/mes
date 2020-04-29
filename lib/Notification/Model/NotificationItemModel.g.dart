@@ -15,7 +15,7 @@ NotificationItemModel _$NotificationItemModelFromJson(
     json['PushText'] as String,
     json['PushFunctionCode'] as String,
     json['PushStatus'] as int,
-  );
+  )..CreateTime = json['CreateTime'] as String;
 }
 
 Map<String, dynamic> _$NotificationItemModelToJson(
@@ -27,4 +27,5 @@ Map<String, dynamic> _$NotificationItemModelToJson(
       'PushText': instance.PushText,
       'PushFunctionCode': instance.PushFunctionCode,
       'PushStatus': instance.PushStatus,
+      'CreateTime': instance.CreateTime,
     };

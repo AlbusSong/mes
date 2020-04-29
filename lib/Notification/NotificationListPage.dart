@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
@@ -19,12 +18,7 @@ class NotificationListPage extends StatefulWidget {
 class _NotificationListPageState extends State<NotificationListPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List arrOfData = [
-    [1, 2, 3],
-    [2, 3],
-    [3],
-    [4, 5]
-  ];
+  List arrOfData = List();
 
   @override
   void initState() {
@@ -36,20 +30,43 @@ class _NotificationListPageState extends State<NotificationListPage> {
   void _getDataFromServer() {
     // Push/GetPushSubject
     Map mDict = Map();
-    mDict["wono"] = "";
-    mDict["item"] = "";
-    mDict["tag"] = "";
-    mDict["id"] = "";
+    // mDict["wono"] = "";
+    // mDict["item"] = "";
+    // mDict["tag"] = "";
+    // mDict["id"] = "";
 
     HudTool.show();
     HttpDigger().postWithUri("Push/GetPushSubject", parameters: mDict, shouldCache: true, success:  (int code, String message, dynamic responseJson) {
       print("Push/GetPushSubject: $responseJson");
 
       HudTool.dismiss();
-      print("asfekkdkkdkd: ${responseJson["Extend"] is String}");
-      // this.arrOfData = (jsonDecode(responseJson["Extend"]) as List)
-      //     .map((item) => NotificationItemModel.fromJson(item))
-      //     .toList();
+      List arr = (responseJson["Extend"]as List)
+          .map((item) => NotificationItemModel.fromJson(item))
+          .toList();
+
+      if (listLength(arr) == 0) {
+        return;
+      }
+
+      String currentDateString = "";
+      List subitemsInSameDay = List();
+      Map oneDayItem;      
+      for (int i = 0; i < listLength(arr); i++) {
+        NotificationItemModel model = arr[i];
+        DateTime d = DateTime.parse(model.CreateTime);
+        String dateString = formatDate(d, [yyyy, '-', mm, '-', dd]);
+        if (dateString != currentDateString) {
+          currentDateString = dateString;
+          oneDayItem = Map();
+          oneDayItem["date"] = currentDateString;
+          subitemsInSameDay = List();
+          subitemsInSameDay.add(model);
+          oneDayItem["items"] = subitemsInSameDay;
+          this.arrOfData.add(oneDayItem);          
+        } else {
+          subitemsInSameDay.add(model);
+        }
+      }
 
       setState(() {        
       });
@@ -92,8 +109,9 @@ class _NotificationListPageState extends State<NotificationListPage> {
 
   Widget _buildListItem(int index) {
     List<Widget> childernWidgets = [_buildDateHeaderCell(index)];
-    List notificationSection = this.arrOfData[index];
-    for (int i = 0; i < listLength(notificationSection); i++) {
+    Map oneDayDict = this.arrOfData[index];
+    List subitemsInSameDay = (oneDayDict["items"] as List);
+    for (int i = 0; i < listLength(subitemsInSameDay); i++) {
       Widget notificationItem = _buildNotificationItemCell(index, i);
       childernWidgets.add(notificationItem);
     }
@@ -111,6 +129,9 @@ class _NotificationListPageState extends State<NotificationListPage> {
   }
 
   Widget _buildNotificationItemCell(int index, int subIndex) {
+    Map oneDayDict = this.arrOfData[index];
+    List subitemsInSameDay = (oneDayDict["items"] as List);
+    NotificationItemModel itemData = subitemsInSameDay[subIndex];
     return GestureDetector(
       onTap: () {
         print("index: $index, subIndex: $subIndex");
@@ -127,7 +148,7 @@ class _NotificationListPageState extends State<NotificationListPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("巡检异常", style: TextStyle(color: hexColor("333333"), fontSize: 16),),
-            Text("工单号 IPQEWKD0193920293 异常", style: TextStyle(color: hexColor("666666")),),
+            Text("工单号 ${itemData.PushFunctionCode} ${itemData.PushText}", style: TextStyle(color: hexColor("666666")),),
           ],
         ),
       ),
@@ -136,6 +157,7 @@ class _NotificationListPageState extends State<NotificationListPage> {
   }
 
   Widget _buildDateHeaderCell(int index) {
+    Map oneDayDict = this.arrOfData[index];
     return Container(
       height: 40,
       color: hexColor("f1f1f7"),
@@ -145,7 +167,7 @@ class _NotificationListPageState extends State<NotificationListPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "2020-04-08",
+            oneDayDict["date"],
             style: TextStyle(color: hexColor("555555"), fontSize: 16),
           ),
         ],
