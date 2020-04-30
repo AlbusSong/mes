@@ -74,9 +74,8 @@ class HttpDigger {
 
   final Dio dio = Dio(BaseOptions(
     baseUrl: baseUrl,
-    connectTimeout: 30000,
-    receiveTimeout: 100000,
-    // 5s
+    connectTimeout: 60000,
+    receiveTimeout: 60000,
     headers: {
       "user-agent": "MES-App",
       // "api": "1.0.0",
@@ -178,9 +177,14 @@ class HttpDigger {
         FlutterCache().cacheData(jsonEncode(responseJson), cacheKey);
       }
     }).catchError((error) {      
-      if (_checkIfNeedReLoginFromError(error) == true) {
-        HudTool.showInfoWithStatus("登录错误");
-        HomePage.eventBus.fire(null);
+      int errorType = _checkErrorType(error);
+      if (errorType > 0) {
+        if (errorType == 1) {
+          HudTool.showInfoWithStatus("网络超时");
+        } else {
+          HudTool.showInfoWithStatus("登录错误");
+          HomePage.eventBus.fire(null);
+        }
       } else {
         print("$uri error: $error");
         if (failure != null) {          
@@ -200,15 +204,19 @@ class HttpDigger {
     return result;
   }
 
-  bool _checkIfNeedReLoginFromError(dynamic error) {
-    bool result = false;
+  int _checkErrorType(dynamic error) {
+    int result = 0;
     if (error is DioError) {
       DioError dError = error;
-      if ((dError.response.statusCode != null) && (dError.response.statusCode == 302)) {
+      if (dError.response == null) {
+        result = 1; // timeout
+      } else {
+        if ((dError.response.statusCode != null) && (dError.response.statusCode == 302)) {
         // 302 means wrong data type（html）
         // 302 means needing relogin
-        result = true;
-      }
+        result = 2; // 登录错误
+      }        
+      }      
     }
 
     return result;

@@ -809,7 +809,11 @@ class _QualityPatrolTestWorkOrderReportPageState
       File picture = this.pictureList[i];
       Map picDict = Map();
       picDict["No"] = i;
-      picDict["Pic"] = base64Encode(picture.readAsBytesSync());
+      if (picture != null) {
+        picDict["Pic"] = base64Encode(picture.readAsBytesSync());
+      } else {
+        picDict["Pic"] = "";
+      }
       picList.add(picDict);
     }
     mDict["picList"] = picList;

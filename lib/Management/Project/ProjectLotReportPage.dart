@@ -158,7 +158,7 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       }
       this.qingxixianInfo = arr.first;
 
-      this.lotAmount = "3";
+      this.lotAmount = "1";
 
       _pInfoDisplayWgt0.setContent(this.qingxixianInfo.ProcessName);
       _pInfoDisplayWgt1.setContent(this.qingxixianInfo.ItemCode);
