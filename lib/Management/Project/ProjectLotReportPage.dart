@@ -142,7 +142,9 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     mDict["nPageindex"] = 0;
 
     HudTool.show();
-    HttpDigger().postWithUri("LotSubmit/UnplanInfo", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("LotSubmit/UnplanInfo",
+        parameters: mDict, shouldCache: true,
+        success: (int code, String message, dynamic responseJson) {
       print("LotSubmit/UnplanInfo: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -158,7 +160,7 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       }
       this.qingxixianInfo = arr.first;
 
-      this.lotAmount = "1";
+      this.lotAmount = this.qingxixianInfo.Qty.toString();
 
       _pInfoDisplayWgt0.setContent(this.qingxixianInfo.ProcessName);
       _pInfoDisplayWgt1.setContent(this.qingxixianInfo.ItemCode);
@@ -416,10 +418,10 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
 
     if (_isQingXiXian() == false) {
       if (this.selectedPlanInfo == null ||
-        isAvailable(this.selectedPlanInfo.LineCode) == false) {
-      HudTool.showInfoWithStatus("请选择工单");
-      return;
-    }
+          isAvailable(this.selectedPlanInfo.LineCode) == false) {
+        HudTool.showInfoWithStatus("请选择工单");
+        return;
+      }
     }
 
     if (isAvailable(this.lotNo) == false) {
@@ -429,9 +431,9 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
 
     if (_isQingXiXian() == false) {
       if (isAvailable(this.lotAmount) == false) {
-      HudTool.showInfoWithStatus("请输入模具数量");
-      return;
-    }
+        HudTool.showInfoWithStatus("请输入模具数量");
+        return;
+      }
     }
 
     bool isOkay =
@@ -456,7 +458,7 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       mDict["grade"] = this.selectedGradeInfo.Level;
       mDict["line"] = this.selectedPlanInfo.WorkCenterCode;
       mDict["productCode"] = this.selectedPlanInfo.ItemCode;
-    }            
+    }
 
     HudTool.show();
     HttpDigger().postWithUri("LotSubmit/Submit", parameters: mDict,
@@ -510,7 +512,10 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
     }
     this.lotNo = c;
     _pTextInputWgt0.setContent(this.lotNo);
-    _getDataFromServer();
+
+    if (_isQingXiXian()) {
+      _getQingxixianInfoFromServer();
+    }
   }
 
   Future _tryToScan() async {
@@ -522,5 +527,8 @@ class _ProjectLotReportPageState extends State<ProjectLotReportPage> {
       this.lotNo = c.substring(0, 16);
     }
     _pTextInputWgt0.setContent(this.lotNo);
+    if (_isQingXiXian()) {
+      _getQingxixianInfoFromServer();
+    }
   }
 }

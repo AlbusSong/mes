@@ -226,8 +226,8 @@ class HttpDigger {
           result = 2; // 登录错误
         }
       }
-    } else {
-      FlutterError fError = error as FlutterError;
+    } else if (error is FlutterError) {
+      FlutterError fError = error;
       if (fError.message != null) {
         if (fError.message.startsWith("setState()")) {
           result = -1;

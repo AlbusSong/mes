@@ -14,7 +14,7 @@ ProjectQingxixianInfoModel _$ProjectQingxixianInfoModelFromJson(
     json['ItemCode'] as String,
     json['ItemName'] as String,
     json['Grade'] as String,
-  );
+  )..Qty = json['Qty'] as int;
 }
 
 Map<String, dynamic> _$ProjectQingxixianInfoModelToJson(
@@ -25,4 +25,5 @@ Map<String, dynamic> _$ProjectQingxixianInfoModelToJson(
       'ItemCode': instance.ItemCode,
       'ItemName': instance.ItemName,
       'Grade': instance.Grade,
+      'Qty': instance.Qty,
     };

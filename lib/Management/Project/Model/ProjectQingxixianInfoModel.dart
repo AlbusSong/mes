@@ -21,6 +21,9 @@ part 'ProjectQingxixianInfoModel.g.dart';
   @JsonKey(name: 'Grade')
   String Grade;
 
+  @JsonKey(name: 'Qty')
+  int Qty;
+
   ProjectQingxixianInfoModel(this.ProcessCode,this.ProcessName,this.ItemCode,this.ItemName,this.Grade,);
 
   factory ProjectQingxixianInfoModel.fromJson(Map<String, dynamic> srcJson) => _$ProjectQingxixianInfoModelFromJson(srcJson);
