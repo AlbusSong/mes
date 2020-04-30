@@ -16,6 +16,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../Model/ProjectLotInfoModel.dart';
 import '../Model/ProjectRepairCodeModel.dart';
+import '../Model/ProjectReturnRepairmentReasonProcessItemModel.dart';
 
 import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
 
@@ -56,6 +57,7 @@ class _ProjectReturnRepairmentLotPageState
   List arrOfRepairCode;
   ProjectRepairCodeModel selectedRepairCode;
   File obtainedPicture;
+  ProjectReturnRepairmentReasonProcessItemModel reasonProcessInfo;
 
   bool get wantKeepAlive => true;
 
@@ -79,17 +81,27 @@ class _ProjectReturnRepairmentLotPageState
         parameters: {"lotno": this.lotNo}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
       print("Repair/GetLotInfo: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
       HudTool.dismiss();
       List arr = responseJson["Extend"];
       if (listLength(arr) > 0) {
         this.lotInfoData = ProjectLotInfoModel.fromJson(arr.first);
 
         _selectionWgt0.setContent(this.lotInfoData.Wono);
-        _selectionWgt1.setContent(
-            '${this.lotInfoData.ItemCode}|${this.lotInfoData.ProcessName}');
         _selectionWgt2.setContent(this.lotInfoData.Qty.toString());
 
         _getRepairCodeListFromServer();
+      }
+
+      List arr2 = responseJson["Extend2"];
+      if (listLength(arr2) > 0) {
+        this.reasonProcessInfo = ProjectReturnRepairmentReasonProcessItemModel.fromJson(arr2.first);
+        _selectionWgt1.setContent(
+            '${this.reasonProcessInfo.StepCode}|${this.reasonProcessInfo.StepName}');
       }
     });
   }
@@ -294,7 +306,7 @@ class _ProjectReturnRepairmentLotPageState
     List<String> arrOfSelectionTitle = [];
     if (index == 3) {
       for (ProjectRepairCodeModel m in this.arrOfRepairCode) {
-        arrOfSelectionTitle.add('${m.LOTRepairCodeID}|${m.LOTRepairCode}');
+        arrOfSelectionTitle.add('${m.LOTRepairCode}|${m.Description}');
       }
     }
 
