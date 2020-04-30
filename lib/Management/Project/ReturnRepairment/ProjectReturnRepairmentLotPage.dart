@@ -99,7 +99,8 @@ class _ProjectReturnRepairmentLotPageState
 
       List arr2 = responseJson["Extend2"];
       if (listLength(arr2) > 0) {
-        this.reasonProcessInfo = ProjectReturnRepairmentReasonProcessItemModel.fromJson(arr2.first);
+        this.reasonProcessInfo =
+            ProjectReturnRepairmentReasonProcessItemModel.fromJson(arr2.first);
         _selectionWgt1.setContent(
             '${this.reasonProcessInfo.StepCode}|${this.reasonProcessInfo.StepName}');
       }
@@ -227,16 +228,15 @@ class _ProjectReturnRepairmentLotPageState
             margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
             height: 40,
             child: FlatButton(
-            textColor: hexColor("333333"),
-            color: hexColor("dddddd"),
-            child: Text("上传图片"),
-            onPressed: () {
-              _tryToGetImage();
-            },
+              textColor: hexColor("333333"),
+              color: hexColor("dddddd"),
+              child: Text("上传图片"),
+              onPressed: () {
+                _tryToGetImage();
+              },
+            ),
           ),
-          ),
-
-          _buildImageContentArea(),          
+          _buildImageContentArea(),
         ],
       ),
     );
@@ -259,7 +259,7 @@ class _ProjectReturnRepairmentLotPageState
 
   void _tryToGetImage() {
     print("_tryToGetImage");
-    _popSheetAlertForImage();    
+    _popSheetAlertForImage();
   }
 
   void _popSheetAlertForImage() {
@@ -288,7 +288,8 @@ class _ProjectReturnRepairmentLotPageState
 
   Future _tryToObtainImage(int index) async {
     print("_tryToChooseImage");
-    var picture = await ImagePicker.pickImage(source: (index == 0 ? ImageSource.gallery : ImageSource.camera));
+    var picture = await ImagePicker.pickImage(
+        source: (index == 0 ? ImageSource.gallery : ImageSource.camera));
     print("picture: $picture");
     if (picture == null) {
       return;
@@ -296,8 +297,7 @@ class _ProjectReturnRepairmentLotPageState
 
     this.obtainedPicture = picture;
 
-    setState(() {      
-    });
+    setState(() {});
   }
 
   void _hasSelectedItem(int index) {
@@ -473,8 +473,9 @@ class _ProjectReturnRepairmentLotPageState
 
   Future _tryToUseOCR() async {
     print("_tryToUseOCR");
-    // TakePhotoForOCRPage 
-    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    // TakePhotoForOCRPage
+    var c = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => TakePhotoForOCRPage()));
     print("cccccc: $c");
     if (c == null) {
       return;

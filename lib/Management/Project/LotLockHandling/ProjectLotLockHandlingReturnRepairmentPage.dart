@@ -16,6 +16,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../Model/ProjectLotInfoModel.dart';
 import '../Model/ProjectRepairCodeModel.dart';
+import '../Model/ProjectReturnRepairmentReasonProcessItemModel.dart';
 
 import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
 
@@ -58,6 +59,7 @@ class _ProjectLotLockHandlingReturnRepairmentPageState
   List arrOfRepairCode;
   ProjectRepairCodeModel selectedRepairCode;
   File obtainedPicture;
+  ProjectReturnRepairmentReasonProcessItemModel reasonProcessInfo;
 
   @override
   void initState() {
@@ -97,6 +99,13 @@ class _ProjectLotLockHandlingReturnRepairmentPageState
         _selectionWgt2.setContent(this.lotInfoData.Qty.toString());
 
         _getRepairCodeListFromServer();
+      }
+
+      List arr2 = responseJson["Extend2"];
+      if (listLength(arr2) > 0) {
+        this.reasonProcessInfo = ProjectReturnRepairmentReasonProcessItemModel.fromJson(arr2.first);
+        _selectionWgt1.setContent(
+            '${this.reasonProcessInfo.StepCode}|${this.reasonProcessInfo.StepName}');
       }
     });
   }
