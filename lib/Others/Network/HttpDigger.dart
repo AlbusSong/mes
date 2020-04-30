@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:mes/Others/Model/MeInfo.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
@@ -37,20 +38,21 @@ class HttpDigger {
 //    FlutterCache();
     // _setCertificateForHttpClient(this.dio);
 
-    _startTimer();    
+    _startTimer();
   }
 
   void _setCertificateForHttpClient(Dio d) {
-    (d.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate  = (client) {
-    SecurityContext sc =  SecurityContext.defaultContext;
-    //file is the path of certificate
-    sc.setTrustedCertificates("");
-    HttpClient httpClient = new HttpClient(context: sc);
-    // httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
-    //   return true;
-    // };
-    return httpClient;
-};
+    (d.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      SecurityContext sc = SecurityContext.defaultContext;
+      //file is the path of certificate
+      sc.setTrustedCertificates("");
+      HttpClient httpClient = new HttpClient(context: sc);
+      // httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
+      //   return true;
+      // };
+      return httpClient;
+    };
   }
 
   void _startTimer() {
@@ -176,20 +178,23 @@ class HttpDigger {
       if (shouldCache == true) {
         FlutterCache().cacheData(jsonEncode(responseJson), cacheKey);
       }
-    }).catchError((error) {      
+    }).catchError((error) {
       int errorType = _checkErrorType(error);
-      if (errorType > 0) {
+      if (errorType != 0) {
         if (errorType == 1) {
           HudTool.showInfoWithStatus("网络超时");
-        } else {
+        } else if (errorType == 2) {
           HudTool.showInfoWithStatus("登录错误");
           HomePage.eventBus.fire(null);
+        } else if (errorType == -1) {
+          // Do nothing
+          HudTool.dismiss();
         }
       } else {
         print("$uri error: $error");
-        if (failure != null) {          
+        if (failure != null) {
           failure(error);
-        } else {          
+        } else {
           HudTool.showInfoWithStatus("网络或服务器错误: $uri");
         }
       }
@@ -197,7 +202,9 @@ class HttpDigger {
   }
 
   bool _checkIfTimeoutByResponse(Map responseDict) {
-    bool result = ((responseDict is Map) && responseDict["Message"] != null && ((responseDict["Message"] as String).contains("登录超时")));
+    bool result = ((responseDict is Map) &&
+        responseDict["Message"] != null &&
+        ((responseDict["Message"] as String).contains("登录超时")));
     if (result) {
       print("_checkIfTimeoutByResponse: $responseDict");
     }
@@ -208,15 +215,24 @@ class HttpDigger {
     int result = 0;
     if (error is DioError) {
       DioError dError = error;
-      if (dError.response == null) {
+      if (dError.type == DioErrorType.CONNECT_TIMEOUT ||
+          dError.type == DioErrorType.RECEIVE_TIMEOUT) {
         result = 1; // timeout
       } else {
-        if ((dError.response.statusCode != null) && (dError.response.statusCode == 302)) {
-        // 302 means wrong data type（html）
-        // 302 means needing relogin
-        result = 2; // 登录错误
-      }        
-      }      
+        if ((dError.response.statusCode != null) &&
+            (dError.response.statusCode == 302)) {
+          // 302 means wrong data type（html）
+          // 302 means needing relogin
+          result = 2; // 登录错误
+        }
+      }
+    } else {
+      FlutterError fError = error as FlutterError;
+      if (fError.message != null) {
+        if (fError.message.startsWith("setState()")) {
+          result = -1;
+        }
+      }
     }
 
     return result;
@@ -298,11 +314,11 @@ class HttpDigger {
     )).post("Login/OutOnline", data: {
       "UserName": username ?? "",
       "Password": password ?? ""
-    }).then((responseObject) {      
+    }).then((responseObject) {
       MeInfo().cookie = responseObject.headers.value("set-cookie");
       MeInfo().storeCookie();
-      if (success != null) {      
-        Map responseJson = responseObject.data;         
+      if (success != null) {
+        Map responseJson = responseObject.data;
         bool s = responseJson["Success"];
         String message = responseJson["Message"];
         success(s ? 1 : 0, message, responseJson);

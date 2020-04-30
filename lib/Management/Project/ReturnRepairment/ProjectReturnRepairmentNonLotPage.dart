@@ -42,6 +42,8 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
 
   ProjectTextInputWidget _txtInputWgt0;
 
+  MESContentInputWidget _contentInputWgt;
+
   String remarkContent;
   String returnRepairmentNum;
 
@@ -69,6 +71,8 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
     _selectionWgt4 = _buildSelectionInputItem(4);
 
     _txtInputWgt0 = _buildTextInputWidgetItem(0);
+
+    _contentInputWgt = _buildContentInputItem();
 
     _getDataFromServer();
   }
@@ -101,10 +105,14 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
         HudTool.showInfoWithStatus(message);
         return;
       }
-
-      HudTool.dismiss();
+      
       this.arrOfProject = (responseJson["Extend"] as List).map((item) => ProjectReturnRepairmentProjectItemModel.fromJson(item))
           .toList();
+      if (listLength(this.arrOfProject) == 0) {
+        HudTool.showInfoWithStatus("该作业中心无工程信息");
+      } else {
+        HudTool.dismiss();
+      }
     });
   }
 
@@ -204,7 +212,7 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
         _selectionWgt3,
         _txtInputWgt0,
         _selectionWgt4,
-        _buildContentInputItem(),
+        _contentInputWgt,
         _buildFooter(),
       ],
     );
@@ -272,6 +280,10 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
       arrOfSelectionTitle.add('${m.WorkCenterCode}|${m.WorkCenterName}');
     }
     } else if (index == 1) {
+      if (listLength(this.arrOfProject) == 0) {
+        HudTool.showInfoWithStatus("该作业中心无工程信息");
+        return;
+      }
       for (ProjectReturnRepairmentProjectItemModel m in this.arrOfProject) {
         arrOfSelectionTitle.add('${m.ProcessCode}|${m.ProcessName}');
       }
@@ -389,6 +401,8 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
   }
 
   Future _btnConfirmClicked() async {
+    hideKeyboard(context);
+    
     if (this.selectedWorkOrder == null) {
       HudTool.showInfoWithStatus("请选择作业中心");
       return;
