@@ -137,14 +137,14 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     });
   }
 
-  void _getMaterialInfoFromServer(String wono, {shouldShowHud = true}) {
+  void _getMaterialInfoFromServer(String wono, {shouldShowHud = true, shouldCache = true}) {
     // 获取追溯物料
     print("wono: $wono");
     if (shouldShowHud == true) {
       HudTool.show();
     }
     HttpDigger().postWithUri("LoadMaterial/RPTItem",
-        parameters: {"wono": wono}, shouldCache: true,
+        parameters: {"wono": wono}, shouldCache: shouldCache,
         success: (int code, String message, dynamic responseJson) {
       print("LoadMaterial/RPTItem: $responseJson");
       if (shouldShowHud == true) {
@@ -495,11 +495,14 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     );
   }
 
-  void _gotoAddMaterialTagPage(ProjectMaterialItemModel materialInfo, String wono) {
+  Future _gotoAddMaterialTagPage(ProjectMaterialItemModel materialInfo, String wono) async {
     Widget w = ProjectAddMaterialTagPage(
           materialInfo, wono);
-      Navigator.of(_scaffoldKey.currentContext)
-          .push(MaterialPageRoute(builder: (BuildContext context) => w));
+    bool success = await Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
+    if (success != null && success) {
+      print("gotoAddMaterialTagPage success");
+      _getMaterialInfoFromServer(this.selectedTodayWork.Wono, shouldCache: false);
+    }
   }
 
   Future _functionItemClickedAtIndex(int index) async {

@@ -266,7 +266,7 @@ class _ProjectAddMaterialTagPageState extends State<ProjectAddMaterialTagPage> {
       }
 
       HudTool.showInfoWithStatus("操作成功");
-      Navigator.pop(context);
+      Navigator.of(context).pop(true);
     });
   }
 }
