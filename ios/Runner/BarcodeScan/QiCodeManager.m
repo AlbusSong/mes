@@ -17,11 +17,25 @@ static NSString *QiInputCorrectionLevelH = @"H";//!< H: 30%
 @property (nonatomic, assign) BOOL lightObserverHasCalled;
 @property (nonatomic, assign) BOOL autoStop;
 
+// Filter
+@property (nonatomic, strong) CIFilter *sharpenFilter;
+@property (nonatomic, strong) CIDetector *qrCodeDetector;
+// 每5帧进行一次检测（没必要每帧都检测）
+@property (nonatomic) NSInteger frameCount;
+
 @end
 
 @implementation QiCodeManager
 
 #pragma mark - 扫描二维码/条形码
+
+- (void)initFilters {
+    self.frameCount = 0;
+    
+    self.qrCodeDetector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{CIDetectorAccuracy : CIDetectorAccuracyHigh}];
+    self.sharpenFilter  = [CIFilter filterWithName:@"CIUnsharpMask"];
+    [self.sharpenFilter setValue:@10.0 forKey:@"inputRadius"];
+}
 
 - (instancetype)initWithPreviewView:(QiCodePreviewView *)previewView completion:(nonnull void (^)(void))completion {
     
@@ -34,6 +48,8 @@ static NSString *QiInputCorrectionLevelH = @"H";//!< H: 30%
             _previewView.delegate = self;
         }
         
+        [self initFilters];
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
@@ -45,6 +61,9 @@ static NSString *QiInputCorrectionLevelH = @"H";//!< H: 30%
             
             AVCaptureMetadataOutput *output = [[AVCaptureMetadataOutput alloc] init];
             [output setMetadataObjectsDelegate:self queue:dispatch_get_main_queue()];
+            
+            AVCaptureVideoDataOutput *metadataOutput = [[AVCaptureVideoDataOutput alloc] init];
+            [metadataOutput setSampleBufferDelegate:self queue:dispatch_get_global_queue(0, 0)];
             
             self.session = [[AVCaptureSession alloc] init];
             self.session.sessionPreset = AVCaptureSessionPresetHigh;
@@ -146,6 +165,9 @@ static NSString *QiInputCorrectionLevelH = @"H";//!< H: 30%
 }
 
 - (void)stopScanning {
+    // kill filters
+    self.qrCodeDetector = nil;
+    self.sharpenFilter = nil;
     
     if (_session && _session.isRunning) {
         [_session stopRunning];
@@ -186,18 +208,6 @@ static NSString *QiInputCorrectionLevelH = @"H";//!< H: 30%
 - (void)applicationDidEnterBackground:(NSNotification *)notification {
     
     [self stopScanning];
-}
-
-
-#pragma mark - AVCaptureMetadataOutputObjectsDelegate
-
-- (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection {
-    
-    AVMetadataMachineReadableCodeObject *code = metadataObjects.firstObject;
-    
-    if (code.stringValue) {
-        [self handleCodeString:code.stringValue];
-    }
 }
 
 
@@ -354,7 +364,19 @@ static NSString *QiInputCorrectionLevelH = @"H";//!< H: 30%
 }
 
 
-#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
+#pragma mark - AVCaptureMetadataOutputObjectsDelegate
+
+- (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection {
+    
+    AVMetadataMachineReadableCodeObject *code = metadataObjects.firstObject;
+    
+    if (code.stringValue) {
+        [self handleCodeString:code.stringValue];
+    }
+}
+
+
+#pragma mark AVCaptureVideoDataOutputSampleBufferDelegate
 
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
     
@@ -381,8 +403,41 @@ static NSString *QiInputCorrectionLevelH = @"H";//!< H: 30%
             lastDimmed = dimmed;
         }
     }
+    
+    [self handleSampleBuffer:sampleBuffer];
 }
 
+
+- (void)handleSampleBuffer:(CMSampleBufferRef)sampleBuffer {
+//    NSLog(@"handleSampleBuffer: %@", sampleBuffer);
+    
+    NSLog(@"frameCount: %li", self.frameCount);
+    self.frameCount++;
+    if (self.frameCount % 5 != 0) {
+        return;
+    }
+    
+    if (self.sharpenFilter == nil) {
+        return;
+    }
+    
+    // 锐化
+    CVImageBufferRef cvImage = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CIImage *inputCIImage = [[CIImage alloc] initWithCVPixelBuffer:cvImage];
+    [self.sharpenFilter setValue:inputCIImage forKey:kCIInputImageKey];
+    CIImage *outputImage = self.sharpenFilter.outputImage;
+    
+    NSArray *qrcodeFeatures = [self.qrCodeDetector featuresInImage:outputImage];
+    NSLog(@"qrcodeFeatures: %@", qrcodeFeatures);
+    for (CIQRCodeFeature *feature in qrcodeFeatures) {
+        NSLog(@"qrcodeFeature: %@", feature.messageString);
+        if (feature.messageString.length > 0) {
+            [self handleCodeString:feature.messageString];
+            break;
+        }
+//        NSLog(@"qrcodeFeature: %@",NSStringFromCGRect(feature.bounds));
+    }
+}
 
 
 #pragma mark - 缩放手势

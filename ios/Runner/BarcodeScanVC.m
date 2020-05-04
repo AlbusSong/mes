@@ -31,6 +31,7 @@
 }
 
 - (void)close {
+    [self.codeManager stopScanning];
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
