@@ -1,12 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 // import 'package:mes/Others/Tool/WidgetTool.dart';
 
+import 'Model/NotificationItemModel.dart';
+
 class NotificationDetailPage extends StatelessWidget {
+  NotificationDetailPage(
+    this.data,
+  );
+
+  final NotificationItemModel data;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void _getDataFromServer() {
+    // Push/SetPushStatus
+    Map mDict = Map();
+    mDict["pushCode"] = this.data.PushCode;
+
+    HudTool.show();
+    HttpDigger().postWithUri("Push/SetPushStatus", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("Push/SetPushStatus: $responseJson");
+      if (code == 0) {
+        HudTool.showInfoWithStatus(message);
+        return;
+      }
+
+      HudTool.dismiss();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    _getDataFromServer();
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: hexColor("f2f2f7"),
@@ -43,7 +71,7 @@ class NotificationDetailPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "工单号 PQED32382838283 异常",
+            "工单号 ${this.data.PushFunctionCode} ${this.data.PushText}",
             style: TextStyle(
                 color: hexColor("333333"),
                 fontSize: 19,

@@ -219,11 +219,15 @@ class HttpDigger {
           dError.type == DioErrorType.RECEIVE_TIMEOUT) {
         result = 1; // timeout
       } else {
-        if ((dError.response.statusCode != null) &&
-            (dError.response.statusCode == 302)) {
-          // 302 means wrong data type（html）
-          // 302 means needing relogin
-          result = 2; // 登录错误
+        if (dError.response != null) {
+          if ((dError.response.statusCode != null) &&
+              (dError.response.statusCode == 302)) {
+            // 302 means wrong data type（html）
+            // 302 means needing relogin
+            result = 2; // 登录错误
+          }
+        } else {
+          result = 1;
         }
       }
     } else if (error is FlutterError) {

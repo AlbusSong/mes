@@ -36,7 +36,7 @@ class _NotificationListPageState extends State<NotificationListPage> {
     // mDict["id"] = "";
 
     HudTool.show();
-    HttpDigger().postWithUri("Push/GetPushSubject", parameters: mDict, shouldCache: true, success:  (int code, String message, dynamic responseJson) {
+    HttpDigger().postWithUri("Push/GetPushSubject", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
       print("Push/GetPushSubject: $responseJson");
 
       HudTool.dismiss();
@@ -44,9 +44,12 @@ class _NotificationListPageState extends State<NotificationListPage> {
           .map((item) => NotificationItemModel.fromJson(item))
           .toList();
 
-      if (listLength(arr) == 0) {
+      this.arrOfData.clear();
+      if (listLength(arr) == 0) {        
+        setState(() {        
+        });
         return;
-      }
+      }      
 
       String currentDateString = "";
       List subitemsInSameDay = List();
@@ -124,8 +127,11 @@ class _NotificationListPageState extends State<NotificationListPage> {
   }
 
   void _hasSelectedNotificationItemCell(int index, int subIndex) {
+    Map oneDayDict = this.arrOfData[index];
+    List subitemsInSameDay = (oneDayDict["items"] as List);
+    NotificationItemModel itemData = subitemsInSameDay[subIndex];
     Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(
-              builder: (BuildContext context) => NotificationDetailPage()));
+              builder: (BuildContext context) => NotificationDetailPage(itemData)));
   }
 
   Widget _buildNotificationItemCell(int index, int subIndex) {
@@ -147,13 +153,27 @@ class _NotificationListPageState extends State<NotificationListPage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("巡检异常", style: TextStyle(color: hexColor("333333"), fontSize: 16),),
+            Text(_getPushTypeStringBy(itemData.PushType), style: TextStyle(color: hexColor("333333"), fontSize: 16),),
             Text("工单号 ${itemData.PushFunctionCode} ${itemData.PushText}", style: TextStyle(color: hexColor("666666")),),
           ],
         ),
       ),
     ),
     );
+  }
+
+  String _getPushTypeStringBy(int pushType) {
+    String result = "产线异常";
+    if (pushType == 1) {
+      result = "锁定退料";
+    } else if (pushType == 2) {
+      result = "巡检异常";
+    } else if (pushType == 3) {
+      result = "自检异常";
+    } else if (pushType == 4) {
+      result = "点检异常";
+    }
+    return result;
   }
 
   Widget _buildDateHeaderCell(int index) {

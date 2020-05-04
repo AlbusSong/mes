@@ -84,15 +84,15 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		4ED0E68C243781AB00616EE8 /* QiCodeReader */ = {
+		4ED0E68C243781AB00616EE8 /* BarcodeScan */ = {
 			isa = PBXGroup;
 			children = (
-				4ED0E68D243781AB00616EE8 /* QiCodePreviewView.m */,
-				4ED0E68E243781AB00616EE8 /* QiCodeManager.m */,
 				4ED0E68F243781AB00616EE8 /* QiCodePreviewView.h */,
+				4ED0E68D243781AB00616EE8 /* QiCodePreviewView.m */,
 				4ED0E690243781AB00616EE8 /* QiCodeManager.h */,
+				4ED0E68E243781AB00616EE8 /* QiCodeManager.m */,
 			);
-			path = QiCodeReader;
+			path = BarcodeScan;
 			sourceTree = "<group>";
 		};
 		4ED0E696243785AE00616EE8 /* Macro */ = {
@@ -147,7 +147,7 @@
 				4ED0E696243785AE00616EE8 /* Macro */,
 				4ED0E6932437824900616EE8 /* BarcodeScanVC.h */,
 				4ED0E6942437824900616EE8 /* BarcodeScanVC.m */,
-				4ED0E68C243781AB00616EE8 /* QiCodeReader */,
+				4ED0E68C243781AB00616EE8 /* BarcodeScan */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
