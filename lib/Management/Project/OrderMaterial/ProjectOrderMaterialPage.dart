@@ -133,8 +133,14 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
           .toList();
       
       if (shouldShowHud == true) {
-        if (responseJson["isCachedData"] != null) {
-          HudTool.dismiss();
+        if (responseJson["isCachedData"] == null) {
+          // 如果是网络数据
+          HudTool.dismiss();          
+        } else {
+          // 如果是缓存数据，必须要有值才行
+          if (listLength(this.arrOfTodayWork) > 0) {
+            HudTool.dismiss();
+          }
         }
       }
     });

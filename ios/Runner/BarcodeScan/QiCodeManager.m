@@ -411,7 +411,6 @@ static NSString *QiInputCorrectionLevelH = @"H";//!< H: 30%
 - (void)handleSampleBuffer:(CMSampleBufferRef)sampleBuffer {
 //    NSLog(@"handleSampleBuffer: %@", sampleBuffer);
     
-    NSLog(@"frameCount: %li", self.frameCount);
     self.frameCount++;
     if (self.frameCount % 5 != 0) {
         return;
