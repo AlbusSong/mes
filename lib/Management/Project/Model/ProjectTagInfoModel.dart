@@ -9,6 +9,9 @@ part 'ProjectTagInfoModel.g.dart';
   @JsonKey(name: 'ItemCode')
   String ItemCode;
 
+  @JsonKey(name: 'ID')
+  int ID;
+
   @JsonKey(name: 'TagID')
   String TagID;
 

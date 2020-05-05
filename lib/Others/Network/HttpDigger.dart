@@ -100,7 +100,7 @@ class HttpDigger {
     this.dio.options.headers["Cookie"] = MeInfo().cookie;
     // this.dio.options.headers["cookie"] = MeInfo().cookie;
     this.dio.options.headers.remove("cookie");
-    print("$uri header: ${this.dio.options.headers}");
+    // print("$uri header: ${this.dio.options.headers}");
     print("$uri mDict: $parameters");
 
     String md5OfParameters = generateMd5(jsonEncode(parameters));

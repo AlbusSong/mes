@@ -127,13 +127,16 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     HttpDigger().postWithUri("LoadMaterial/TodayWo",
         parameters: {"line": workLine}, shouldCache: true,
         success: (int code, String message, dynamic responseJson) {
-      print("LoadMaterial/TodayWo: $responseJson");
-      if (shouldShowHud == true) {
-        HudTool.dismiss();
-      }
+      print("LoadMaterial/TodayWo: $responseJson");      
       this.arrOfTodayWork = (responseJson["Extend"] as List)
           .map((item) => ProjectTodayWorkOrderModel.fromJson(item))
           .toList();
+      
+      if (shouldShowHud == true) {
+        if (responseJson["isCachedData"] != null) {
+          HudTool.dismiss();
+        }
+      }
     });
   }
 
@@ -556,7 +559,7 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
     mDict["wono"] = this.selectedTodayWork.Wono;
     mDict["item"] = this.materialInfo.ItemCode;
     mDict["tag"] = this.selectedMaterialTag.TagID;
-    mDict["id"] = this.selectedTodayWork.ID;
+    mDict["id"] = this.selectedMaterialTag.ID.toString();
     print("$uri mDict: $mDict");
     
     HudTool.show();

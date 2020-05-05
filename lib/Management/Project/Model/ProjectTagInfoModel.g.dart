@@ -20,13 +20,14 @@ ProjectTagInfoModel _$ProjectTagInfoModelFromJson(Map<String, dynamic> json) {
     json['Delflag'] as bool,
     json['Comment'] as String,
     json['DataGroup'] as String,
-  );
+  )..ID = json['ID'] as int;
 }
 
 Map<String, dynamic> _$ProjectTagInfoModelToJson(
         ProjectTagInfoModel instance) =>
     <String, dynamic>{
       'ItemCode': instance.ItemCode,
+      'ID': instance.ID,
       'TagID': instance.TagID,
       'Qty': instance.Qty,
       'Cost': instance.Cost,
