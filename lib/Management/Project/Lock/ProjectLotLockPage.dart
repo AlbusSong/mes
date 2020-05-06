@@ -168,49 +168,62 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
   }
 
   Widget _buildPushSectionHeader() {
-    if (this.selectedLockCode == null || this.selectedLockCode.LockCode != "TL") {
+    if (this.selectedLockCode == null ||
+        this.selectedLockCode.LockCode != "TL") {
       // 如果锁定代码不是“退料”的话
-      return Container(height: 1,);
+      return Container(
+        height: 1,
+      );
     }
 
     return Container(
       margin: EdgeInsets.fromLTRB(10, 10, 10, 5),
       child: Text(
         "推送设置",
-        style: TextStyle(fontSize: 20, color: hexColor("333333"), fontWeight: FontWeight.normal),
+        style: TextStyle(
+            fontSize: 20,
+            color: hexColor("333333"),
+            fontWeight: FontWeight.normal),
       ),
     );
   }
 
   Widget _buildPushSectionCell(int index) {
-    if (this.selectedLockCode == null || this.selectedLockCode.LockCode != "TL") {
+    if (this.selectedLockCode == null ||
+        this.selectedLockCode.LockCode != "TL") {
       // 如果锁定代码不是“退料”的话
-      return Container(height: 1,);
+      return Container(
+        height: 1,
+      );
     }
 
     return GestureDetector(
       child: Container(
-      // height: 50,
-      constraints: BoxConstraints(minHeight: 50),
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Text(
-            _fillContentForPushSectionCell(index),
-            style: TextStyle(fontSize: 16),
-          ),
-          ),
-          Icon(Icons.arrow_forward_ios, color: hexColor("999999"), size: 16,),
-        ],
+        // height: 50,
+        constraints: BoxConstraints(minHeight: 50),
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                _fillContentForPushSectionCell(index),
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: hexColor("999999"),
+              size: 16,
+            ),
+          ],
+        ),
       ),
-    ),
-    onTap: () {
-      _hasClickedPushSectionCell(index);
-    },
+      onTap: () {
+        _hasClickedPushSectionCell(index);
+      },
     );
   }
 
@@ -255,18 +268,19 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
       w = ProjectLockPushPersonPage(lineList);
     }
 
-    if (w == null) {      
+    if (w == null) {
       return;
-    } 
+    }
 
     if (index == 0) {
-      this.arrOfProductionLine = await Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
+      this.arrOfProductionLine = await Navigator.of(_scaffoldKey.currentContext)
+          .push(MaterialPageRoute(builder: (BuildContext context) => w));
     } else {
-      this.arrOfPushPerson = await Navigator.of(_scaffoldKey.currentContext).push(MaterialPageRoute(builder: (BuildContext context) => w));
-    }    
+      this.arrOfPushPerson = await Navigator.of(_scaffoldKey.currentContext)
+          .push(MaterialPageRoute(builder: (BuildContext context) => w));
+    }
 
-    setState(() {      
-    });
+    setState(() {});
   }
 
   Widget _buildSelectionInputItem(int index) {
@@ -338,10 +352,8 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
 
       _selectionWgt2.setContent(title);
     } else if (index == 3) {
-    } else if (index == 4) {
-    }
-    setState(() {      
-    });
+    } else if (index == 4) {}
+    setState(() {});
   }
 
   Widget _buildContentInputItem() {
@@ -413,13 +425,14 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     //   return;
     // }
 
-    if (this.selectedLockCode != null && this.selectedLockCode.LockCode == "TL") {
+    if (this.selectedLockCode != null &&
+        this.selectedLockCode.LockCode == "TL") {
       // 如果是“退料”的话
       if (listLength(this.arrOfPushPerson) == 0) {
-      HudTool.showInfoWithStatus("请选择推送人");
-      return;
+        HudTool.showInfoWithStatus("请选择推送人");
+        return;
+      }
     }
-    }    
 
     bool isOkay =
         await AlertTool.showStandardAlert(_scaffoldKey.currentContext, "确定锁定?");
@@ -437,11 +450,13 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
     mDict["comment"] = this.remarkContent;
 
     List arrOfPushPersonId = List();
-    for (ProjectPushPersonItemModel m in this.arrOfPushPerson) {
-      arrOfPushPersonId.add(m.UserID);
+    if (listLength(this.arrOfPushPerson) > 0) {
+      for (ProjectPushPersonItemModel m in this.arrOfPushPerson) {
+        arrOfPushPersonId.add(m.UserID);
+      }
     }
     mDict["personList"] = arrOfPushPersonId;
-    
+
     HudTool.show();
     HttpDigger().postWithUri("LotSubmit/LotLock", parameters: mDict,
         success: (int code, String message, dynamic responseJson) {
@@ -485,8 +500,9 @@ class _ProjectLotLockPageState extends State<ProjectLotLockPage> {
 
   Future _tryToUseOCR() async {
     print("_tryToUseOCR");
-    // TakePhotoForOCRPage 
-    var c = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TakePhotoForOCRPage()));
+    // TakePhotoForOCRPage
+    var c = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => TakePhotoForOCRPage()));
     print("cccccc: $c");
     if (c == null) {
       return;
