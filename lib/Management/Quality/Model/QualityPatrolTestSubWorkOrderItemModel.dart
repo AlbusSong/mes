@@ -15,6 +15,9 @@ part 'QualityPatrolTestSubWorkOrderItemModel.g.dart';
   @JsonKey(name: 'IPQCItemNo')
   String IPQCItemNo;
 
+  @JsonKey(name: 'Attach')
+  String Attach;
+
   @JsonKey(name: 'StepCode')
   String StepCode;
 

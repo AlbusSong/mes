@@ -11,7 +11,6 @@ import 'package:mes/Others/View/MESContentInputWidget.dart';
 
 import '../Model/QualityPatrolTestWorkOrderItemModel.dart';
 import '../Model/QualityMachineTypeItemModel.dart';
-import '../Model/QualityMachineDetailInfoModel.dart';
 import '../Model/QualityPatrolTestSubWorkOrderItemModel.dart';
 
 import 'QualityPatrolTestImageBrowserPage.dart';
@@ -114,8 +113,7 @@ class _QualityPatrolTestWorkOrderReportPageState
   void _getAttachmentImageDataFromServer() {
     // CHK/Browse
     Map mDict = Map();
-    mDict["ipqcType"] = this.detailData.IPQCItemNo;
-    mDict["ipqcType"] = this.itemData.IPQCType;
+    mDict["attachPath"] = this.detailData.Attach;
 
     HttpDigger().postWithUri("CHK/Browse", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
       print("CHK/Browse: $responseJson");
@@ -124,7 +122,7 @@ class _QualityPatrolTestWorkOrderReportPageState
         return;
       }
 
-      this.imageBase64String = responseJson["data"];
+      this.imageBase64String = responseJson["Extend"];
     });
   }
 

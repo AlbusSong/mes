@@ -146,12 +146,12 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("下发时间：${avoidNull(itemData.AppTime)}",
+                        Text("下单号：${avoidNull(itemData.IPQCWoNo)}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
                     ),
-                  ),
+                  ),                  
                   Container(
                     color: Colors.white,
                     margin: EdgeInsets.only(left: 10),
@@ -159,12 +159,12 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("类型：${avoidNull(itemData.AppIPQCType)}",
+                        Text("下发时间：${avoidNull(itemData.AppTime)}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],
                     ),
-                  ),
+                  ),                  
                   Container(
                     color: Colors.white,
                     margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
@@ -172,7 +172,7 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("类型：${avoidNull(itemData.LineCode)}",
+                        Text("类型：${avoidNull(itemData.AppIPQCType)}",
                             style: TextStyle(
                                 color: hexColor("999999"), fontSize: 15))
                       ],

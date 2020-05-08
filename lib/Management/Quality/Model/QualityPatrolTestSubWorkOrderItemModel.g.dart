@@ -34,7 +34,7 @@ QualityPatrolTestSubWorkOrderItemModel
     json['Comment'] as String,
     json['RowVersion'] as String,
     json['DataGroup'] as String,
-  );
+  )..Attach = json['Attach'] as String;
 }
 
 Map<String, dynamic> _$QualityPatrolTestSubWorkOrderItemModelToJson(
@@ -43,6 +43,7 @@ Map<String, dynamic> _$QualityPatrolTestSubWorkOrderItemModelToJson(
       'ID': instance.ID,
       'IPQCPlanNo': instance.IPQCPlanNo,
       'IPQCItemNo': instance.IPQCItemNo,
+      'Attach': instance.Attach,
       'StepCode': instance.StepCode,
       'Step': instance.Step,
       'Item': instance.Item,
