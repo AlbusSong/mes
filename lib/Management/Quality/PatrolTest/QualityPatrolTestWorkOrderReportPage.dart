@@ -807,6 +807,7 @@ class _QualityPatrolTestWorkOrderReportPageState
       File picture = this.pictureList[i];
       Map picDict = Map();
       picDict["No"] = i;
+      picDict["PicPath"] = "${randomIntWithRange(100000, 1000000).toString()}.png";
       if (picture != null) {
         picDict["Pic"] = base64Encode(picture.readAsBytesSync());
       } else {
@@ -815,8 +816,6 @@ class _QualityPatrolTestWorkOrderReportPageState
       picList.add(picDict);
     }
     mDict["picList"] = picList;
-
-    print("mDict: $mDict");
 
     HudTool.show();
     HttpDigger().postWithUri("CHK/WorkOrderBook", parameters: mDict, success: (int code, String message, dynamic responseJson) {
