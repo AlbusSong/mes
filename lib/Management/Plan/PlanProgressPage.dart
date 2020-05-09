@@ -182,8 +182,8 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
     }
 
     PlanProcessItemModel selectedItem = this.arrOfData[index];
-    Map mDict = {"Wono": selectedItem.Wono};
-    print("$uri mDict: $mDict");
+    Map mDict = {"ID": selectedItem.ID.toString()};
+
     HudTool.show();
     HttpDigger().postWithUri(uri, parameters: mDict,
         success: (int code, String message, dynamic responseJson) {
@@ -594,7 +594,7 @@ class _PlanProgressPageState extends State<PlanProgressPage> {
                           ),
                         ),
                         Text(
-                          "实绩：${itemData.WoGoodQty.round()}",
+                          "实绩：${itemData.WoOutPutQty.round()}",
                           style: TextStyle(
                             fontSize: 13,
                             color: hexColor("666666"),
