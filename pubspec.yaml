@@ -32,9 +32,10 @@ dependencies:
   sqflite: ^1.2.0
   dio: ^3.0.9
   json_annotation: ^3.0.0
-  flutter_general_toast: ^0.0.1
+  # flutter_general_toast: ^0.0.1
   event_bus: ^1.1.1
   image_picker: ^0.6.3+4
+  bot_toast: ^3.0.0
   # barcode_scan: ^1.0.0
   # qrscan: ^0.2.17
   flutter_drag_scale:

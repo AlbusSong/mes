@@ -7,6 +7,7 @@ import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Tool/NativeCommunicationTool.dart';
 import 'Others/Const/Const.dart';
 import 'package:mes/Others/Network/FlutterCache.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 void main() {
   runApp(MESApp());
@@ -30,6 +31,8 @@ class MESApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MES App',
+      builder: BotToastInit(), //1. call BotToastInit
+      navigatorObservers: [BotToastNavigatorObserver()],
       theme: ThemeData(
         primaryColor: hexColor(MAIN_COLOR),
       ),

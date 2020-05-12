@@ -106,13 +106,14 @@ class _ProjectReturnRepairmentNonLotPageState extends State<ProjectReturnRepairm
         return;
       }
       
+      HudTool.dismiss();
       this.arrOfProject = (responseJson["Extend"] as List).map((item) => ProjectReturnRepairmentProjectItemModel.fromJson(item))
-          .toList();
-      if (listLength(this.arrOfProject) == 0) {
-        HudTool.showInfoWithStatus("该作业中心无工程信息");
-      } else {
-        HudTool.dismiss();
-      }
+          .toList();      
+      // if (listLength(this.arrOfProject) == 0) {
+      //   HudTool.showInfoWithStatus("该作业中心无工程信息");
+      // } else {
+      //   HudTool.dismiss();
+      // }
     });
   }
 
