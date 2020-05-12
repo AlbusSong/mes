@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
+import 'package:mes/Others/Tool/HudTool.dart';
 import '../../Others/View/MESSquareItemWidget.dart';
 
 import 'MoldInPage.dart';
@@ -27,6 +28,7 @@ class MoldPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    HudTool.dismiss();
     _initSomeThings();
     return Scaffold(
       key: _scaffoldKey,

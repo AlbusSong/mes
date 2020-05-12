@@ -153,7 +153,7 @@ class _ProjectLotBatchDetailPageState extends State<ProjectLotBatchDetailPage> {
       placeholder = "请输入数字(只能输入数字)";
       canScan = false;
     } else if (index == 1) {
-      title = "LotNo/模具ID";
+      title = "LotNo/载具ID";
       placeholder = "扫描/输入";
     }
     ProjectTextInputWidget wgt = ProjectTextInputWidget(
