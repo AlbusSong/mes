@@ -15,10 +15,13 @@ class NotificationDetailPage extends StatelessWidget {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  List<String> detailInfoList;
+
   void _getDataFromServer() {
     // Push/SetPushStatus
     Map mDict = Map();
     mDict["pushCode"] = this.data.PushCode;
+    this.detailInfoList = this.data.PushText.split("|");
 
     HudTool.show();
     HttpDigger().postWithUri("Push/SetPushStatus", parameters: mDict, shouldCache: true, success: (int code, String message, dynamic responseJson) {
@@ -71,19 +74,33 @@ class NotificationDetailPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "工单号 ${this.data.PushFunctionCode} ${this.data.PushText}",
+            "${_getPushTypeStringBy(this.data.PushType)} ${this.data.PushFunctionCode}",
             style: TextStyle(
                 color: hexColor("333333"),
                 fontSize: 19,
                 fontWeight: FontWeight.bold),
           ),
-          Text(
-            "操作人：Horo",
-            style: TextStyle(color: hexColor("333333"), fontSize: 14),
-          )
+          // Text(
+          //   "操作人：Horo",
+          //   style: TextStyle(color: hexColor("333333"), fontSize: 14),
+          // )
         ],
       ),
     );
+  }
+
+  String _getPushTypeStringBy(int pushType) {
+    String result = "产线异常";
+    if (pushType == 1) {
+      result = "锁定退料";
+    } else if (pushType == 2) {
+      result = "巡检异常";
+    } else if (pushType == 3) {
+      result = "自检异常";
+    } else if (pushType == 4) {
+      result = "点检异常";
+    }
+    return result;
   }
 
   Widget _buildDetailContentCell() {
@@ -103,35 +120,35 @@ class NotificationDetailPage extends StatelessWidget {
           Container(
             constraints: BoxConstraints(minHeight: 30),
             child: Text(
-              "产线：活塞线                项目：垂直度",
+              "产线：${this.data.PushSubject}                项目：${this.detailInfoList[0]}",
               style: TextStyle(color: hexColor("333333"), fontSize: 15),
             ),
           ),
           Container(
             height: 30,
             child: Text(
-              "工序：活塞捡漏",
+              "工序：${this.detailInfoList[1]}",
               style: TextStyle(color: hexColor("333333"), fontSize: 15),
             ),
           ),
           Container(
             height: 30,
             child: Text(
-              "机型：活塞1Y38XD",
+              "机型：${this.detailInfoList[2]}",
               style: TextStyle(color: hexColor("333333"), fontSize: 15),
             ),
           ),
           Container(
             height: 30,
             child: Text(
-              "标准：2～3MM",
+              "标准：${this.detailInfoList[3]}",
               style: TextStyle(color: hexColor("333333"), fontSize: 15),
             ),
           ),
           Container(
             height: 30,
             child: Text(
-              "实际测量结果：4MM",
+              "实际测量结果：${this.detailInfoList[4]}",
               style: TextStyle(color: hexColor("333333"), fontSize: 15),
             ),
           ),

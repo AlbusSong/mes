@@ -154,7 +154,7 @@ class _NotificationListPageState extends State<NotificationListPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(_getPushTypeStringBy(itemData.PushType), style: TextStyle(color: hexColor("333333"), fontSize: 16),),
-            Text("工单号 ${itemData.PushFunctionCode} ${itemData.PushText}", style: TextStyle(color: hexColor("666666")),),
+            Text("推送号：${itemData.PushFunctionCode} ${itemData.PushSubject}", style: TextStyle(color: hexColor("666666")),),
           ],
         ),
       ),
