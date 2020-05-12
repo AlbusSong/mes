@@ -9,8 +9,8 @@ class PlanPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Map> functionItemDataArray = [
-    {"title": "计划进度", "icon": "", "badgeValue": 0},
-    {"title": "物料接收", "icon": "", "badgeValue": 0},
+    {"title": "计划进度", "icon": "", "badgeValue": 0, "iconUri": "JiHuaJinDu.png"},
+    {"title": "物料接收", "icon": "", "badgeValue": 0, "iconUri": "WuLiaoJieShou.png"},
   ];
 
   final List<MESSquareItemWidget> functionItemArray = [];
@@ -35,16 +35,16 @@ class PlanPage extends StatelessWidget {
     for (int i = 0; i < functionItemDataArray.length; i++) {
       Map functionItemData = functionItemDataArray[i];
       MESSquareItemWidget item =
-          _buildFunctionModuleItem(functionItemData["title"], i);
+          _buildFunctionModuleItem(functionItemData["title"], i, functionItemData["iconUri"]);
       functionItemArray.add(item);
     }
   }
 
-  Widget _buildFunctionModuleItem(String title, int index) {
+  Widget _buildFunctionModuleItem(String title, int index, String iconUri) {
     void Function(int) onClick = (int v) {
       _functionItemClickedAtIndex(v);
     };
-    return MESSquareItemWidget(index, title, 0, onClick);
+    return MESSquareItemWidget(index, title, 0, iconUri, onClick);
   }
 
   void _functionItemClickedAtIndex(int index) {

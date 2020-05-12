@@ -12,10 +12,10 @@ class QualityPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Map> functionItemDataArray = [
-    {"title": "自检工单", "icon": "", "badgeValue": 0},
-    {"title": "巡检工单", "icon": "", "badgeValue": 0},
-    {"title": "原材料Hold", "icon": "", "badgeValue": 0},
-    {"title": "解Hold", "icon": "", "badgeValue": 0},
+    {"title": "自检工单", "icon": "", "badgeValue": 0, "iconUri": "ZiJianGongDan.png"},
+    {"title": "巡检工单", "icon": "", "badgeValue": 0, "iconUri": "XunJianGongDan.png"},
+    {"title": "原材料Hold", "icon": "", "badgeValue": 0, "iconUri": "YuanCaiLiaoHold.png"},
+    {"title": "解Hold", "icon": "", "badgeValue": 0, "iconUri": "JieHold.png"},
   ];
 
   final List<MESSquareItemWidget> functionItemArray = [];
@@ -40,16 +40,16 @@ class QualityPage extends StatelessWidget {
     for (int i = 0; i < functionItemDataArray.length; i++) {
       Map functionItemData = functionItemDataArray[i];
       MESSquareItemWidget item =
-          _buildFunctionModuleItem(functionItemData["title"], i);
+          _buildFunctionModuleItem(functionItemData["title"], i, functionItemData["iconUri"]);
       functionItemArray.add(item);
     }
   }
 
-  Widget _buildFunctionModuleItem(String title, int index) {
+  Widget _buildFunctionModuleItem(String title, int index, String iconUri) {
     void Function(int) onClick = (int v) {
       _functionItemClickedAtIndex(v);
     };
-    return MESSquareItemWidget(index, title, 0, onClick);
+    return MESSquareItemWidget(index, title, 0, iconUri, onClick);
   }
 
   void _functionItemClickedAtIndex(int index) {

@@ -7,12 +7,14 @@ class MESSquareItemWidget extends StatefulWidget {
     this.index,
     this.title,
     this.badgeValue,
+    this.iconUri,
     this.onClick,
   );
 
   final int index;
   final String title;
   final int badgeValue;
+  final String iconUri;
 
   //点击回调
   final void Function(int) onClick;
@@ -26,7 +28,7 @@ class MESSquareItemWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     _itemState = _MESSquareItemWidgetState(
-        this.index, this.title, this.badgeValue, this.onClick);
+        this.index, this.title, this.badgeValue, this.iconUri, this.onClick);
     return _itemState;
   }
 }
@@ -36,12 +38,16 @@ class _MESSquareItemWidgetState extends State<MESSquareItemWidget> {
     this.index,
     this.title,
     this.badgeValue,
+    this.iconUri,
     this.onClick,
   );
 
   final int index;
   final String title;
   int badgeValue;
+  final String iconUri;
+
+  final String iconUrlPrefix = "http://qa7lnm3mb.bkt.clouddn.com/";
 
   //点击回调
   final void Function(int) onClick;
@@ -75,14 +81,14 @@ class _MESSquareItemWidgetState extends State<MESSquareItemWidget> {
                   ),
                 ),
                 Container(
-                  color: randomColor(),
+                  // color: randomColor(),
                   height: 45,
                   width: 50,
-                  // child: Image(
-                  //   height: 50,
-                  //   width: 45,
-                  //   image: AssetImage("others/images/Home-CompanyLogo.jpeg"),
-                  // ),
+                  child: Image.network(
+                    iconUrlPrefix + this.iconUri,
+                    height: 50,
+                    width: 45,
+                  ),
                 )
               ],
             ),

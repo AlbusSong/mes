@@ -15,13 +15,13 @@ class MoldPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Map> functionItemDataArray = [
-    {"title": "模具入库", "icon": "", "badgeValue": 0},
-    {"title": "模具出库", "icon": "", "badgeValue": 0},
-    {"title": "模具锁定", "icon": "", "badgeValue": 0},
-    {"title": "模具解锁", "icon": "", "badgeValue": 0},
-    {"title": "保养申请", "icon": "", "badgeValue": 0},
-    {"title": "维修申请", "icon": "", "badgeValue": 0},
-    {"title": "模具信息", "icon": "", "badgeValue": 0},
+    {"title": "模具入库", "icon": "", "badgeValue": 0, "iconUri": "MuJuRuKu.png"},
+    {"title": "模具出库", "icon": "", "badgeValue": 0, "iconUri": "MuJuChuKu.png"},
+    {"title": "模具锁定", "icon": "", "badgeValue": 0, "iconUri": "MuJuSuoDing.png"},
+    {"title": "模具解锁", "icon": "", "badgeValue": 0, "iconUri": "MuJuJieSuo.png"},
+    {"title": "保养申请", "icon": "", "badgeValue": 0, "iconUri": "BaoYangShenQing.png"},
+    {"title": "维修申请", "icon": "", "badgeValue": 0, "iconUri": "WeiXiuShenQing.png"},
+    {"title": "模具信息", "icon": "", "badgeValue": 0, "iconUri": "MuJuXinXi.png"},
   ];
 
   final List<MESSquareItemWidget> functionItemArray = [];
@@ -47,16 +47,16 @@ class MoldPage extends StatelessWidget {
     for (int i = 0; i < functionItemDataArray.length; i++) {
       Map functionItemData = functionItemDataArray[i];
       MESSquareItemWidget item =
-          _buildFunctionModuleItem(functionItemData["title"], i);
+          _buildFunctionModuleItem(functionItemData["title"], i, functionItemData["iconUri"]);
       functionItemArray.add(item);
     }
   }
 
-  Widget _buildFunctionModuleItem(String title, int index) {
+  Widget _buildFunctionModuleItem(String title, int index, String iconUri) {
     void Function(int) onClick = (int v) {
       _functionItemClickedAtIndex(v);
     };
-    return MESSquareItemWidget(index, title, 0, onClick);
+    return MESSquareItemWidget(index, title, 0, iconUri, onClick);
   }
 
   void _functionItemClickedAtIndex(int index) {

@@ -18,17 +18,17 @@ class ProjectPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Map> functionItemDataArray = [
-    {"title": "工单上料", "icon": "", "badgeValue": 0},
-    {"title": "Lot报工", "icon": "", "badgeValue": 0},
-    {"title": "Lot查询", "icon": "", "badgeValue": 0},
-    {"title": "Lot锁定", "icon": "", "badgeValue": 0},
-    {"title": "Lot解锁", "icon": "", "badgeValue": 0},
-    {"title": "返修", "icon": "", "badgeValue": 0},
-    {"title": "Lot分批", "icon": "", "badgeValue": 0},
-    {"title": "档位变更", "icon": "", "badgeValue": 0},
-    {"title": "修理", "icon": "", "badgeValue": 0},
-    {"title": "报废", "icon": "", "badgeValue": 0},
-    {"title": "Lot锁定处理", "icon": "", "badgeValue": 0},
+    {"title": "工单上料", "icon": "", "badgeValue": 0, "iconUri": "GongDanShangLiao.png"},
+    {"title": "Lot报工", "icon": "", "badgeValue": 0, "iconUri": "LotBaoGong.png"},
+    {"title": "Lot查询", "icon": "", "badgeValue": 0, "iconUri": "LotChaXun.png"},
+    {"title": "Lot锁定", "icon": "", "badgeValue": 0, "iconUri": "LotSuoDing.png"},
+    {"title": "Lot解锁", "icon": "", "badgeValue": 0, "iconUri": "LotJieSuo.png"},
+    {"title": "返修", "icon": "", "badgeValue": 0, "iconUri": "FanXiu.png"},
+    {"title": "Lot分批", "icon": "", "badgeValue": 0, "iconUri": "LotFenPi.png"},
+    {"title": "档位变更", "icon": "", "badgeValue": 0, "iconUri": "DangWeiBianGeng.png"},
+    {"title": "修理", "icon": "", "badgeValue": 0, "iconUri": "XiuLi.png"},
+    {"title": "报废", "icon": "", "badgeValue": 0, "iconUri": "BaoFei.png"},
+    {"title": "Lot锁定处理", "icon": "", "badgeValue": 0, "iconUri": "LotSuoDingChuLi.png"},
   ];
 
   final List<MESSquareItemWidget> functionItemArray = [];
@@ -52,16 +52,16 @@ class ProjectPage extends StatelessWidget {
     for (int i = 0; i < functionItemDataArray.length; i++) {
       Map functionItemData = functionItemDataArray[i];
       MESSquareItemWidget item =
-          _buildFunctionModuleItem(functionItemData["title"], i);
+          _buildFunctionModuleItem(functionItemData["title"], i, functionItemData["iconUri"]);
       functionItemArray.add(item);
     }
   }
 
-  Widget _buildFunctionModuleItem(String title, int index) {
+  Widget _buildFunctionModuleItem(String title, int index, String iconUri) {
     void Function(int) onClick = (int v) {
       _functionItemClickedAtIndex(v);
     };
-    return MESSquareItemWidget(index, title, 0, onClick);
+    return MESSquareItemWidget(index, title, 0, iconUri, onClick);
   }
 
   void _functionItemClickedAtIndex(int index) {
