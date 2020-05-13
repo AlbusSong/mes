@@ -19,6 +19,7 @@ class HudTool {
   static void showInfoWithStatus(String status) {
     // MyToast.showMessage(status);
     // FlutterGeneralToast.showMessage(status);
+    BotToast.closeAllLoading();
     BotToast.showText(text: status);
   }
 

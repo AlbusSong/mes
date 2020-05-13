@@ -615,6 +615,10 @@ class _QualityPatrolTestWorkOrderReportPageState
 
   void _tryToGetImage() {
     print("_tryToGetImage");
+    if (listLength(this.pictureList) == 0) {
+      HudTool.showInfoWithStatus("请务必先选择机型");
+      return;
+    }
     _popSheetAlert();    
   }
 
