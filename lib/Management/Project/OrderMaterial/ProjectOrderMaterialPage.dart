@@ -578,7 +578,9 @@ class _ProjectOrderMaterialPageState extends State<ProjectOrderMaterialPage> {
       }
 
       HudTool.showInfoWithStatus("操作成功");
-      Navigator.pop(context);
+      Future.delayed(Duration(seconds: 1), (){
+        _getTagListFromServer(this.selectedTodayWork.Wono, this.materialInfo.ItemCode);
+      });
     });
   }
 

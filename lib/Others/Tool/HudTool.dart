@@ -26,6 +26,7 @@ class HudTool {
   static void show() {
     // MyToast.show();
     // FlutterGeneralToast.show();
+    BotToast.closeAllLoading();
     BotToast.showLoading();
   }
 

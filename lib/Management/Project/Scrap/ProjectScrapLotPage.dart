@@ -15,6 +15,7 @@ import 'package:flutter_picker/flutter_picker.dart';
 
 import '../Model/ProjectLotInfoModel.dart';
 import '../Model/ProjectScrapItemModel.dart';
+import '../Model/ProjectReturnRepairmentReasonProcessItemModel.dart';
 
 import 'package:mes/Others/Page/TakePhotoForOCRPage.dart';
 
@@ -55,6 +56,7 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
   ProjectLotInfoModel lotInfoData;
   List arrOfScrapCode;
   ProjectScrapItemModel selectedScrapCode;
+  ProjectReturnRepairmentReasonProcessItemModel reasonProcessInfo;
   File obtainedPicture;
 
   @override
@@ -97,6 +99,14 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
         _selectionWgt1.setContent(
             '${this.lotInfoData.ItemCode}|${this.lotInfoData.ProcessName}');
         _selectionWgt2.setContent(this.lotInfoData.Qty.toString());
+      }
+
+      List arr2 = responseJson["Extend2"];
+      if (listLength(arr2) > 0) {
+        this.reasonProcessInfo =
+            ProjectReturnRepairmentReasonProcessItemModel.fromJson(arr2.first);
+        _selectionWgt1.setContent(
+            '${this.reasonProcessInfo.StepCode}|${this.reasonProcessInfo.StepName}');
       }
     });
   }
@@ -418,10 +428,11 @@ class _ProjectScrapLotPageState extends State<ProjectScrapLotPage>
     mDict["ScrapCode"] = this.selectedScrapCode.ScrapCode;
     if (this.obtainedPicture != null) {
       mDict["myPic"] = base64Encode(this.obtainedPicture.readAsBytesSync());
+      mDict["myFile"] = "${randomIntWithRange(100000, 1000000).toString()}.png";
     } else {
       mDict["myPic"] = "";
-    }
-    mDict["myFile"] = "";
+      mDict["myFile"] = "";
+    }    
 
     HudTool.show();
     HttpDigger().postWithUri("Repair/ScrapLot", parameters: mDict,

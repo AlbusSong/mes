@@ -76,8 +76,8 @@ class HttpDigger {
 
   final Dio dio = Dio(BaseOptions(
     baseUrl: baseUrl,
-    connectTimeout: 60000,
-    receiveTimeout: 60000,
+    connectTimeout: 30000,
+    receiveTimeout: 30000,
     headers: {
       "user-agent": "MES-App",
       // "api": "1.0.0",

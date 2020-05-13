@@ -259,6 +259,7 @@ class _ProjectReturnRepairmentLotPageState
 
   void _tryToGetImage() {
     print("_tryToGetImage");
+    hideKeyboard(context);
     _popSheetAlertForImage();
   }
 
