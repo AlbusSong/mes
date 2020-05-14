@@ -426,10 +426,11 @@ class _ProjectReturnRepairmentLotPageState
     mDict["RepairCode"] = this.selectedRepairCode.LOTRepairCode;
     if (this.obtainedPicture != null) {
       mDict["myPic"] = base64Encode(this.obtainedPicture.readAsBytesSync());
+      mDict["myFile"] = "${randomIntWithRange(100000, 1000000).toString()}.png";
     } else {
       mDict["myPic"] = "";
-    }
-    mDict["myFile"] = "";
+      mDict["myFile"] = "";
+    }    
 
     HudTool.show();
     HttpDigger().postWithUri("Repair/RepairLot", parameters: mDict,
