@@ -810,12 +810,13 @@ class _QualityPatrolTestWorkOrderReportPageState
     for (int i = 0; i < listLength(this.pictureList); i++) {
       File picture = this.pictureList[i];
       Map picDict = Map();
-      picDict["No"] = i;
-      picDict["PicPath"] = "${randomIntWithRange(100000, 1000000).toString()}.png";
+      picDict["No"] = i;      
       if (picture != null) {
         picDict["Pic"] = base64Encode(picture.readAsBytesSync());
+        picDict["PicPath"] = "${randomIntWithRange(100000, 1000000).toString()}.png";
       } else {
         picDict["Pic"] = "";
+        picDict["PicPath"] = "";
       }
       picList.add(picDict);
     }

@@ -64,7 +64,7 @@ class _MoldLockPageState extends State<MoldLockPage> {
         success: (int code, String message, dynamic responseJson) {
       print("Mould/LoadMould: $responseJson");
       HudTool.dismiss();
-      this.responseJson = responseJson;
+      this.responseJson = responseJson["Extend"];
       _reloadListView();
     });
   }

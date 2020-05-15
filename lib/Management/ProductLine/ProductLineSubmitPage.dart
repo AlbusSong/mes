@@ -93,6 +93,8 @@ class _ProductLineSubmitPageState extends State<ProductLineSubmitPage> {
           .toList();
       if (listLength(arr) > 0) {
         this.productLineDetailData = arr.first;
+      } else {
+        this.productLineDetailData = null;
       }
     });
   }
