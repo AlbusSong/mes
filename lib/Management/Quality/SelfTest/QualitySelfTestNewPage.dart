@@ -268,7 +268,7 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
                   0: Text("OK"),
                   1: Text("NG"),
                 },
-                groupValue: (isAvailable(itemData.Actual) ? (int.parse(itemData.Actual) == 1 ? 0 : 1) : 0),
+                groupValue: (isAvailable(itemData.Actual) ? (int.parse(itemData.Actual) == 1 ? 0 : 1) : null),
                 onValueChanged: (value) {
                   print("onValueChanged: $value");
                   hideKeyboard(context);
