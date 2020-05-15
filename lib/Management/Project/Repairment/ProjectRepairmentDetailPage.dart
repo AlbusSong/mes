@@ -91,7 +91,6 @@ class _ProjectRepairmentDetailPageState
     }
 
     this.lotNo = this.data.LotNo;
-    _pTextInputWgt0.setContent(this.lotNo);
     _getDataFromServer();
   }
 
@@ -175,7 +174,7 @@ class _ProjectRepairmentDetailPageState
     String placeholder = "";
     bool canScan = true;
     if (index == 0) {
-      title = "LotNo/模具ID";
+      title = "载具ID";
       placeholder = "扫描/输入";
     }
     ProjectTextInputWidget wgt = ProjectTextInputWidget(

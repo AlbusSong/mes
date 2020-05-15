@@ -3,11 +3,14 @@ import 'package:mes/Others/Network/HttpDigger.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
 import 'package:mes/Others/Tool/HudTool.dart';
-import 'package:mes/Others/View/SearchBar.dart';
+import 'package:mes/Others/View/SelectionBar.dart';
 
 import 'QualityPatrolTestSubWorkOrderListPage.dart';
 
 import '../Model/QualityPatrolTestWorkOrderItemModel.dart';
+import '../../Project/Model/ProjectLineModel.dart';
+
+import 'package:flutter_picker/flutter_picker.dart';
 
 class QualityPatrolTestWorkOrderPage extends StatefulWidget {
   @override
@@ -18,22 +21,31 @@ class QualityPatrolTestWorkOrderPage extends StatefulWidget {
 
 class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOrderPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final SearchBar _sBar = SearchBar(
-    hintText: "产线代码",
-  );
+  final SelectionBar _sBar = SelectionBar();
 
   String lineCode;
   List arrOfData;
+  List arrOfLineItem;
+  ProjectLineModel selectedLineItem;
 
   @override
   void initState() {
     super.initState();
 
-    _sBar.keyboardReturnBlock = (String c) {
-      this.lineCode = c;
-      _getDataFromServer();
-    };
+    _sBar.setSelectionBlock(() {
+      List<String> arrOfSelectionTitle = [];
+      for (ProjectLineModel m in this.arrOfLineItem) {
+        arrOfSelectionTitle.add('${m.LineName}|${m.LineCode}');
+      }
 
+      if (arrOfSelectionTitle.length == 0) {
+        return;
+      }
+
+      _showPickerWithData(arrOfSelectionTitle, 0);
+    });
+
+    _getProductionLineListFromServer();
     _getDataFromServer();
   }
 
@@ -59,6 +71,23 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
       
       setState(() {        
       });
+    });
+  }
+
+  void _getProductionLineListFromServer() {
+    // LoadMaterial/AllLine
+    HudTool.show();
+    HttpDigger().postWithUri("LoadMaterial/AllLine", parameters: {}, shouldCache: true, success: (int code, String message, dynamic responseJson) {
+      print("LoadMaterial/AllLine: $responseJson");
+      // if (code == 0) {
+      //   HudTool.showInfoWithStatus(message);
+      //   return;
+      // } 
+
+      HudTool.dismiss();
+      this.arrOfLineItem = (responseJson['Extend'] as List)
+          .map((item) => ProjectLineModel.fromJson(item))
+          .toList();           
     });
   }
 
@@ -207,7 +236,28 @@ class _QualityPatrolTestWorkOrderPageState extends State<QualityPatrolTestWorkOr
               builder: (BuildContext context) => w));
   }
 
-  void _btnConfirmClicked() {
-    
+  void _showPickerWithData(List<String> listData, int index) {
+    Picker picker = new Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: listData),
+        changeToFirst: true,
+        textAlign: TextAlign.left,
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List indexOfSelectedItems) {
+          print(indexOfSelectedItems.first);
+          print(picker.getSelectedValues());
+          this._handlePickerConfirmation(indexOfSelectedItems.first,
+              picker.getSelectedValues().first, index);
+        });
+    // picker.show(Scaffold.of(context));
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  void _handlePickerConfirmation(
+      int indexOfSelectedItem, String title, int index) {
+    _sBar.setContent(title);
+    this.selectedLineItem = this.arrOfLineItem[indexOfSelectedItem];
+    this.lineCode = this.selectedLineItem.LineCode;
+
+    _getDataFromServer();
   }
 }
