@@ -1,3 +1,4 @@
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
@@ -27,6 +28,7 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
   String batchNo = "20190111";
   String itemCode = "";
   String tagNo = "";
+  String remarkContent;
   List arrOfData;
   List<bool> expansionList = List();
   List<bool> selectionList = List();
@@ -36,13 +38,15 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
   void initState() {
     super.initState();
 
+    this.batchNo = formatDate(DateTime.now(), ["yyyy", "mm", "dd"]);
+
     _pTextInputWgt0 = _buildTextInputWidgetItem(0);
     _pTextInputWgt1 = _buildTextInputWidgetItem(1);
     _pTextInputWgt2 = _buildTextInputWidgetItem(2);
 
     _pTextInputWgt0.setContent(this.batchNo);
     _pTextInputWgt1.setContent(this.itemCode);
-    _pTextInputWgt2.setContent(this.tagNo);
+    _pTextInputWgt2.setContent(this.tagNo);    
 
     _getDataFromServer();    
   }
@@ -393,8 +397,14 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
       return;
     }
 
-    bool isOkay = await AlertTool.showStandardAlert(context, "确定锁定?");    
-    if (isOkay) {
+    Map resultDict = await AlertTool.showInputFeildAlert(_scaffoldKey.currentContext, "确定提交?", placeholder: "请输入备注信息");
+    this.remarkContent = resultDict["text"];
+    if (isAvailable(this.remarkContent) == false) {
+      HudTool.showInfoWithStatus("需要输入备注信息");
+      return;
+    }
+
+    if (resultDict["confirmation"] == true) {
       _realConfirmationAction(selectedItems);
     }
   }
@@ -402,10 +412,12 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
   void _realConfirmationAction(List selectedItems) {
     // LoadPlanProcess/LockTag
     String tagIDString = "";
+    String itemCodeString = "";
     for (int i = 0; i < listLength(selectedItems); i++) {
       QualityMaterialHoldItemModel item = selectedItems[i];
+      itemCodeString = item.ItemCode;
       if (i == listLength(selectedItems) - 1) {
-        // 如果是最好一个元素
+        // 如果是最后一个元素
         tagIDString += item.TagID;
       } else {
         tagIDString += "${item.TagID},";
@@ -415,6 +427,9 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
 
     Map mDict = Map();
     mDict["TagID"] = tagIDString;
+    mDict["ItemCode"] = itemCodeString;
+    mDict["Batch"] = this.batchNo;
+    mDict["Remark"] = this.remarkContent;
 
     HudTool.show();
     HttpDigger().postWithUri("LoadPlanProcess/LockTag", parameters: mDict, success: (int code, String message, dynamic responseJson) {
