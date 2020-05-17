@@ -63,11 +63,13 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            LoginInputItem(this.username, "用户名", false, EdgeInsets.fromLTRB(25, 25, 25, 0),
+            LoginInputItem(
+                this.username, "用户名", false, EdgeInsets.fromLTRB(25, 25, 25, 0),
                 (newText) {
               this.username = newText;
             }),
-            LoginInputItem(this.password, "密码", true, EdgeInsets.fromLTRB(25, 25, 25, 0),
+            LoginInputItem(
+                this.password, "密码", true, EdgeInsets.fromLTRB(25, 25, 25, 0),
                 (newText) {
               this.password = newText;
             }),
@@ -76,13 +78,15 @@ class _LoginPageState extends State<LoginPage> {
               color: Colors.white,
               height: 25,
               child: FlatButton.icon(
-                icon: Icon((this.shouldRememberMe ? Icons.check_box : Icons.check_box_outline_blank)),
+                icon: Icon((this.shouldRememberMe
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank)),
                 label: Text(
                   "记住账户",
                   style: TextStyle(fontSize: 15, color: hexColor("333333")),
                 ),
                 onPressed: () {
-                  print("记住账户");                  
+                  print("记住账户");
                   setState(() {
                     this.shouldRememberMe = !this.shouldRememberMe;
                   });
@@ -119,20 +123,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _tryToLogin() {
-     if (isAvailable(this.username) == false) {
-       HudTool.showInfoWithStatus("请输入用户名");
-       return;
-     }
+    if (isAvailable(this.username) == false) {
+      HudTool.showInfoWithStatus("请输入用户名");
+      return;
+    }
 
-     if (isAvailable(this.password) == false) {
-       HudTool.showInfoWithStatus("请输入密码");
-       return;
-     }
+    if (isAvailable(this.password) == false) {
+      HudTool.showInfoWithStatus("请输入密码");
+      return;
+    }
 
     hideKeyboard(context);
 
     HudTool.show();
-    HttpDigger.login(this.username, this.password, success: (int code, String message, dynamic responseJson) {
+    Future.delayed(Duration(seconds: 1), () {
+      _loginAction();
+    });
+  }
+
+  void _loginAction() {
+    HttpDigger.login(this.username, this.password,
+        success: (int code, String message, dynamic responseJson) {
       print("Login/OutOnline: $responseJson");
       if (code == 0) {
         HudTool.showInfoWithStatus(message);
@@ -140,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       Navigator.pop(_scaffoldKey.currentContext);
-      
+
       HudTool.showInfoWithStatus(message);
       MeInfo().isLogined = true;
       MeInfo().shouldRememberMe = this.shouldRememberMe;
@@ -151,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
 
       // Future.delayed(Duration(seconds: 2), (){
       //   _afterLoginAction();
-      // });      
+      // });
     }, failure: (dynamic e) {
       HudTool.showInfoWithStatus("${e.toString()}");
     });
