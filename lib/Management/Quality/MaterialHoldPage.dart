@@ -139,7 +139,7 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
           child: FlatButton(
             textColor: Colors.white,
             color: hexColor(MAIN_COLOR),
-            child: Text("锁定"),
+            child: Text("解锁"),
             onPressed: () {
               _btnConfirmClicked();
             },
@@ -397,7 +397,7 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
       return;
     }
 
-    Map resultDict = await AlertTool.showInputFeildAlert(_scaffoldKey.currentContext, "确定提交?", placeholder: "请输入备注信息");
+    Map resultDict = await AlertTool.showInputFeildAlert(_scaffoldKey.currentContext, "确定锁定?", placeholder: "请输入备注信息");
     this.remarkContent = resultDict["text"];
     if (isAvailable(this.remarkContent) == false) {
       HudTool.showInfoWithStatus("需要输入备注信息");

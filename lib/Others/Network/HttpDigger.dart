@@ -71,8 +71,8 @@ class HttpDigger {
     HttpDigger.login(MeInfo().username, MeInfo().password);
   }
 
-  // static const String baseUrl = "https://szzivos.51vip.biz/";
-  static const String baseUrl = "http://172.65.0.41:8181/";
+  static const String baseUrl = "https://szzivos.51vip.biz/";
+  // static const String baseUrl = "http://172.65.0.41:8181/";
 
   final Dio dio = Dio(BaseOptions(
     baseUrl: baseUrl,

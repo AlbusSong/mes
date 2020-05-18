@@ -1,3 +1,4 @@
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:mes/Others/Tool/GlobalTool.dart';
 import 'package:mes/Others/Const/Const.dart';
@@ -27,6 +28,7 @@ class _MaterialUnholdPageState extends State<MaterialUnholdPage> {
   String batchNo = "20190111";
   String itemCode = "";
   String tagNo = "";
+  String remarkContent;
   List arrOfData;
   List<bool> expansionList = List();
   List<bool> selectionList = List();
@@ -35,6 +37,8 @@ class _MaterialUnholdPageState extends State<MaterialUnholdPage> {
   @override
   void initState() {
     super.initState();
+
+    this.batchNo = formatDate(DateTime.now(), ["yyyy", "mm", "dd"]);
 
     _pTextInputWgt0 = _buildTextInputWidgetItem(0);
     _pTextInputWgt1 = _buildTextInputWidgetItem(1);
@@ -135,7 +139,7 @@ class _MaterialUnholdPageState extends State<MaterialUnholdPage> {
           child: FlatButton(
             textColor: Colors.white,
             color: hexColor(MAIN_COLOR),
-            child: Text("锁定"),
+            child: Text("解锁"),
             onPressed: () {
               _btnConfirmClicked();
             },
@@ -393,8 +397,14 @@ class _MaterialUnholdPageState extends State<MaterialUnholdPage> {
       return;
     }
 
-    bool isOkay = await AlertTool.showStandardAlert(context, "确定锁定?");    
-    if (isOkay) {
+    Map resultDict = await AlertTool.showInputFeildAlert(_scaffoldKey.currentContext, "确定解Hold?", placeholder: "请输入备注信息");
+    this.remarkContent = resultDict["text"];
+    if (isAvailable(this.remarkContent) == false) {
+      HudTool.showInfoWithStatus("需要输入备注信息");
+      return;
+    }
+
+    if (resultDict["confirmation"] == true) {
       _realConfirmationAction(selectedItems);
     }
   }
@@ -402,8 +412,10 @@ class _MaterialUnholdPageState extends State<MaterialUnholdPage> {
   void _realConfirmationAction(List selectedItems) {
     // LoadPlanProcess/UnLockTag
     String tagIDString = "";
+    String itemCodeString = "";
     for (int i = 0; i < listLength(selectedItems); i++) {
       QualityMaterialHoldItemModel item = selectedItems[i];
+      itemCodeString = item.ItemCode;
       if (i == listLength(selectedItems) - 1) {
         // 如果是最好一个元素
         tagIDString += item.TagID;
@@ -415,6 +427,9 @@ class _MaterialUnholdPageState extends State<MaterialUnholdPage> {
 
     Map mDict = Map();
     mDict["TagID"] = tagIDString;
+    mDict["ItemCode"] = itemCodeString;
+    mDict["Batch"] = this.batchNo;
+    mDict["Remark"] = this.remarkContent;
 
     HudTool.show();
     HttpDigger().postWithUri("LoadPlanProcess/UnLockTag", parameters: mDict, success: (int code, String message, dynamic responseJson) {
