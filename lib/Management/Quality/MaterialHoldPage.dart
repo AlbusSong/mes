@@ -139,7 +139,7 @@ class _MaterialHoldPageState extends State<MaterialHoldPage> {
           child: FlatButton(
             textColor: Colors.white,
             color: hexColor(MAIN_COLOR),
-            child: Text("解锁"),
+            child: Text("锁定"),
             onPressed: () {
               _btnConfirmClicked();
             },

@@ -287,6 +287,8 @@ class _QualitySelfTestNewPageState extends State<QualitySelfTestNewPage> {
   void _showPickerWithData(List<String> listData, int index) {
     Picker picker = new Picker(
         adapter: PickerDataAdapter<String>(pickerdata: listData),
+        cancelText: "取消",
+        confirmText: "确定",
         changeToFirst: true,
         textAlign: TextAlign.left,
         columnPadding: const EdgeInsets.all(8.0),
